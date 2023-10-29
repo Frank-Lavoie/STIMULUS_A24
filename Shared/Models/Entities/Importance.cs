@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STIMULUS.Shared.Models.Entities
+namespace STIMULUS_V2.Shared.Models.Entities
 {
     public class Importance
     {

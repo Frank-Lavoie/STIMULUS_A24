@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using STIMULUS.Shared.Models.Entities;
+using STIMULUS_V2.Shared.Models.Entities;
 
 namespace STIMULUS_V2.Server.Data
 {
