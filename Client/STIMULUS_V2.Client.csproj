@@ -20,4 +20,8 @@
     <Folder Include="Services\Interfaces\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\css\MainFooter.css" />
+  </ItemGroup>
+
 </Project>

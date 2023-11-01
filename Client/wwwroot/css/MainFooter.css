@@ -1,0 +1,50 @@
+﻿/*Modification footer*/
+.custom-footer-background {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    margin-top: auto;
+    width: 100%;
+    height: 95%;
+    background-color: darkblue;
+}
+
+.custom-footer-bigger-text {
+    color: #FFFFFF;
+    align-items: center;
+    font-size: larger;
+    font-weight: bolder;
+    text-align: center;
+}
+
+.custom-footer-smaller-text {
+    color: #FFFFFF;
+    align-items: center;
+    font-weight: bolder;
+    font-size: smaller;
+    text-align: center;
+}
+
+.custom-column-cepi {
+    padding-right: 10%;
+}
+
+.custom-column-cr {
+    padding-right: 10%;
+}
+
+.custom-column-img {
+    padding-left: 19%;
+    padding-right: 10%;
+}
+
+.custom-image {
+    width: 35%;
+    height: auto;
+    border-radius: 10%;
+}
+
+.custom-icon {
+    font-size: 16px;
+}

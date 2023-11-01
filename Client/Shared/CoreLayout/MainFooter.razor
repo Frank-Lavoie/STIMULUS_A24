@@ -1,11 +1,8 @@
-﻿<RadzenFooter class="containerFooter ">
+﻿<RadzenFooter class="custom-footer-background">
     <RadzenRow Gap="1rem">
-        <RadzenColumn Size="5" class="rz-p-5 text-center">
+        <RadzenColumn Size="5" class="custom-column-cepi">
             <RadzenRow class="d-flex flex-column custom-footer-bigger-text">
                  CEPI
-            </RadzenRow>
-            <RadzenRow class="d-flex flex-column custom-footer-smaller-text">
-                Nous contacter
             </RadzenRow>
             <RadzenRow class="d-flex flex-column custom-footer-smaller-text">
                 Contact: +1(418)541-2205
@@ -14,25 +11,27 @@
                 E-Mail: aidecepi@Gmail.com
             </RadzenRow>
         </RadzenColumn>
-        <RadzenColumn Size="3" class="rz-p-5 text-center">
-            <RadzenRow class="d-flex flex-column custom-footer-bigger-text">
-                2023 Copyright
+        <RadzenColumn Size="3" class="text-center custom-column-cr">
+            <RadzenRow class="d-flex custom-footer-bigger-text">
+                Copyright
             </RadzenRow>
             <RadzenRow class="d-flex flex-column custom-footer-smaller-text">
-                Tout droit réservés
+                <div class="d-flex align-items-center">
+                    <RadzenIcon Icon="copyright" class="mr-2 custom-icon" />
+                    <span>2023 CEPI</span>
+                </div>
             </RadzenRow>
         </RadzenColumn>
-        <RadzenColumn Size="4" class="rz-p-5 text-center">
+        <RadzenColumn Size="4" class="text-center">
             <RadzenRow class="d-flex flex-column custom-footer-bigger-text">
                 Nos partenaires
             </RadzenRow>
-            <RadzenRow class="d-flex justify-content-center custom-column">
+            <RadzenRow class="d-flex justify-content-center custom-column-img">
                 <RadzenImage Path="/RessourceVisuel/LogoCegep.jpg" class="custom-image" />
                 <RadzenImage Path="/RessourceVisuel/LogoDICJ.jpg" class="custom-image" />
             </RadzenRow>
         </RadzenColumn>
     </RadzenRow>
-
 </RadzenFooter>
 
 @code {
