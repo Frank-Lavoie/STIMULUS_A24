@@ -62,3 +62,54 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+/*
+Modification générale*/
+.row {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+    
+/*Modification footer*/
+.containerFooter {
+    background-color: #00008B;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    margin-top: auto;
+    padding-bottom: 1vh;
+    height: auto;
+    order: 3;
+}
+
+.custom-footer-bigger-text {
+    margin-bottom: 5px;
+    padding-top: 10px;
+    color: #FFFFFF;
+    align-items: center;
+    font-size: larger;
+    font-weight: bolder;
+    text-align: center;
+}
+
+.custom-footer-smaller-text {
+    margin: 0;
+    padding: 0;
+    color: #FFFFFF;
+    align-items: center;
+    font-weight: bolder;
+    font-size: smaller;
+    text-align: center;
+}
+
+.custom-column {
+    padding-left: 10%;
+}
+
+.custom-image {
+    width: 35%;
+    height: auto;
+    border-radius: 18%;
+}

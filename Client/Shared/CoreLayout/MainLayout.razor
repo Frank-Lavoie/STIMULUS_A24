@@ -1,19 +1,15 @@
-﻿@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase 
 
-<RadzenComponents />
+<RadzenComponents/>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<RadzenLayout>
+	<MainMenu sidebarExpanded=false />
+	<RadzenBody>
+		@Body
+	</RadzenBody>
+	<MainFooter />
+</RadzenLayout>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+@code{
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+}

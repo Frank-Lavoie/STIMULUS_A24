@@ -1,0 +1,16 @@
+﻿<MainMenuHeader sidebarExpanded=sidebarExpanded SidebarExpandedChanged="ToggleSidebar" />
+<MainMenuSidebar sidebarExpanded=sidebarExpanded />
+
+@code {
+    /// <summary>
+    /// Define if the sidebar should be extended when the page is first loaded.
+    /// Default to false.
+    /// </summary>
+    [Parameter]
+    public bool sidebarExpanded { get; set; } = false;
+
+    private void ToggleSidebar(bool HeaderIsExpand)
+    {
+        sidebarExpanded = HeaderIsExpand;
+    }
+}

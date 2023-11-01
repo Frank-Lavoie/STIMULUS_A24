@@ -1,0 +1,10 @@
+﻿<RadzenSidebar Style="width:auto">
+    <RadzenSidebar @bind-Expanded="@sidebarExpanded" Responsive=false>
+        À FAIRE
+    </RadzenSidebar>
+</RadzenSidebar>
+
+@code {
+    [Parameter]
+    public bool sidebarExpanded { get; set; } = false;
+}
