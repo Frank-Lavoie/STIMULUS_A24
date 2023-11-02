@@ -31,12 +31,10 @@ builder.Services.AddScoped<IModelService<Graphe, int>, GrapheService>();
 builder.Services.AddScoped<IModelService<Groupe, int>, GroupeService>();
 builder.Services.AddScoped<IModelService<Image, int>, ImageService>();
 builder.Services.AddScoped<IModelService<Importance, int>, ImportanceService>();
-builder.Services.AddScoped<IModelService<LienUtile, int>, LienUtileService>();
 builder.Services.AddScoped<IModelService<Noeud, int>, NoeudService>();
 builder.Services.AddScoped<IModelService<Page, int>, PageService>();
 builder.Services.AddScoped<IModelService<Professeur, string>, ProfesseurService>();
 builder.Services.AddScoped<IModelService<Reference, int>, ReferenceService>();
-builder.Services.AddScoped<IModelService<StatusGraphe, string>, StatusGrapheService>();
 builder.Services.AddScoped<IModelService<TexteFormater, int>, TexteFormaterService>();
 builder.Services.AddScoped<IModelService<Video, int>, VideoService>();
 

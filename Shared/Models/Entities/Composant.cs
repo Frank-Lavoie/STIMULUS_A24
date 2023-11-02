@@ -16,10 +16,6 @@ namespace STIMULUS_V2.Shared.Models.Entities
         [Column(TypeName = "nvarchar(20)")]
         public string? Type { get; set; }
 
-        [ForeignKey("Reference")]
-        public int? ReferenceId { get; set; }
-        public Reference? Reference { get; set; }
-
         [ForeignKey("Page")]
         public int? PageId { get; set; }
         public Page? Page { get; set; }

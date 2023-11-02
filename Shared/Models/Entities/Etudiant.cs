@@ -22,9 +22,5 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [Column(TypeName = "nvarchar(50)")]
         public string? MotDePasse { get; set; }
-
-        [ForeignKey("Groupe")]
-        public int? GroupeId { get; set; }
-        public Groupe? Groupe { get; set; }
     }
 }

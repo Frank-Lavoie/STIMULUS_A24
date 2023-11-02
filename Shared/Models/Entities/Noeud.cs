@@ -12,13 +12,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public int NoeudId { get; set; }
 
         [Column(TypeName = "nvarchar(10)")]
-        public string code { get; set; }
+        public string Nom { get; set; }
 
         [Column(TypeName = "nvarchar(255)")]
         public string Description { get; set; }
 
         public DateTime Disponibilite { get; set; } = DateTime.Now;
-        public int Pts { get; set; } = 0;
         public bool Obligatoire { get; set; } = false;
         public int Status { get; set; }
 
@@ -38,9 +37,9 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public int? GrapheId { get; set; }
         public Graphe? Graphe { get; set; }
 
-        [ForeignKey("NoeudLiaison")]
-        public int? NoeudLiaisonId { get; set; }
-        public Noeud? NoeudLiaison { get; set; }
+        [ForeignKey("NoeudParent")]
+        public int? NoeudParentId { get; set; }
+        public Noeud? NoeudParent { get; set; }
     }
 
     public enum NoeudType

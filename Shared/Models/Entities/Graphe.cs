@@ -17,15 +17,9 @@ namespace STIMULUS_V2.Shared.Models.Entities
         [Column(TypeName = "varchar(10)")]
         public GrapheStatus Status { get; set; }
 
-
-        [ForeignKey("StatusGraphe")]
-        public string? StatusGrapheId { get; set; }
-        public StatusGraphe? StatusGraphe { get; set; }
-
-
-        [ForeignKey("Cours")]
-        public int? CoursId { get; set; }
-        public Cours? Cours { get; set; }
+        [ForeignKey("Groupe")]
+        public int? GroupeId { get; set; }
+        public Groupe? Groupe { get; set; }
     }
 
     public enum GrapheStatus

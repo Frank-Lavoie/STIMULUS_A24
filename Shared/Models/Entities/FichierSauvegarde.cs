@@ -18,11 +18,9 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public string? Contenue { get; set; }
         public DateTime Version { get; set; } = DateTime.Now;
 
-        [ForeignKey("Page_Etudiant")]
-        public int? Page_EtudiantId { get; set; }
-        public Page_Etudiant? Page_Etudiant { get; set; }
-
+        [ForeignKey("Etudiant")]
+        public int? CodeDA { get; set; }
+        public Etudiant? Etudiant { get; set; }
         
-
     }
 }
