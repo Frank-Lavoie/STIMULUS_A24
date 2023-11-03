@@ -1,13 +1,18 @@
 ﻿@inherits LayoutComponentBase 
 
 <RadzenComponents/>
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
 
 <RadzenLayout>
-	<MainMenu sidebarExpanded=false />
+	<Header/>
+	<Menu sidebarExpanded=false /> 
 	<RadzenBody>
 		@Body
-	</RadzenBody>
-	<MainFooter />
+ 	</RadzenBody>
+	<Footer />
 </RadzenLayout>
 
 @code{

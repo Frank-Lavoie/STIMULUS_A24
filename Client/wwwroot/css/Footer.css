@@ -1,13 +1,12 @@
 ﻿/*Modification footer*/
 .custom-footer-background {
+    background-color: darkblue;
     display: flex;
     flex-direction: column;
     text-align: center;
     align-items: center;
-    margin-top: auto;
     width: 100%;
-    height: 95%;
-    background-color: darkblue;
+    height: 100%;
 }
 
 .custom-footer-bigger-text {
@@ -26,25 +25,25 @@
     text-align: center;
 }
 
-.custom-column-cepi {
+.custom-footer-column-cepi {
     padding-right: 10%;
 }
 
-.custom-column-cr {
+.custom-footer-column-cr {
     padding-right: 10%;
 }
 
-.custom-column-img {
+.custom-footer-column-img {
     padding-left: 19%;
     padding-right: 10%;
 }
 
-.custom-image {
+.custom-footer-image {
     width: 35%;
     height: auto;
     border-radius: 10%;
 }
 
-.custom-icon {
+.custom-footer-icon {
     font-size: 16px;
 }

@@ -1,0 +1,17 @@
+﻿.custom-header-background {
+    background-color: darkblue;
+}
+
+.custom-header-image {
+    text-align: center;
+    width: 10%;
+    height: 10%;
+    float: right;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.custom-header-radzen-breadcrumb{
+    font-size:smaller;
+    font-weight:bolder;
+}

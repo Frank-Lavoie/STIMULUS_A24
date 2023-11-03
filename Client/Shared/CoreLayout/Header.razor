@@ -1,0 +1,40 @@
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration config;
+
+<RadzenHeader class="custom-header-background">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+        <RadzenSidebarToggle Click="@ToggleSidebar" />
+        <RadzenImage Path="/RessourceVisuel/LogoCEPI.png" class="custom-header-image" />
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2rem">
+            <RadzenLabel Text=@config["Title"] />
+            <div>
+                <RadzenBreadCrumb class="custom-header-radzen-breadcrumb">
+                    <RadzenBreadCrumbItem Path="/" style="white-space: nowrap;" Text="Tableau de bord" />
+                </RadzenBreadCrumb>
+            </div>
+        </RadzenStack>
+        <RadzenProfileMenu Style="background-color: darkblue; margin-left: 60%;">
+            <Template>
+                <RadzenIcon Icon="account_circle"></RadzenIcon>
+            </Template>
+            <ChildContent>
+                <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="list"></RadzenProfileMenuItem>
+                 <RadzenProfileMenuItem Text="Réglages" Path="settings" Icon="build" ></RadzenProfileMenuItem>
+                <RadzenProfileMenuItem Text="Déconnexion" Path="deconnexion" Icon="exit_to_app"></RadzenProfileMenuItem>
+            </ChildContent>
+        </RadzenProfileMenu>
+    </RadzenStack>
+</RadzenHeader>
+
+@code {
+    [Parameter]
+    public bool sidebarExpanded { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<bool> SidebarExpandedChanged { get; set; }
+
+    private void ToggleSidebar()
+    {
+        sidebarExpanded = !sidebarExpanded;
+        SidebarExpandedChanged.InvokeAsync(sidebarExpanded);
+    }
+}

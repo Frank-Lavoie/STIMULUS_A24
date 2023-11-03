@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\css\MainFooter.css" />
+    <None Include="wwwroot\css\Footer.css" />
   </ItemGroup>
 
 </Project>
