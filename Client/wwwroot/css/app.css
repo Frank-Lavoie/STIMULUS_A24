@@ -71,9 +71,3 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
-
-/*SideBar Icon Expanded*/
-/*Define sidebar width variable*/
-:root {
-    --rz-sidebar-icon-width: calc(2 * var(--rz-sidebar-toggle-padding) + var(--rz-sidebar-toggle-icon-width) + var(--rz-border-width));
-}
