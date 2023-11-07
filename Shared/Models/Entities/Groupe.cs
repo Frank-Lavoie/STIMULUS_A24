@@ -14,6 +14,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
         [Column(TypeName = "nvarchar(10)")]
         public string Nom { get; set; }
 
+        [Column(TypeName = "Date")]
+        public DateTime DateCreation { get; set; }
+
+        [Column(TypeName = "Date")]
+        public DateTime DateCloture { get; set; }
+
         [ForeignKey("Cours")]
         public int? CoursId { get; set; }
         public Cours? Cours { get; set; }

@@ -11,6 +11,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
     {
         public int Page_EtudiantId { get; set; }
 
+        [Column(TypeName = "Date")]
+        public DateTime DateDebut { get; set; }
+
+        [Column(TypeName = "Date")]
+        public DateTime DateFin { get; set; }
+
         [ForeignKey("Page")]
         public int? PageId { get; set; }
         public Page? Page { get; set; }
