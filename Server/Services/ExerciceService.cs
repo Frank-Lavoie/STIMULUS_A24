@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using STIMULUS_V2.Server.Data;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
 using System.Linq;
 
 namespace STIMULUS_V2.Server.Services
 {
-    public class ExercieService : IModelService<Exercice, int>
+    public class ExerciceService : IExerciceService
     {
         private readonly STIMULUSContext sTIMULUSContext;
 
-        public ExercieService(STIMULUSContext sTIMULUSContext)
+        public ExerciceService(STIMULUSContext sTIMULUSContext)
         {
             this.sTIMULUSContext = sTIMULUSContext;
         }
@@ -113,7 +113,7 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
-        public Task<APIResponse<IEnumerable<Exercice>>> GetFromParentId(int id)
+        public Task<APIResponse<IEnumerable<Exercice>>> GetAllById(int id)
         {
             throw new NotImplementedException();
         }

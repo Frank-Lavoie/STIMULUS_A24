@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.Entities;
 
 namespace STIMULUS_V2.Server.Controllers
@@ -8,9 +8,9 @@ namespace STIMULUS_V2.Server.Controllers
     [ApiController]
     public class EtudiantController : Controller
     {
-        private readonly IModelService<Etudiant, int> etudiantService;
+        private readonly IEtudiantService etudiantService;
 
-        public EtudiantController(IModelService<Etudiant, int> etudiantService)
+        public EtudiantController(IEtudiantService etudiantService)
         {
             this.etudiantService = etudiantService;
         }
@@ -23,14 +23,14 @@ namespace STIMULUS_V2.Server.Controllers
         }
 
         [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
             var response = await etudiantService.Delete(id);
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpGet("Fetch/{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
             var response = await etudiantService.Get(id);
             return StatusCode(response.StatusCode, response);
@@ -43,15 +43,15 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("Fetch/FromParent/{id}")]
-        public async Task<IActionResult> GetFromParentId(int id)
+        [HttpGet("Fetch/All/{id}")]
+        public async Task<IActionResult> GetAllById(int id)
         {
-            var response = await etudiantService.GetFromParentId(id);
+            var response = await etudiantService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpPut("Update/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Etudiant etudiant)
+        public async Task<IActionResult> Update(string id, [FromBody] Etudiant etudiant)
         {
             var response = await etudiantService.Update(id, etudiant);
             return StatusCode(response.StatusCode, response);

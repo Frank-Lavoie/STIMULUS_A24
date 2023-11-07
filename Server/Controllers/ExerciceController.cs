@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.Entities;
 
 namespace STIMULUS_V2.Server.Controllers
@@ -8,9 +8,9 @@ namespace STIMULUS_V2.Server.Controllers
     [ApiController]
     public class ExerciceController : Controller
     {
-        private readonly IModelService<Exercice, int> exerciceService;
+        private readonly IExerciceService exerciceService;
 
-        public ExerciceController(IModelService<Exercice, int> exerciceService)
+        public ExerciceController(IExerciceService exerciceService)
         {
             this.exerciceService = exerciceService;
         }
@@ -43,10 +43,10 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("Fetch/FromParent/{id}")]
-        public async Task<IActionResult> GetFromParentId(int id)
+        [HttpGet("Fetch/All/{id}")]
+        public async Task<IActionResult> GetAllById(int id)
         {
-            var response = await exerciceService.GetFromParentId(id);
+            var response = await exerciceService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
 

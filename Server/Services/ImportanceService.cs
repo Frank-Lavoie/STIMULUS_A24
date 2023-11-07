@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using STIMULUS_V2.Server.Data;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
 
 namespace STIMULUS_V2.Server.Services
 {
-    public class ImportanceService : IModelService<Importance, int>
+    public class ImportanceService : IImportanceService
     {
         private readonly STIMULUSContext sTIMULUSContext;
 
@@ -112,7 +112,7 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
-        public async Task<APIResponse<IEnumerable<Importance>>> GetFromParentId(int id)
+        public async Task<APIResponse<IEnumerable<Importance>>> GetAllById(int id)
         {
             try
             {

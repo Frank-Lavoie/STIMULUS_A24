@@ -1,11 +1,11 @@
-﻿using STIMULUS_V2.Client.Services.Interfaces;
+﻿using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
 using System.Net.Http.Json;
 
 namespace STIMULUS_V2.Client.Services
 {
-    public class PageService : IModelService<Page, int>
+    public class PageService : IPageService
     {
         private readonly HttpClient _httpClient;
 
@@ -37,7 +37,7 @@ namespace STIMULUS_V2.Client.Services
             return result;
         }
 
-        public Task<APIResponse<IEnumerable<Page>>> GetFromParentId(int id)
+        public Task<APIResponse<IEnumerable<Page>>> GetAllById(int id)
         {
             throw new NotImplementedException();
         }

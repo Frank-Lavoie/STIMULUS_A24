@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.Entities;
 
 namespace STIMULUS_V2.Server.Controllers
@@ -8,9 +8,9 @@ namespace STIMULUS_V2.Server.Controllers
     [ApiController]
     public class NoeudController : Controller
     {
-        private readonly IModelService<Noeud, int> noeudService;
+        private readonly INoeudService noeudService;
 
-        public NoeudController(IModelService<Noeud, int> noeudService)
+        public NoeudController(INoeudService noeudService)
         {
             this.noeudService = noeudService;
         }
@@ -43,10 +43,10 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("Fetch/FromParent/{id}")]
-        public async Task<IActionResult> GetFromParentId(int id)
+        [HttpGet("Fetch/All/{id}")]
+        public async Task<IActionResult> GetAllById(int id)
         {
-            var response = await noeudService.GetFromParentId(id);
+            var response = await noeudService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
 

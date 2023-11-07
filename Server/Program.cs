@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using STIMULUS_V2.Server.Data;
 using Serilog;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.Entities;
 using STIMULUS_V2.Server.Services;
 
@@ -20,23 +20,23 @@ builder.Host.UseSerilog((ctx, lc) =>
 builder.Services.AddDbContextPool<STIMULUSContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("STIMULUSConnection")));
 
-builder.Services.AddScoped<IModelService<Code, int>, CodeService>();
-builder.Services.AddScoped<IModelService<Composant, int>, ComposantService>();
-builder.Services.AddScoped<IModelService<Cours, int>, CoursService>();
-builder.Services.AddScoped<IModelService<Etudiant, string>, EtudiantService>();
-builder.Services.AddScoped<IModelService<Exercice, int>, ExercieService>();
-builder.Services.AddScoped<IModelService<FichierSauvegarde, int>, FichierSauvegardeService>();
-builder.Services.AddScoped<IModelService<FichierSource, int>, FichierSourceService>();
-builder.Services.AddScoped<IModelService<Graphe, int>, GrapheService>();
-builder.Services.AddScoped<IModelService<Groupe, int>, GroupeService>();
-builder.Services.AddScoped<IModelService<Image, int>, ImageService>();
-builder.Services.AddScoped<IModelService<Importance, int>, ImportanceService>();
-builder.Services.AddScoped<IModelService<Noeud, int>, NoeudService>();
-builder.Services.AddScoped<IModelService<Page, int>, PageService>();
-builder.Services.AddScoped<IModelService<Professeur, string>, ProfesseurService>();
-builder.Services.AddScoped<IModelService<Reference, int>, ReferenceService>();
-builder.Services.AddScoped<IModelService<TexteFormater, int>, TexteFormaterService>();
-builder.Services.AddScoped<IModelService<Video, int>, VideoService>();
+builder.Services.AddScoped<ICodeService, CodeService>();
+builder.Services.AddScoped<IComposantService, ComposantService>();
+builder.Services.AddScoped<ICoursService, CoursService>();
+builder.Services.AddScoped<IEtudiantService, EtudiantService>();
+builder.Services.AddScoped<IExerciceService, ExerciceService>();
+builder.Services.AddScoped<IFichierSauvegardeService, FichierSauvegardeService>();
+builder.Services.AddScoped<IFichierSourceService, FichierSourceService>();
+builder.Services.AddScoped<IGrapheService, GrapheService>();
+builder.Services.AddScoped<IGroupeService, GroupeService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IImportanceService, ImportanceService>();
+builder.Services.AddScoped<INoeudService, NoeudService>();
+builder.Services.AddScoped<IPageService, PageService>();
+builder.Services.AddScoped<IProfesseurService, ProfesseurService>();
+builder.Services.AddScoped<IReferenceService, ReferenceService>();
+builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
+builder.Services.AddScoped<IVideoService, VideoService>();
 
 
 var app = builder.Build();

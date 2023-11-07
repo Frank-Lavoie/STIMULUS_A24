@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.Entities;
 
 namespace STIMULUS_V2.Server.Controllers
@@ -8,9 +8,9 @@ namespace STIMULUS_V2.Server.Controllers
     [ApiController]
     public class GroupeController : Controller
     {
-        private readonly IModelService<Groupe, int> groupeService;
+        private readonly IGroupeService groupeService;
 
-        public GroupeController(IModelService<Groupe, int> groupeService)
+        public GroupeController(IGroupeService groupeService)
         {
             this.groupeService = groupeService;
         }
@@ -43,10 +43,10 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("Fetch/FromParent/{id}")]
-        public async Task<IActionResult> GetFromParentId(int id)
+        [HttpGet("Fetch/All/{id}")]
+        public async Task<IActionResult> GetAllById(int id)
         {
-            var response = await groupeService.GetFromParentId(id);
+            var response = await groupeService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.Entities;
 using System.ComponentModel;
 
@@ -9,9 +9,9 @@ namespace STIMULUS_V2.Server.Controllers
     [ApiController]
     public class ComposantController : Controller
     {
-        private readonly IModelService<Composant, int> composantService;
+        private readonly IComposantService composantService;
 
-        public ComposantController(IModelService<Composant, int> composantService)
+        public ComposantController(IComposantService composantService)
         {
             this.composantService = composantService;
         }
@@ -44,10 +44,10 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("Fetch/FromParent/{id}")]
-        public async Task<IActionResult> GetFromParentId(int id)
+        [HttpGet("Fetch/All/{id}")]
+        public async Task<IActionResult> GetAllById(int id)
         {
-            var response = await composantService.GetFromParentId(id);
+            var response = await composantService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
 

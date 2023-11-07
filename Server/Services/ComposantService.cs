@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using STIMULUS_V2.Server.Data;
-using STIMULUS_V2.Server.Services.Interfaces;
+using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
 using System.Linq;
 
 namespace STIMULUS_V2.Server.Services
 {
-    public class ComposantService : IModelService<Composant, int>
+    public class ComposantService : IComposantService
     {
         private readonly STIMULUSContext sTIMULUSContext;
 
@@ -113,7 +113,7 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
-        public async Task<APIResponse<IEnumerable<Composant>>> GetFromParentId(int id)
+        public async Task<APIResponse<IEnumerable<Composant>>> GetAllById(int id)
         {
             try
             {
