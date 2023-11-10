@@ -1,6 +1,6 @@
 ﻿.custom-header-background {
-    background-color: darkblue;
-}
+/*    background-color: darkblue;
+*/}
 
 .custom-header-image {
     width: 75px;
@@ -11,37 +11,4 @@
 .custom-header-radzen-breadcrumb{
     font-size:smaller;
     font-weight:bolder;
-}
-
-:root {
-    --rz-sidebar-icon-width: calc(2 * var(--rz-sidebar-toggle-padding) + var(--rz-sidebar-toggle-icon-width) + var(--rz-border-width));
-}
-
-.rz-navigation-item {
-    white-space: nowrap;
-}
-
-.rz-sidebar {
-    padding-right: 0;
-}
-
-@media (max-width: 1279px) {
-
-    .rz-sidebar-expanded {
-        width: var(--rz-sidebar-icon-width);
-    }
-
-        .rz-sidebar-expanded :is(.rz-navigation-item-text, .rz-navigation-item-icon-children) {
-            width: 0px;
-            opacity: 0;
-        }
-
-        .rz-sidebar-expanded:hover {
-            width: var(--rz-sidebar-width);
-            margin-right: calc(-1 * (var(--rz-sidebar-width) - var(--rz-sidebar-icon-width)));
-        }
-            .rz-sidebar-expanded:hover :is(.rz-navigation-item-text, .rz-navigation-item-icon-children) {
-                width: unset;
-                opacity: unset;
-            }
 }

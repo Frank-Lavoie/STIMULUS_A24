@@ -1,17 +1,12 @@
-﻿<RadzenSidebar Style="width:auto;" @bind-Expanded="@sidebarExpanded" Responsive=false>
-    <RadzenPanelMenu Multiple=false>
-        @* This section is for teachers only *@
-        <RadzenPanelMenuItem Text="General" Icon="home">
-            <RadzenPanelMenuItem Text="Tableau de bord" Path="à déterminer" Icon="dashboard"></RadzenPanelMenuItem>
-            <RadzenPanelMenuItem Text="Gestion des graph" Path="à déterminer" Icon="line_style"></RadzenPanelMenuItem>
-            <RadzenPanelMenuItem Text="Gestion des groupes" Path="à déterminer" Icon="account_circle"></RadzenPanelMenuItem>
-        </RadzenPanelMenuItem>
+﻿@inject TooltipService tooltipService
+
+<RadzenSidebar Responsive="true" Style="width: max-content">
+    <RadzenPanelMenu DisplayStyle="@(sidebarExpanded ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon)" ShowArrow="@sidebarExpanded">
+        <RadzenPanelMenuItem Text="Accueil" Icon="home" Path="/" />
+        <RadzenPanelMenuItem Text="Graph" Icon="account_tree" Path="/Graph" />
         <AuthorizeView Roles="ADMIN">
-            <Authorized>
-                <RadzenPanelMenuItem Text="Ajouter un utilisateur" Path="/AjouterUtilisateur" Icon="account_circle"></RadzenPanelMenuItem>
-            </Authorized>
+            <RadzenPanelMenuItem Text="Ajouter un utiliateur" Icon="person_add" Path="/AjouterUtilisateur" />
         </AuthorizeView>
-        ­­­­
     </RadzenPanelMenu>
 </RadzenSidebar>
 

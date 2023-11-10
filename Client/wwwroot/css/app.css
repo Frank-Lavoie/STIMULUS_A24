@@ -1,5 +1,42 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+:root {
+    /*--rz-header-background-color:red;*/
+    --rz-text-font-family: Arial;
+    --rz-text-title-color: #333746;
+    /*--rz-text-color: #333746;*/
+    --rz-text-secondary-color: #394652;
+    --rz-text-disabled-color: #DEDEE0;
+    /*--rz-body-background-color: #ffffff;*/
+    --rz-grid-border: 1px solid #333746;
+    --rz-grid-stripe-background-color: #DEDEE0;
+    --rz-grid-cell-color: #333746;
+    --rz-grid-hover-color: #394652;
+    --rz-grid-selected-background-color: #394652;
+    /*--rz-grid-hover-background-color: #394652;*/
+    --rz-grid-column-resizer-helper-background-color: #333746;
+    --rz-grid-header-color: #ffffff;
+    --rz-grid-header-background-color: #333746;
+    --rz-grid-filter-focus-color: #394652;
+    --rz-grid-apply-filter-button-background-color: #394652;
+    --rz-grid-foot-background-color: #ffffff;
+    --rz-grid-header-filter-icon-active-color: #00B2A9;
+    --rz-paginator-background-color: var(--rz-primary);
+    --rz-paginator-numeric-button-color: #ffffff;
+    --rz-paginator-next-button-color: #ffffff;
+    --rz-paginator-back-button-color: #ffffff;
+    --rz-primary: #0021A5;
+   --rz-primary-lighter: rgba(98, 27, 9, 0.12);
+    --rz-secondary: #394652;
+    --rz-success: #6966db;
+    --rz-info: #DEDEE0;
+    --rz-warning: #FFB500;
+    --rz-danger: #ED0089;
+    --rz-panel-menu-item-active-color: #FA4616;
+    --rz-panel-menu-item-2nd-level-active-color: #FA4616;
+    
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     height: 100%;
