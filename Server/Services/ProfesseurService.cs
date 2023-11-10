@@ -41,7 +41,7 @@ namespace STIMULUS_V2.Server.Services
         {
             try
             {
-                if (sTIMULUSContext.Professeur.Where(item => item.NumEmploye == id).Count() > 0)
+                if (sTIMULUSContext.Professeur.Where(item => item.Identifiant == id).Count() > 0)
                 {
                     var item = await sTIMULUSContext.Professeur.FindAsync(id);
                     sTIMULUSContext.Professeur.Remove(item);

@@ -1,20 +1,28 @@
-﻿@inherits LayoutComponentBase 
+﻿@inherits LayoutComponentBase
 
-<RadzenComponents/>
+<RadzenComponents />
 <RadzenDialog />
 <RadzenNotification />
 <RadzenContextMenu />
 <RadzenTooltip />
+<AuthorizeView Roles="PROFESSEUR, ETUDIANT, ADMIN">
+    <Authorized>
+        <RadzenLayout>
+            <Header />
+            <Menu sidebarExpanded=false />
+            <RadzenBody>
+                @Body
+            </RadzenBody>
+            <Footer />
+        </RadzenLayout>
+    </Authorized>
+    <NotAuthorized>
+        <RadzenLayout Style="display: flex; justify-content:center; background-image: url('/RessourceVisuel/Fond.png');">
+            <LoginComponent />
+        </RadzenLayout>
+    </NotAuthorized>
+</AuthorizeView>
 
-<RadzenLayout>
-	<Header/>
-	<Menu sidebarExpanded=false /> 
-	<RadzenBody>
-		@Body
- 	</RadzenBody>
-	<Footer />
-</RadzenLayout>
-
-@code{
+@code {
 
 }

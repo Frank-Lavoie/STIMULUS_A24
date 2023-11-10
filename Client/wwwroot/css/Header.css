@@ -3,12 +3,9 @@
 }
 
 .custom-header-image {
-    text-align: center;
-    width: 10%;
-    height: 10%;
-    float: right;
-    margin-left: 3px;
-    margin-right: 3px;
+    width: 75px;
+    height: 25px;
+    vertical-align: baseline;
 }
 
 .custom-header-radzen-breadcrumb{

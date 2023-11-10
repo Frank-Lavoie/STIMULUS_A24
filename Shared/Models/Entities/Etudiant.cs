@@ -1,4 +1,5 @@
-﻿using System;
+﻿using STIMULUS_V2.Shared.Models.Authentication;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,19 +9,10 @@ using System.Threading.Tasks;
 
 namespace STIMULUS_V2.Shared.Models.Entities
 {
-    public class Etudiant
+    public class Etudiant : Utilisateur
     {
-        [Key]
-        [Column(TypeName = "nvarchar(255)")]
-        public string CodeDA { get; set; }
+       
 
-        [Column(TypeName = "nvarchar(40)")]
-        public string Nom { get; set; }
-
-        [Column(TypeName = "nvarchar(40)")]
-        public string Prenom { get; set; }
-
-        [Column(TypeName = "nvarchar(50)")]
-        public string? MotDePasse { get; set; }
+       
     }
 }

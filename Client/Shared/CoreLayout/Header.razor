@@ -1,28 +1,52 @@
-﻿@inject Microsoft.Extensions.Configuration.IConfiguration config;
+﻿@using STIMULUS_V2.Shared.Models.Authentication;
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject AuthenticationStateProvider authStateProvider
 
 <RadzenHeader class="custom-header-background">
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
-        <RadzenSidebarToggle Click="@ToggleSidebar" />
-        <RadzenImage Path="/RessourceVisuel/LogoCEPI.png" class="custom-header-image" />
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2rem">
+    <div style="display:flex; flex-direction:row; justify-content:space-between; ">
+        <div>
+            <RadzenSidebarToggle Click="@ToggleSidebar" />
+            <img src="/RessourceVisuel/LogoCEPI.png" class="custom-header-image" />
+            @* <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2rem">
             <RadzenLabel Text=@config["Title"] />
             <div>
-                <RadzenBreadCrumb class="custom-header-radzen-breadcrumb">
-                    <RadzenBreadCrumbItem Path="/" style="white-space: nowrap;" Text="Tableau de bord" />
-                </RadzenBreadCrumb>
+            <RadzenBreadCrumb class="custom-header-radzen-breadcrumb">
+            <RadzenBreadCrumbItem Path="/" style="white-space: nowrap;" Text="Tableau de bord" />
+            </RadzenBreadCrumb>
             </div>
-        </RadzenStack>
-        <RadzenProfileMenu Style="background-color: darkblue; margin-left: 70%;">
-            <Template>
-                <RadzenIcon Icon="account_circle"></RadzenIcon>
-            </Template>
-            <ChildContent>
-                <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="list"></RadzenProfileMenuItem>
-                 <RadzenProfileMenuItem Text="Réglages" Path="settings" Icon="build" ></RadzenProfileMenuItem>
-                <RadzenProfileMenuItem Text="Déconnexion" Path="deconnexion" Icon="exit_to_app"></RadzenProfileMenuItem>
-            </ChildContent>
-        </RadzenProfileMenu>
-    </RadzenStack>
+            </RadzenStack> *@
+        </div>
+
+        <div style="display:flex; align-items: center;">
+
+            <RadzenProfileMenu Style="background-color: darkblue;">
+                <Template>
+                    <div style="display: flex; flex-direction:row; ">
+                        <RadzenIcon Icon="account_circle"></RadzenIcon>
+                        <AuthorizeView>
+                            <Authorized>
+                                <span>@context.User.Identity!.Name</span>
+                            </Authorized>
+                            <NotAuthorized>
+                                <span>Guest</span>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                </Template>
+                <ChildContent>
+                    <AuthorizeView Roles="Prof">
+                        <Authorized>
+                            <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="list"></RadzenProfileMenuItem>
+                        </Authorized>
+                    </AuthorizeView>
+                    <RadzenProfileMenuItem Text="Réglages" Path="settings" Icon="build"></RadzenProfileMenuItem>
+                    <RadzenProfileMenuItem Text="Déconnexion" @onclick="Logout" Icon="exit_to_app"></RadzenProfileMenuItem>
+                    <Button style="width:100%;" @onclick="Logout"><RadzenIcon Icon="exit_to_app" /><span>Déconnexion</span></Button>
+                </ChildContent>
+            </RadzenProfileMenu>
+
+        </div>
+    </div>
 </RadzenHeader>
 
 @code {
@@ -36,5 +60,11 @@
     {
         sidebarExpanded = !sidebarExpanded;
         SidebarExpandedChanged.InvokeAsync(sidebarExpanded);
+    }
+
+    public async Task Logout()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new SessionUtilisateur());
     }
 }

@@ -1,5 +1,4 @@
-﻿@* Header will need authorization *@
-<RadzenSidebar Style="width:auto;" @bind-Expanded="@sidebarExpanded" Responsive=false>
+﻿<RadzenSidebar Style="width:auto;" @bind-Expanded="@sidebarExpanded" Responsive=false>
     <RadzenPanelMenu Multiple=false>
         @* This section is for teachers only *@
         <RadzenPanelMenuItem Text="General" Icon="home">
@@ -7,14 +6,13 @@
             <RadzenPanelMenuItem Text="Gestion des graph" Path="à déterminer" Icon="line_style"></RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Gestion des groupes" Path="à déterminer" Icon="account_circle"></RadzenPanelMenuItem>
         </RadzenPanelMenuItem>
-
-        @* This section is for teachers and students  *@
-        <RadzenPanelMenuItem Text="Graphique" Icon="assignment">
-            <RadzenPanelMenuItem Text="Graph 1" Path="à déterminer" Icon="line_style"></RadzenPanelMenuItem>
-            <RadzenPanelMenuItem Text="Graph 2" Path="à déterminer" Icon="line_style"></RadzenPanelMenuItem>
-            <RadzenPanelMenuItem Text="Graph 3" Path="à déterminer" Icon="line_style"></RadzenPanelMenuItem>
-        </RadzenPanelMenuItem>
-     ­­­­</RadzenPanelMenu>      
+        <AuthorizeView Roles="ADMIN">
+            <Authorized>
+                <RadzenPanelMenuItem Text="Ajouter un utilisateur" Path="/AjouterUtilisateur" Icon="account_circle"></RadzenPanelMenuItem>
+            </Authorized>
+        </AuthorizeView>
+        ­­­­
+    </RadzenPanelMenu>
 </RadzenSidebar>
 
 @code {

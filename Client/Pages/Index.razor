@@ -1,8 +1,23 @@
-﻿@page "/"
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
 
-<PageTitle>Index</PageTitle>
+@inject ICoursService coursService
 
-@code{
+@page "/"
+
+<div class="container text-center">
+    <h1 class="display-4">Bienvenue sur STIMULUS_V2</h1>
+    <p class="lead">Votre plateforme d'apprentissage en ligne.</p>
+    <AuthorizeView Roles="PROFESSEUR">
+        <p class="lead">Vous etes un prof</p>
+    </AuthorizeView>
+    <AuthorizeView Roles="ETUDIANT">
+        <p class="lead">Vous etes un etudiant</p>
+    </AuthorizeView>
+    <AuthorizeView Roles="ADMIN">
+        <p class="lead">Vous etes un admin</p>
+    </AuthorizeView>
+</div>
+
+@code {
 
 }
- 

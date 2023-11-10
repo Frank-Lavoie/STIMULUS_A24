@@ -1,6 +1,7 @@
 ﻿using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
+using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace STIMULUS_V2.Client.Services
@@ -37,9 +38,10 @@ namespace STIMULUS_V2.Client.Services
             return result;
         }
 
-        public Task<APIResponse<IEnumerable<Noeud>>> GetAllById(int id)
+        public async Task<APIResponse<IEnumerable<Noeud>>> GetAllById(int id)
         {
-            throw new NotImplementedException();
+            var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Noeud>>>($"api/Noeud/Fetch/AllBy/{id}");
+            return result; ;
         }
 
         public async Task<APIResponse<Noeud>> Update(int id, Noeud item)

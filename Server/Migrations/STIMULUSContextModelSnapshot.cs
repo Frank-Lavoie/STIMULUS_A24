@@ -22,7 +22,57 @@ namespace STIMULUS_V2.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Code", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Authentication.TokenInfo", b =>
+                {
+                    b.Property<int>("TokenInfoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TokenInfoId"), 1L, 1);
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("TokenExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TokenInfoId");
+
+                    b.ToTable("TokenInfo");
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Authentication.Utilisateur", b =>
+                {
+                    b.Property<string>("Identifiant")
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MotDePasse")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Prenom")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Identifiant");
+
+                    b.ToTable("Utilisateur");
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Code", b =>
                 {
                     b.Property<int>("CodeId")
                         .ValueGeneratedOnAdd()
@@ -42,7 +92,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Code");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Composant", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Composant", b =>
                 {
                     b.Property<int>("ComposantId")
                         .ValueGeneratedOnAdd()
@@ -56,9 +106,6 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Property<int?>("PageId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReferenceId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(20)");
 
@@ -66,12 +113,10 @@ namespace STIMULUS_V2.Server.Migrations
 
                     b.HasIndex("PageId");
 
-                    b.HasIndex("ReferenceId");
-
                     b.ToTable("Composant");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Cours", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Cours", b =>
                 {
                     b.Property<int>("CoursId")
                         .ValueGeneratedOnAdd()
@@ -86,48 +131,12 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("GroupeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProfesseurId")
-                        .HasColumnType("nvarchar(255)");
-
                     b.HasKey("CoursId");
-
-                    b.HasIndex("GroupeId");
-
-                    b.HasIndex("ProfesseurId");
 
                     b.ToTable("Cours");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Etudiant", b =>
-                {
-                    b.Property<string>("CodeDA")
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("GroupeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MotDePasse")
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(40)");
-
-                    b.Property<string>("Prenom")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(40)");
-
-                    b.HasKey("CodeDA");
-
-                    b.HasIndex("GroupeId");
-
-                    b.ToTable("Etudiant");
-                });
-
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Exercice", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Exercice", b =>
                 {
                     b.Property<int>("ExerciceId")
                         .ValueGeneratedOnAdd()
@@ -143,13 +152,16 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Exercice");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.FichierSauvegarde", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.FichierSauvegarde", b =>
                 {
                     b.Property<int>("FichierSauvegardeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FichierSauvegardeId"), 1L, 1);
+
+                    b.Property<string>("CodeDA")
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Contenue")
                         .HasColumnType("varchar(8000)");
@@ -158,20 +170,17 @@ namespace STIMULUS_V2.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<int?>("Page_EtudiantId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Version")
                         .HasColumnType("datetime2");
 
                     b.HasKey("FichierSauvegardeId");
 
-                    b.HasIndex("Page_EtudiantId");
+                    b.HasIndex("CodeDA");
 
                     b.ToTable("FichierSauvegarde");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.FichierSource", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.FichierSource", b =>
                 {
                     b.Property<int>("FichierSourceId")
                         .ValueGeneratedOnAdd()
@@ -201,7 +210,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("FichierSource");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Graphe", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Graphe", b =>
                 {
                     b.Property<int>("GrapheId")
                         .ValueGeneratedOnAdd()
@@ -209,7 +218,7 @@ namespace STIMULUS_V2.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GrapheId"), 1L, 1);
 
-                    b.Property<int?>("CoursId")
+                    b.Property<int?>("GroupeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nom")
@@ -220,19 +229,14 @@ namespace STIMULUS_V2.Server.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(10)");
 
-                    b.Property<string>("StatusGrapheId")
-                        .HasColumnType("char(3)");
-
                     b.HasKey("GrapheId");
 
-                    b.HasIndex("CoursId");
-
-                    b.HasIndex("StatusGrapheId");
+                    b.HasIndex("GroupeId");
 
                     b.ToTable("Graphe");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Groupe", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Groupe", b =>
                 {
                     b.Property<int>("GroupeId")
                         .ValueGeneratedOnAdd()
@@ -240,16 +244,32 @@ namespace STIMULUS_V2.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GroupeId"), 1L, 1);
 
+                    b.Property<int?>("CoursId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCloture")
+                        .HasColumnType("Date");
+
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("Date");
+
                     b.Property<string>("Nom")
                         .IsRequired()
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("ProfesseurId")
+                        .HasColumnType("nvarchar(255)");
+
                     b.HasKey("GroupeId");
+
+                    b.HasIndex("CoursId");
+
+                    b.HasIndex("ProfesseurId");
 
                     b.ToTable("Groupe");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Groupe_Etudiant", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant", b =>
                 {
                     b.Property<int>("Groupe_EtudiantId")
                         .ValueGeneratedOnAdd()
@@ -272,7 +292,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Groupe_Etudiant");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Image", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Image", b =>
                 {
                     b.Property<int>("ImageId")
                         .ValueGeneratedOnAdd()
@@ -298,7 +318,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Image");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Importance", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Importance", b =>
                 {
                     b.Property<string>("Code")
                         .ValueGeneratedOnAdd()
@@ -316,29 +336,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Importance");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.LienUtile", b =>
-                {
-                    b.Property<int>("LienUtileId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LienUtileId"), 1L, 1);
-
-                    b.Property<int?>("GrapheId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("LienUtileId");
-
-                    b.HasIndex("GrapheId");
-
-                    b.ToTable("LienUtile");
-                });
-
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Noeud", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Noeud", b =>
                 {
                     b.Property<int>("NoeudId")
                         .ValueGeneratedOnAdd()
@@ -356,8 +354,12 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Property<int?>("GrapheId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NoeudLiaisonId")
+                    b.Property<int?>("NoeudParentId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("Obligatoire")
                         .HasColumnType("bit");
@@ -367,9 +369,6 @@ namespace STIMULUS_V2.Server.Migrations
 
                     b.Property<decimal>("PosY")
                         .HasColumnType("decimal(8,2)");
-
-                    b.Property<int>("Pts")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("Rayon")
                         .HasColumnType("decimal(4,2)");
@@ -381,20 +380,16 @@ namespace STIMULUS_V2.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(10)");
-
                     b.HasKey("NoeudId");
 
                     b.HasIndex("GrapheId");
 
-                    b.HasIndex("NoeudLiaisonId");
+                    b.HasIndex("NoeudParentId");
 
                     b.ToTable("Noeud");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Page", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page", b =>
                 {
                     b.Property<int>("PageId")
                         .ValueGeneratedOnAdd()
@@ -420,7 +415,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Page");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Page_Etudiant", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page_Etudiant", b =>
                 {
                     b.Property<int>("Page_EtudiantId")
                         .ValueGeneratedOnAdd()
@@ -431,10 +426,13 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Property<string>("CodeDA")
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("PageId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("DateDebut")
+                        .HasColumnType("Date");
 
-                    b.Property<int>("Pts")
+                    b.Property<DateTime>("DateFin")
+                        .HasColumnType("Date");
+
+                    b.Property<int?>("PageId")
                         .HasColumnType("int");
 
                     b.HasKey("Page_EtudiantId");
@@ -446,29 +444,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Page_Etudiant");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Professeur", b =>
-                {
-                    b.Property<string>("NumEmploye")
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("MotDePasse")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Prenom")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("NumEmploye");
-
-                    b.ToTable("Professeur");
-                });
-
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Reference", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Reference", b =>
                 {
                     b.Property<int>("ReferenceId")
                         .ValueGeneratedOnAdd()
@@ -488,21 +464,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Reference");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.StatusGraphe", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("char(3)");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("varchar(20)");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("StatusGraphe");
-                });
-
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.TexteFormater", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.TexteFormater", b =>
                 {
                     b.Property<int>("TexteFormaterId")
                         .ValueGeneratedOnAdd()
@@ -518,7 +480,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("TexteFormater");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Video", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Video", b =>
                 {
                     b.Property<int>("VideoId")
                         .ValueGeneratedOnAdd()
@@ -544,85 +506,78 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Video");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Composant", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Etudiant", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Page", "Page")
+                    b.HasBaseType("STIMULUS_V2.Shared.Models.Authentication.Utilisateur");
+
+                    b.ToTable("Etudiant", (string)null);
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Professeur", b =>
+                {
+                    b.HasBaseType("STIMULUS_V2.Shared.Models.Authentication.Utilisateur");
+
+                    b.ToTable("Professeur", (string)null);
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Composant", b =>
+                {
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Page", "Page")
                         .WithMany()
                         .HasForeignKey("PageId");
 
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Reference", "Reference")
-                        .WithMany()
-                        .HasForeignKey("ReferenceId");
-
                     b.Navigation("Page");
-
-                    b.Navigation("Reference");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Cours", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.FichierSauvegarde", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Groupe", "Groupe")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Etudiant", "Etudiant")
                         .WithMany()
-                        .HasForeignKey("GroupeId");
+                        .HasForeignKey("CodeDA");
 
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Professeur", "Professeur")
-                        .WithMany()
-                        .HasForeignKey("ProfesseurId");
-
-                    b.Navigation("Groupe");
-
-                    b.Navigation("Professeur");
+                    b.Navigation("Etudiant");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Etudiant", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.FichierSource", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Groupe", "Groupe")
-                        .WithMany()
-                        .HasForeignKey("GroupeId");
-
-                    b.Navigation("Groupe");
-                });
-
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.FichierSauvegarde", b =>
-                {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Page_Etudiant", "Page_Etudiant")
-                        .WithMany()
-                        .HasForeignKey("Page_EtudiantId");
-
-                    b.Navigation("Page_Etudiant");
-                });
-
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.FichierSource", b =>
-                {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Exercice", "Exercice")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Exercice", "Exercice")
                         .WithMany()
                         .HasForeignKey("ExerciceId");
 
                     b.Navigation("Exercice");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Graphe", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Graphe", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Cours", "Cours")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Groupe", "Groupe")
+                        .WithMany()
+                        .HasForeignKey("GroupeId");
+
+                    b.Navigation("Groupe");
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Groupe", b =>
+                {
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Cours", "Cours")
                         .WithMany()
                         .HasForeignKey("CoursId");
 
-                    b.HasOne("STIMULUS.Shared.Models.Entities.StatusGraphe", "StatusGraphe")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Professeur", "Professeur")
                         .WithMany()
-                        .HasForeignKey("StatusGrapheId");
+                        .HasForeignKey("ProfesseurId");
 
                     b.Navigation("Cours");
 
-                    b.Navigation("StatusGraphe");
+                    b.Navigation("Professeur");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Groupe_Etudiant", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Etudiant", "Etudiant")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Etudiant", "Etudiant")
                         .WithMany()
                         .HasForeignKey("CodeDA");
 
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Groupe", "Groupe")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Groupe", "Groupe")
                         .WithMany()
                         .HasForeignKey("GroupeId");
 
@@ -631,37 +586,28 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Groupe");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.LienUtile", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Noeud", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Graphe", "Graphe")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Graphe", "Graphe")
                         .WithMany()
                         .HasForeignKey("GrapheId");
 
-                    b.Navigation("Graphe");
-                });
-
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Noeud", b =>
-                {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Graphe", "Graphe")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Noeud", "NoeudParent")
                         .WithMany()
-                        .HasForeignKey("GrapheId");
-
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Noeud", "NoeudLiaison")
-                        .WithMany()
-                        .HasForeignKey("NoeudLiaisonId");
+                        .HasForeignKey("NoeudParentId");
 
                     b.Navigation("Graphe");
 
-                    b.Navigation("NoeudLiaison");
+                    b.Navigation("NoeudParent");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Page", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Importance", "Importance")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Importance", "Importance")
                         .WithMany()
                         .HasForeignKey("ImportanceId");
 
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Noeud", "Noeud")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Noeud", "Noeud")
                         .WithMany()
                         .HasForeignKey("NoeudId");
 
@@ -670,19 +616,37 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Noeud");
                 });
 
-            modelBuilder.Entity("STIMULUS.Shared.Models.Entities.Page_Etudiant", b =>
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page_Etudiant", b =>
                 {
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Etudiant", "Etudiant")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Etudiant", "Etudiant")
                         .WithMany()
                         .HasForeignKey("CodeDA");
 
-                    b.HasOne("STIMULUS.Shared.Models.Entities.Page", "Page")
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Page", "Page")
                         .WithMany()
                         .HasForeignKey("PageId");
 
                     b.Navigation("Etudiant");
 
                     b.Navigation("Page");
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Etudiant", b =>
+                {
+                    b.HasOne("STIMULUS_V2.Shared.Models.Authentication.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("STIMULUS_V2.Shared.Models.Entities.Etudiant", "Identifiant")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Professeur", b =>
+                {
+                    b.HasOne("STIMULUS_V2.Shared.Models.Authentication.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("STIMULUS_V2.Shared.Models.Entities.Professeur", "Identifiant")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

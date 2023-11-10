@@ -9,6 +9,6 @@ using System.Threading.Tasks;
 namespace STIMULUS_V2.Shared.Interface.ChildInterface
 {
     public interface INoeudService : IModelService<Noeud, int>
-    {
+    {        
     }
 }

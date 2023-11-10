@@ -5,6 +5,10 @@ using Serilog;
 using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.Entities;
 using STIMULUS_V2.Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using STIMULUS_V2.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +23,21 @@ builder.Host.UseSerilog((ctx, lc) =>
 
 builder.Services.AddDbContextPool<STIMULUSContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("STIMULUSConnection")));
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+});
 
 builder.Services.AddScoped<ICodeService, CodeService>();
 builder.Services.AddScoped<IComposantService, ComposantService>();
@@ -37,9 +56,25 @@ builder.Services.AddScoped<IProfesseurService, ProfesseurService>();
 builder.Services.AddScoped<IReferenceService, ReferenceService>();
 builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<UtilisateurFactory>();
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    // Récupérer le contexte de la base de données
+    var context = services.GetRequiredService<STIMULUSContext>();
+
+    // Supprimer la base de données existante et la recréer
+    context.Database.EnsureDeleted();
+    context.Database.EnsureCreated();
+
+    // Créer le compte administrateur si nécessaire
+    context.EnsureAdminUserCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -62,6 +97,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();

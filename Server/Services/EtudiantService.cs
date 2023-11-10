@@ -42,7 +42,7 @@ namespace STIMULUS_V2.Server.Services
         {
             try
             {
-                if (sTIMULUSContext.Etudiant.Where(item => item.CodeDA == id).Count() > 0)
+                if (sTIMULUSContext.Etudiant.Where(item => item.Identifiant == id).Count() > 0)
                 {
                     var item = await sTIMULUSContext.Etudiant.FindAsync(id);
                     sTIMULUSContext.Etudiant.Remove(item);
