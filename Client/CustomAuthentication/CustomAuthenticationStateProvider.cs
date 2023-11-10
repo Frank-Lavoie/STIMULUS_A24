@@ -26,8 +26,8 @@ namespace STIMULUS_V2.Client.CustomAuthentication
             try
             {
                 var userSession = DeSerializedUserSession(token);
-                var (email, role) = await GetClaimsFromJWT(userSession.Token!);
-                return await Task.FromResult(new AuthenticationState(SetClaimsPrincipal(email, role)));
+                var (Identifiant, role) = await GetClaimsFromJWT(userSession.Token!);
+                return await Task.FromResult(new AuthenticationState(SetClaimsPrincipal(Identifiant, role)));
             }
             catch
             {
@@ -44,8 +44,8 @@ namespace STIMULUS_V2.Client.CustomAuthentication
             if (!string.IsNullOrEmpty(userSession.Token))
             {
                 await localStorageService.SetItemAsync("token", SerializedUserSession(userSession));
-                var (email, role) = await GetClaimsFromJWT(userSession.Token!);
-                claimsPrincipal = SetClaimsPrincipal(email, role);
+                var (Identifiant, role) = await GetClaimsFromJWT(userSession.Token!);
+                claimsPrincipal = SetClaimsPrincipal(Identifiant, role);
             }
             else
             {
@@ -56,17 +56,17 @@ namespace STIMULUS_V2.Client.CustomAuthentication
         }
 
         // General methods
-        private static ClaimsPrincipal SetClaimsPrincipal(string email, string role)
+        private static ClaimsPrincipal SetClaimsPrincipal(string Identifiant, string role)
         {
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
-                    new(ClaimTypes.Name, email),
+                    new(ClaimTypes.Name, Identifiant),
                     new(ClaimTypes.Role, role)
                 }, "JwtAuth"));
             return claimsPrincipal;
         }
 
-        private static async Task<(string email, string role)> GetClaimsFromJWT(string jwt)
+        private static async Task<(string Identifiant, string role)> GetClaimsFromJWT(string jwt)
         {
             try
             {
@@ -75,9 +75,9 @@ namespace STIMULUS_V2.Client.CustomAuthentication
                 var claims = token.Claims;
 
                 var role = claims.First(_ => _.Type == ClaimTypes.Role).Value;
-                var email = claims.First(_ => _.Type == ClaimTypes.Name).Value;
+                var Identifiant = claims.First(_ => _.Type == ClaimTypes.Name).Value;
 
-                return (email.ToString(), role);
+                return (Identifiant.ToString(), role);
             }
             catch { throw new Exception("something happened"); }
         }
