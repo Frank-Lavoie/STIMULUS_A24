@@ -113,9 +113,46 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
-        public Task<APIResponse<IEnumerable<Etudiant>>> GetAllById(int id)
+        public async Task<APIResponse<IEnumerable<Etudiant>>> GetAllById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var itemList = await sTIMULUSContext.Etudiant.ToListAsync();
+
+                if (itemList != null)
+                {
+                    return new APIResponse<IEnumerable<Etudiant>>(itemList, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<IEnumerable<Etudiant>>(null, 404, $"{typeof(Etudiant).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<Etudiant>>(null, 500, $"Erreur lors de la récupération de la liste du model {typeof(Etudiant).Name}. Message : {ex.Message}.");
+            }
+        }
+
+        public async Task<APIResponse<IEnumerable<Etudiant>>> GetAllByIdentifiant(string id)
+        {
+            try
+            {
+                var itemList = await sTIMULUSContext.Etudiant.Where(item => item.Identifiant == id).ToListAsync();
+
+                if (itemList != null)
+                {
+                    return new APIResponse<IEnumerable<Etudiant>>(itemList, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<IEnumerable<Etudiant>>(null, 404, $"{typeof(Etudiant).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<Etudiant>>(null, 500, $"Erreur lors de la récupération de la liste du model {typeof(Etudiant).Name}. Message : {ex.Message}.");
+            }
         }
 
         public async Task<APIResponse<Etudiant>> Update(string id, Etudiant item)

@@ -50,6 +50,15 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
+        
+        [HttpGet("Fetch/FromGraph/{id}")]
+        public async Task<IActionResult> GetAllFromGraph(int id)
+        {
+            var response = await noeudService.GetAllFromGraph(id);
+            return StatusCode(response.StatusCode, response);
+        }
+
+
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Noeud noeud)
         {

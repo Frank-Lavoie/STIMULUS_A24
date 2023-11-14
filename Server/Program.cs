@@ -48,6 +48,7 @@ builder.Services.AddScoped<IFichierSauvegardeService, FichierSauvegardeService>(
 builder.Services.AddScoped<IFichierSourceService, FichierSourceService>();
 builder.Services.AddScoped<IGrapheService, GrapheService>();
 builder.Services.AddScoped<IGroupeService, GroupeService>();
+builder.Services.AddScoped<IGroupeEtudiantService, GroupeEtudiantService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IImportanceService, ImportanceService>();
 builder.Services.AddScoped<INoeudService, NoeudService>();
@@ -65,15 +66,14 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    // Récupérer le contexte de la base de données
     var context = services.GetRequiredService<STIMULUSContext>();
 
-    // Supprimer la base de données existante et la recréer
     context.Database.EnsureDeleted();
     context.Database.EnsureCreated();
 
-    // Créer le compte administrateur si nécessaire
     context.EnsureAdminUserCreated();
+    context.EnsureEtuUserCreated();
+    context.EnsureProfUserCreated();
 }
 
 // Configure the HTTP request pipeline.

@@ -117,6 +117,26 @@ namespace STIMULUS_V2.Server.Services
         {
             throw new NotImplementedException();
         }
+        public async Task<APIResponse<IEnumerable<Graphe>>> GetAllFromGroup(int id)
+        {
+            try
+            {
+                var itemList = await sTIMULUSContext.Graphe.Where(item => item.GroupeId == id).ToListAsync();
+
+                if (itemList != null)
+                {
+                    return new APIResponse<IEnumerable<Graphe>>(itemList, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<IEnumerable<Graphe>>(null, 404, $"{typeof(Graphe).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<Graphe>>(null, 500, $"Erreur lors de la récupération du model par son graph {typeof(Graphe).Name}. Message : {ex.Message}.");
+            }
+        }
 
         public async Task<APIResponse<Graphe>> Update(int id, Graphe item)
         {

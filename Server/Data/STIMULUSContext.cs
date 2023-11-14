@@ -42,6 +42,46 @@ namespace STIMULUS_V2.Server.Data
             }
         }
 
+        public void EnsureProfUserCreated()
+        {
+            if (!Professeur.Any())
+            {
+                var password = "prof";
+                var professeur = new Professeur
+                {
+                    Identifiant = "prof",
+                    Nom = "Prof",
+                    Prenom = "Prof",
+                    Email = "prof@cegepjonquiere.ca",
+                    MotDePasse = BCrypt.Net.BCrypt.HashPassword(password), 
+                    Role = "PROFESSEUR"
+                };
+
+                Professeur.Add(professeur);
+                SaveChanges();
+            }
+        }
+
+        public void EnsureEtuUserCreated()
+        {
+            if (!Etudiant.Any())
+            {
+                var password = "etu";
+                var etudiant = new Etudiant
+                {
+                    Identifiant = "etu",
+                    Nom = "Etu",
+                    Prenom = "Etu",
+                    Email = "etu@etu.cegepjonquiere.ca",
+                    MotDePasse = BCrypt.Net.BCrypt.HashPassword(password),
+                    Role = "ETUDIANT"
+                };
+
+                Etudiant.Add(etudiant);
+                SaveChanges();
+            }
+        }
+
         public DbSet<Code> Code { get; set; }
         public DbSet<Composant> Composant { get; set; }
         public DbSet<Cours> Cours { get; set; }

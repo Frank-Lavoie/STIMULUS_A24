@@ -49,6 +49,12 @@ namespace STIMULUS_V2.Server.Controllers
             var response = await etudiantService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
+        [HttpGet("Fetch/All/{id}")]
+        public async Task<IActionResult> GetAllByIdentifiant(string id)
+        {
+            var response = await etudiantService.GetAllByIdentifiant(id);
+            return StatusCode(response.StatusCode, response);
+        }
 
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] Etudiant etudiant)

@@ -1,0 +1,8 @@
+﻿<div class="component">
+    <iframe width="@VideoModel.Largeur" height="@VideoModel.Longueur" src="@VideoModel.Url"></iframe>
+</div>
+
+@code {
+    [Parameter]
+    public STIMULUS_V2.Shared.Models.Entities.Video VideoModel { get; set; }
+}

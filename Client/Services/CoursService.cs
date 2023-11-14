@@ -37,9 +37,10 @@ namespace STIMULUS_V2.Client.Services
             return result;
         }
 
-        public Task<APIResponse<IEnumerable<Cours>>> GetAllById(int id)
+        public async Task<APIResponse<IEnumerable<Cours>>> GetAllById(int id)
         {
-            throw new NotImplementedException();
+            var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Cours>>>($"api/Cours/Fetch/All/{id}");
+            return result;
         }
 
         public async Task<APIResponse<Cours>> Update(int id, Cours item)

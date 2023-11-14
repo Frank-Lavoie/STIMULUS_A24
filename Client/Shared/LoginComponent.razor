@@ -1,6 +1,6 @@
 ﻿@using STIMULUS_V2.Client.Services.AuthenticationService;
 @using STIMULUS_V2.Shared.Models.Authentication;﻿
-
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IAuthenticationService AuthenticationService
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavMgr

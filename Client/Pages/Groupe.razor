@@ -1,0 +1,81 @@
+﻿@page "/Groupe"
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IGroupeService GroupeService
+@inject IEtudiantService EtudiantService
+@inject ICoursService CoursService
+@inject NavigationManager NavigationManager
+@inject IGrapheService GrapheService
+@inject IGroupeEtudiantService GroupeEtudiantService
+
+
+
+<div class="container text-center">
+    <h1 class="display-4">@((groupeProf != null) ? groupeProf.Nom : "")</h1>
+    <p class="lead">Cours : @((groupeCours != null) ? groupeCours.Code : "")</p>
+    <p class="lead">Graphe(s) associé(s) : </p>
+    @foreach (var graphe in listGrapheGroupe)
+    {
+        <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" />
+    }
+    <p class="lead">Liste des élèves :</p>
+    <RadzenDataGrid Data="@listEtudiant" TItem="Etudiant" AllowSorting="true" AllowFiltering="true" Sortable="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="Etudiant" Property="Identifiant" Title="DA" />
+            <RadzenDataGridColumn TItem="Etudiant" Property="Prenom" Title="Prenom" />
+            <RadzenDataGridColumn TItem="Etudiant" Property="Nom" Title="Nom" />
+        </Columns>
+    </RadzenDataGrid>
+</div>
+@code {
+    public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
+    public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
+    public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
+    public List<Etudiant> listEtudiant { get; set; }  = new List<Etudiant>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));      
+        groupeProf = groupe.Data;
+
+        var cours = await CoursService.Get((int)groupeProf.CoursId);
+        groupeCours = cours.Data;
+
+
+        var graphe = await GrapheService.GetAllFromGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+        var graphes = graphe.Data;
+        foreach (var grapheGroupe in graphes)//Va chercher tous les graphes, de tous les groupes
+        {
+            if (grapheGroupe != null)
+            {
+                listGrapheGroupe.Add(grapheGroupe);
+
+            }
+        }
+
+
+        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+        var etudiants = eleve.Data;
+
+        foreach (var etudiant in etudiants)
+        {
+            var responseEtudiant = await EtudiantService.Get(etudiant.CodeDA);
+            var etudiantGroupe = responseEtudiant.Data;
+
+            // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
+            if (etudiantGroupe != null)
+            {
+                listEtudiant.Add(etudiantGroupe);
+
+            }
+        }
+    }  
+    private async void RedirectionGraphe(int id)
+    {
+        await sessionStorage.SetItemAsync<int>("idGraphe", id);
+        NavigationManager.NavigateTo("/Graphe");
+
+    }
+}

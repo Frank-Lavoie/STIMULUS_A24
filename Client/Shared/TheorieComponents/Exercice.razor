@@ -1,0 +1,389 @@
+﻿@* @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
+@using STIMULUS_V2.Shared.Models.Entities
+@using BlazorMonaco
+@using BlazorMonaco.Editor
+@using BlazorMonaco.Languages
+
+<!--Interpreteur-->
+@if (InitDone)
+{
+    <div class="fileSelector">
+        @foreach (Fichier fichier in FichierCode)
+        {
+            <div>
+                <button @onclick="() => ChangeTab(fichier.Id)">@fichier.Nom</button>
+                <button @onclick="() => Delete(fichier.Id)">X</button>
+            </div>
+        }
+        <button @onclick="AddPage">+</button>
+    </div>
+
+<div class="d-flex justify-content-around">
+    <div class="d-flex justify-content-between">
+        <div>
+            <StandaloneCodeEditor Id="monaco" ConstructionOptions="EditorConstructionOptions" @ref="_editor" />
+        </div>
+        @foreach (Fichier fichier in FichierCode)
+        {
+            if (fichier.Css != "hidden")
+            {
+                SetCode(@fichier.Contenu);
+            }
+            <textarea class="textareaCode hidden" id="@fichier.Id" cols="50" rows="25" name="@fichier.Nom" @bind=@fichier.Contenu @bind:event="oninput" @onfocus="() => Tab(fichier.Id)"></textarea>
+        }
+    </div>
+    <div id="background-result">
+        <p style="white-space:pre-wrap">@Result</p>
+    </div>
+</div>
+}
+
+<!-- Section bouton -->
+<div class="row">
+    <div class="d-flex flex-row-reverse" style="width: 800px">
+        <button @onclick=@Post class="boutonExerciceGauche">Éxecuter</button>
+        <button @onclick=@Save class="boutonExerciceDroite">Sauvegarder</button>
+    </div>
+</div>
+
+<style>
+    .focused {
+        display: block;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .monaco-editor-container { /* for all editor instances */
+        height: 600px;
+        width: 800px;
+    }
+</style>
+
+@code {
+    private StandaloneCodeEditor _editor { get; set; }
+
+    private async Task<string> GetCode()
+    {
+        string code = "-1";
+        if (_editor != null)
+        {
+            code = await _editor.GetValue();
+        }
+        return code;
+    }
+
+    private const string texteDefaut = "texte = \"\"\n" +
+                                "onglets = False\n\n" +
+                                "# Si il y a des onglets\n" +
+                                "if (onglets == True):\n" +
+                                "\ttexte = \"Choisissez un onglet pour commencer a coder !\"\n" +
+                                "# Si il n'y a pas d'onglets\n" +
+                                "elif (onglets == False):\n" +
+                                "\ttexte = \"Creez un onglet avec le bouton '+' puis commencez a coder !\"\n" +
+                                "print (texte)";
+
+    private async Task SetCode(string code = texteDefaut)
+    {
+        if (_editor != null)
+            await _editor.SetValue(code);
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+            {
+                AutomaticLayout = true,
+                Language = "python",
+                Theme = "vs-dark",
+                Value = texteDefaut
+            };
+    }
+
+    [Parameter]
+    public STIMULUS_V2.Shared.Models.Entities.Exercice ExerciceModel { get; set; }
+
+    /// <summary>
+    /// FocusedTab : attribut pour afficher le textarea
+    /// HiddenTab : attribut pour cacher le textarea
+    /// Result : résultat du code python de l'étudiant
+    /// InitDone : Dit si oui ou non l'initialisation du component est fait
+    /// </summary>
+    [Inject]
+    private IJSRuntime JS { get; set; }
+    private string FocusedTab { get; set; } = "focused";
+    private string HiddenTab { get; set; } = "hidden";
+    private string IdEtudiant { get; set; } = string.Empty;
+    private string Result { get; set; } = string.Empty;
+    private bool InitDone { get; set; } = false;
+
+
+    /// <summary>
+    /// Classe interne pour les fichiers
+    /// Le fichier est caché par défaut
+    /// </summary>
+    /// <param name="Id"> id du fichier provenant de la BD </param>
+    /// <param name="Css"> Permet d'afficher ou cacher le textarea </param>
+    /// <param name="Nom"> Nom du fichier </param>
+    /// <param name="Contenu"> Code du fichier </param>
+    public class Fichier
+    {
+        public int Id { get; set; }
+        public string Css { get; set; }
+        public string Nom { get; set; }
+        public string Contenu { get; set; }
+
+        public Fichier(int id, string nom, string contenu)
+        {
+            Id = id;
+            Nom = nom;
+            Contenu = contenu;
+            Css = "hidden";
+        }
+
+        public Fichier()
+        {
+        }
+    }
+
+
+
+    private List<Fichier> FichierCode { get; set; }
+
+    /// <summary>
+    /// Initialise le composant en allant chercher les fichiers d'ecercice correspondants
+    /// </summary>
+    protected override async void OnInitialized()
+    {
+        SetupClient();
+
+        IdEtudiant = await sessionStorage.GetItemAsync<string>("idConnexion");
+
+        var fichiersSauvegardesCall = await ApiClient.FichierSauvegardesAllAsync(ExerciceModel.PageId, ExerciceModel.ExerciceId, IdEtudiant);
+        List<Services.Base.FichierSauvegarderVM> fichierSauvegardes = fichiersSauvegardesCall.ToList();
+
+        FichierCode = new List<Fichier>();
+
+        foreach (FichierSauvegarderVM fichier in fichierSauvegardes)
+        {
+            FichierCode.Add(new Fichier()
+                {
+                    Contenu = fichier.Contenu,
+                    Nom = fichier.Nom,
+                    Id = fichier.Id,
+                    Css = HiddenTab
+                });
+        }
+
+
+
+        InitDone = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// Permet de DELETE un ficher_sauvegarde
+    /// </summary>
+    /// <param name="id"> id du fichier a supprimer </param>
+    private async void Delete(int id)
+    {
+        if (id <= 0)
+        {
+            Result = "Erreur : Ne peut pas supprimer ce qui n'existe pas. Avez-vous sauvegardé?";
+        }
+        else
+        {
+            Console.WriteLine("Trying to delete fichier_sauvegarde #" + id);
+            try
+            {
+                var deletedTab = FichierCode.Find(tab => tab.Id == id);
+                deletedTab.Css = FocusedTab;
+                FichierCode.Remove(deletedTab);
+                await ApiClient.FichierSauvegardesDELETEAsync(id);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to delete : " + e.Message);
+                Result = "Échec de la supression des fichiers";
+            }
+            Result = "Fichier supprimé";
+        }
+        await SetCode();
+        StateHasChanged();
+    }
+
+
+    /// <summary>
+    /// Permet de faire des indentations avec la touche tab à la place de faire 4 espaces manuellement
+    /// </summary>
+    /// <param name="id"> id du fichier qui requiert des tabulations </param>
+    private async void Tab(int id)
+    {
+        //Attention de pas en ajouter plusieurs
+        await JS.InvokeVoidAsync("TabulationFunction.tab", id.ToString());
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeVoidAsync("HighlightFunctions.highlightSnippets");
+    }
+
+    /// <summary>
+    /// Envoit le code de l'étudiant à l'interpréteur
+    /// </summary>
+    private async void Post()
+    {
+        List<object> fichiers = new List<object>();
+        string jsonString = "";
+
+        Result = "Interprétation du code...";
+        Console.WriteLine("Running python code...");
+        StateHasChanged();
+
+        foreach (var fichier in FichierCode)
+        {
+            if (fichier.Css != "hidden")
+            {
+                await ChangeTab(fichier.Id);
+            }
+        }
+
+        string texte = await GetCode();
+        fichiers.Add(new
+        {
+            Nom = "main.py",
+            Contenu = texte.Replace("\"", "\'")
+        });        
+
+        jsonString = JsonConvert.SerializeObject(fichiers);
+
+        //Voir pour le mettre en post
+        Result = await ApiClient.PageExercicePOSTAsync(jsonString, 1);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Sauvegarde le fichier python de l'étudiant
+    /// </summary>
+    private async void Save()
+    {
+        List<FichierSauvegarde> fichiersSauvegardes = new List<FichierSauvegarde>();
+        int id = -1;
+        foreach (Fichier fichier in FichierCode)
+        {
+            if (fichier.Css != "hidden")
+                id = fichier.Id;
+            await ChangeTab(fichier.Id);
+            fichiersSauvegardes.Add(new FichierSauvegarde()
+                {
+                    Id = fichier.Id,
+                    ProgressionPageId = ExerciceModel.PageId,
+                    ExerciceId = ExerciceModel.Id,
+                    FichierEtudiantDa = IdEtudiant,
+                    Contenu = fichier.Contenu,
+                    Nom = fichier.Nom,
+                    Version = DateTime.Now
+                });
+        }
+        try
+        {
+            await ApiClient.FichierSauvegardesPOSTAsync(fichiersSauvegardes);
+            var fichiersSauvegardesCall = await ApiClient.FichierSauvegardesAllAsync(ExerciceModel.PageId, ExerciceModel.Id, IdEtudiant);
+            List<Services.Base.FichierSauvegarderVM> fichierSauvegardes = fichiersSauvegardesCall.ToList();
+
+            FichierCode = new List<Fichier>();
+
+            foreach (FichierSauvegarderVM fichier in fichierSauvegardes)
+            {
+                FichierCode.Add(new Fichier()
+                    {
+                        Contenu = fichier.Contenu,
+                        Nom = fichier.Nom,
+                        Id = fichier.Id,
+                        Css = HiddenTab
+                    });
+            }
+            //FichierCode[0].Css = FocusedTab;
+        }
+        catch (Exception e)
+        {
+            Result = "Échec de l'enregistrement des fichiers";
+        }
+        Result = "Fichiers enregistrés";
+
+        Console.WriteLine("File saved");
+        if (id != -1)
+            await ChangeTab(id);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Change le focus du fichier à éditer
+    /// </summary>
+    /// <param name="id"> id du fichier qui récupère le focus </param>
+    private async Task ChangeTab(int id)
+    {
+        foreach (Fichier fichier in FichierCode)
+        {
+            if (fichier.Css != "hidden")
+            {
+                fichier.Contenu = await GetCode();
+                fichier.Css = HiddenTab;
+            }
+        }
+        FichierCode.Find(f => f.Id == id).Css = FocusedTab;
+        await SetCode(FichierCode.Find(f => f.Id == id).Contenu);
+        StateHasChanged();
+    }
+
+
+    /// <summary>
+    /// Setup le client pour faire des appels API
+    /// </summary>
+    private void SetupClient()
+    {
+        var builder = WebApplication.CreateBuilder();
+        var handler = new HttpClientHandler();
+        handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+        handler.ServerCertificateCustomValidationCallback =
+        (httpRequestMessage, cert, cetChain, policyErrors) =>
+        {
+            return true;
+        };
+        HttpClient httpClient = new HttpClient(handler) { BaseAddress = new System.Uri(builder.Configuration["API:Use"]) };
+
+        ApiClient = new Client(httpClient);
+    }
+
+    /// <summary>
+    /// Ajoute un fichier
+    /// </summary>
+    private async void AddPage()
+    {
+        string nomFichier = await JS.InvokeAsync<string>("PromptFunction.promptFunc", null);
+
+        if (String.IsNullOrWhiteSpace(nomFichier))
+        {
+            Result = "Nom de fichier invalide";
+        }
+        else
+        {
+            foreach (Fichier f in FichierCode)
+            {
+                f.Css = HiddenTab;
+            }
+
+            FichierCode.Add(new Fichier()
+                {
+                    Contenu = "print('Hello World !')",
+                    Nom = nomFichier,
+                    Id = -(FichierCode.Count + 1),
+                    Css = FocusedTab                    
+                });
+        }
+
+        StateHasChanged();
+    }
+
+    public EventCallback<List<FichierSource>> FichierSourceChanged { get; set; }
+} *@

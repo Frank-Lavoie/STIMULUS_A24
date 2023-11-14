@@ -2,5 +2,6 @@
 {
     public class AppState
     {
+        public string Indentifiant;
     }
 }

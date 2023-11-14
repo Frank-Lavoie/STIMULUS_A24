@@ -1,0 +1,22 @@
+﻿.title {
+    margin: 0;
+    padding: 0 2% 0 2%;
+}
+
+.head {
+    background-color: #e6e6e6;
+}
+
+.codeSample {
+    display: flex;
+    flex-direction: column;
+    border: solid 1px #e6e6e6;
+}
+
+.code {
+    background-color: #f2f2f2;
+    padding: 2%;
+    margin: 0;
+}
+
+

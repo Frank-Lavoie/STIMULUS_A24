@@ -132,6 +132,26 @@ namespace STIMULUS_V2.Server.Services
                 return new APIResponse<IEnumerable<Noeud>>(null, 500, $"Erreur lors de la récupération du model par son parent {typeof(Noeud).Name}. Message : {ex.Message}.");
             }
         }
+        public async Task<APIResponse<IEnumerable<Noeud>>> GetAllFromGraph(int id)
+        {
+            try
+            {
+                var itemList = await sTIMULUSContext.Noeud.Where(item => item.GrapheId == id).ToListAsync();
+
+                if (itemList != null)
+                {
+                    return new APIResponse<IEnumerable<Noeud>>(itemList, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<IEnumerable<Noeud>>(null, 404, $"{typeof(Noeud).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<Noeud>>(null, 500, $"Erreur lors de la récupération du model par son graph {typeof(Noeud).Name}. Message : {ex.Message}.");
+            }
+        }
 
         public async Task<APIResponse<Noeud>> Update(int id, Noeud item)
         {

@@ -12,8 +12,8 @@ using STIMULUS_V2.Server.Data;
 namespace STIMULUS_V2.Server.Migrations
 {
     [DbContext(typeof(STIMULUSContext))]
-    [Migration("20231113183556_FirstMigration")]
-    partial class FirstMigration
+    [Migration("20231114163455_first")]
+    partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

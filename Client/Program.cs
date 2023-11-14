@@ -19,6 +19,31 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddBlazoredLocalStorage();
 
+builder.Services.AddScoped<ICodeService, CodeService>();
+builder.Services.AddScoped<IComposantService, ComposantService>();
+builder.Services.AddScoped<ICoursService, CoursService>();
+builder.Services.AddScoped<IEtudiantService, EtudiantService>();
+builder.Services.AddScoped<IExerciceService, ExerciceService>();
+builder.Services.AddScoped<IFichierSauvegardeService, FichierSauvegardeService>();
+builder.Services.AddScoped<IFichierSourceService, FichierSourceService>();
+builder.Services.AddScoped<IGrapheService, GrapheService>();
+builder.Services.AddScoped<IGroupeService, GroupeService>();
+builder.Services.AddScoped<IGroupeEtudiantService, GroupeEtudiantService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IImportanceService, ImportanceService>();
+builder.Services.AddScoped<INoeudService, NoeudService>();
+builder.Services.AddScoped<IPageService, PageService>();
+builder.Services.AddScoped<IProfesseurService, ProfesseurService>();
+builder.Services.AddScoped<IReferenceService, ReferenceService>();
+builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
+builder.Services.AddScoped<IVideoService, VideoService>();
+
+
+builder.Services.AddSingleton<IUpdateService, UpdateService>();
+builder.Services
+            .AddSingleton<MouseService>()
+            .AddSingleton<IMouseService>(ff => ff.GetRequiredService<MouseService>());
+
 builder.Services.AddSingleton<AppState>();
 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();

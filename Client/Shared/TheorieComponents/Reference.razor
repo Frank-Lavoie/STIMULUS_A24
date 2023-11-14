@@ -1,0 +1,11 @@
+﻿@foreach (STIMULUS_V2.Shared.Models.Entities.Reference reference in References)
+{
+    <div class="componentReference">
+        @reference.Description : <a href="@reference.Url">@reference.Url</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<STIMULUS_V2.Shared.Models.Entities.Reference> References { get; set; }
+}
