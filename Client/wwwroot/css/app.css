@@ -36,6 +36,10 @@
     --rz-panel-menu-item-2nd-level-active-color: #FA4616;
 }
 
+.custom-padding-body{
+    padding: 0;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     height: 100%;

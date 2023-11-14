@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 
 <RadzenComponents />
 <RadzenDialog />
@@ -8,13 +9,14 @@
 
 <AuthorizeView Roles="PROFESSEUR, ETUDIANT, ADMIN">
     <Authorized>
-        <RadzenLayout>
+        <RadzenLayout >
             <Header />
             <Menu sidebarExpanded=false />
-            <RadzenBody>
+            <RadzenBody class="custom-padding-body">
                 @Body
+                <Footer />
             </RadzenBody>
-            <Footer />
+       
         </RadzenLayout>
     </Authorized>
     <NotAuthorized>

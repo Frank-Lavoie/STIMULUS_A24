@@ -1,0 +1,53 @@
+﻿<div class="container text-center">
+    <p class="lead">Vous etes un prof</p>
+</div>
+
+<RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
+<div class="">
+    <div class="row">
+        <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+            <RadzenCard class="w-100 mb-4">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+            </RadzenCard>
+            <RadzenChart>
+                <RadzenPieSeries Data="@progression" Title="Student" CategoryProperty="Progression" ValueProperty="Progression">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenPieSeries>
+            </RadzenChart>
+        </div>
+    </div>
+</div>
+
+@code {
+    bool showDataLabels = false;
+
+    class DataItem
+    {
+        public string Student { get; set; }
+        public double Progression { get; set; }
+    }
+
+    DataItem[] progression = new DataItem[] {
+        new DataItem
+        {
+            Student = "Q1",
+            Progression = 30000
+        },
+        new DataItem
+        {
+            Student = "Q2",
+            Progression = 40000
+        },
+        new DataItem
+        {
+            Student = "Q3",
+            Progression = 50000
+        },
+        new DataItem
+        {
+            Student = "Q4",
+            Progression = 80000
+        },
+    };
+}

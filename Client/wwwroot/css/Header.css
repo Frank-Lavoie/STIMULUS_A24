@@ -12,3 +12,8 @@
     font-size:smaller;
     font-weight:bolder;
 }
+
+.custom-header-logoutbutton {
+    background-color: #FFFFFF;
+    border: none;
+}

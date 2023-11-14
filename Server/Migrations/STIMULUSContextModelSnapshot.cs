@@ -36,8 +36,9 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Property<DateTime?>("TokenExpiry")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TokenInfoId");
 
@@ -506,6 +507,13 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Video");
                 });
 
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Admin", b =>
+                {
+                    b.HasBaseType("STIMULUS_V2.Shared.Models.Authentication.Utilisateur");
+
+                    b.ToTable("Admin", (string)null);
+                });
+
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Etudiant", b =>
                 {
                     b.HasBaseType("STIMULUS_V2.Shared.Models.Authentication.Utilisateur");
@@ -629,6 +637,15 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Etudiant");
 
                     b.Navigation("Page");
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Admin", b =>
+                {
+                    b.HasOne("STIMULUS_V2.Shared.Models.Authentication.Utilisateur", null)
+                        .WithOne()
+                        .HasForeignKey("STIMULUS_V2.Shared.Models.Entities.Admin", "Identifiant")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Etudiant", b =>
