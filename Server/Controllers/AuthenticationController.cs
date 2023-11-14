@@ -105,8 +105,7 @@ namespace STIMULUS_V2.Server.Controllers
 
         // Account Registration
         [HttpPost("Inscription")]
-        [Authorize(Roles = "Admin")]
-         //[Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> UtilisateurInscription(InscriptionVerification inscriptionVerification)
         {
             var result = await utilisateurFactory.CreerUtilisateur(inscriptionVerification.Nom, inscriptionVerification.Prenom, inscriptionVerification.Email, inscriptionVerification.Password);
@@ -123,7 +122,7 @@ namespace STIMULUS_V2.Server.Controllers
 
         // Get total user in the database, ONLY Admin can do that.
         [HttpGet("total-users")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetTotalUsersCount()
         {
             var users = await sTIMULUSContext.Utilisateur.ToListAsync();

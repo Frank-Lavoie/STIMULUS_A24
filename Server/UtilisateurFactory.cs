@@ -30,7 +30,7 @@ namespace STIMULUS_V2.Server
 
                 if (email.Contains("@etu.cegepjonquiere.ca"))
                 {
-                    var etudiant = new Etudiant { Identifiant = utilisateurId, Nom = nom, Prenom = prenom, Email = email, MotDePasse = motDePasse, Role = "ETUDIANT" };
+                    var etudiant = new Etudiant { Identifiant = utilisateurId, Nom = nom, Prenom = prenom, Email = email, MotDePasse = BCrypt.Net.BCrypt.HashPassword(motDePasse), Role = "ETUDIANT" };
                     utilisateur = etudiant;
                 }
                 else if (email.Contains("@cegepjonquiere.ca"))
