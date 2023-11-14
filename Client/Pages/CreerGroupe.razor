@@ -85,7 +85,7 @@
     {
         try
         {
-            groupe.DateCreation = DateTime.Now;
+            groupe.DateCreation = DateTime.Now.Date;
             groupe.ProfesseurId = State.Indentifiant;
 
             var Groupe = await GroupeService.Create(groupe);
@@ -99,8 +99,7 @@
                 await GroupeEtudiantService.Create(groupe_etudiant);
                 await sessionStorage.SetItemAsync<int>("idGroupe", nouveauGroupe.GroupeId);
                 ReRender();
-                NavigationManager.NavigateTo("/Groupe");
-                
+                NavigationManager.NavigateTo("/Groupe");              
             }
         }
 

@@ -57,6 +57,12 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
+        [HttpGet("Fetch/All/GroupActif/{id}")]
+        public async Task<IActionResult> GetAllActif(string id)
+        {
+            var response = await groupeService.GetAllGroupActif(id);
+            return StatusCode(response.StatusCode, response);
+        }
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Groupe groupe)
         {

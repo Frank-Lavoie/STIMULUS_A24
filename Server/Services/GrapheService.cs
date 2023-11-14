@@ -136,7 +136,7 @@ namespace STIMULUS_V2.Server.Services
             {
                 return new APIResponse<IEnumerable<Graphe>>(null, 500, $"Erreur lors de la récupération du model par son graph {typeof(Graphe).Name}. Message : {ex.Message}.");
             }
-        }
+        }        
 
         public async Task<APIResponse<Graphe>> Update(int id, Graphe item)
         {

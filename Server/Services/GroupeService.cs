@@ -10,6 +10,7 @@ namespace STIMULUS_V2.Server.Services
     public class GroupeService : IGroupeService
     {
         private readonly STIMULUSContext sTIMULUSContext;
+        private DateTime dateDuJour = DateTime.Now.Date;
 
         public GroupeService(STIMULUSContext sTIMULUSContext)
         {
@@ -133,7 +134,29 @@ namespace STIMULUS_V2.Server.Services
                 return new APIResponse<IEnumerable<Groupe>>(null, 500, $"Erreur lors de la récupération de la liste du model {typeof(Groupe).Name}. Message : {ex.Message}.");
             }
         }
-       
+
+        public async Task<APIResponse<IEnumerable<Groupe>>> GetAllGroupActif(string id)
+        {
+            try
+            {
+
+                var itemList = await sTIMULUSContext.Groupe.Where(item => item.ProfesseurId == id && item.DateCloture >= dateDuJour).ToListAsync();
+
+                if (itemList != null)
+                {
+                    return new APIResponse<IEnumerable<Groupe>>(itemList, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<IEnumerable<Groupe>>(null, 404, $"{typeof(Groupe).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<Groupe>>(null, 500, $"Erreur lors de la récupération de la liste du model {typeof(Groupe).Name}. Message : {ex.Message}.");
+            }
+        }
+
         public async Task<APIResponse<IEnumerable<Groupe>>> GetAllById(int id)
         {
             try
