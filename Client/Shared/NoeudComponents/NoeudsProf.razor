@@ -127,7 +127,7 @@
     }
     else if (GetModeDeVue() == 3)
     {
-        <NavLink >
+        <NavLink @onclick="DirectionPage">
             <circle @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) @onclick="(e => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
             <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) class="textLink" text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
         </NavLink>
@@ -286,5 +286,9 @@
     /// <summary>
     /// Permet le changement de page en fonction du noeud choisis
     /// </summary>
-    private void DirectionPage() => NavigationManager.NavigateTo("/theorie/" + Node.NoeudId);
+    private async Task DirectionPage()
+    {
+        await sessionStorage.SetItemAsync<int>("idNoeud", Node.NoeudId);
+        NavigationManager.NavigateTo("/Theorie/");
+    }
 }
