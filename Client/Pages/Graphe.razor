@@ -1,4 +1,4 @@
-﻿@page "/graphe"
+﻿@page "/Graphe"
 @using STIMULUS_V2.Client.Shared.GrapheComponents
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
@@ -15,10 +15,10 @@
 
 
 <AuthorizeView Roles="PROFESSEUR">
-    <GrapheProf />
+        <GrapheProf />
 </AuthorizeView>
 <AuthorizeView Roles="ETUDIANT">
-    <GrapheEtudiant />
+        <GrapheEtudiant />
 </AuthorizeView>
 
 @code {

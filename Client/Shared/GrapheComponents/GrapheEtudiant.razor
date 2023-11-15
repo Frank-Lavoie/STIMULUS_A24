@@ -13,6 +13,7 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IUpdateService updateService
 @inject INoeudService NoeudService;
+@inject AppState State;
 
 <div class="row mt-2">
     <div class="col">
@@ -76,9 +77,7 @@
     {
 
         Nodes = new();
-        if (sessionStorage != null)
-        {
-            int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
+        int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
 
             // Wait until 'idGraphe' is not zero (use a timeout or cancellation token for safety).
             while (idGraphe == 0)
@@ -88,7 +87,6 @@
             }
 
             Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
-        }
 
         // Consider navigating using a relative URL
         StateHasChanged();

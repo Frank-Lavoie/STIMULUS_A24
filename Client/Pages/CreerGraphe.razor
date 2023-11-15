@@ -73,8 +73,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        State.Indentifiant = "prof";
-        var responseGroupe = await GroupeService.GetAllForTeacher(State.Indentifiant);//Va cherchert tous les groupes du prof
+        var responseGroupe = await GroupeService.GetAllForTeacher(await sessionStorage.GetItemAsync<string>("idConnexion"));//Va cherchert tous les groupes du prof
         var groupes = responseGroupe.Data;
         listGroupe.AddRange(groupes);//Ajout des groupes dans la liste
     }

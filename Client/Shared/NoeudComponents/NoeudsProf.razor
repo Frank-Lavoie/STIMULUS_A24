@@ -1,14 +1,18 @@
 @using STIMULUS_V2.Client.Services;
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+@inject IJSRuntime JSRuntime
+
 @* @using STIMULUS_V2.Client.Shared.TheorieComponents; *@
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
+@inject Radzen.DialogService RadzenDialogService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject INoeudService NoeudService;
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRunTime
 @inject IPageService PageService
 @inject IComposantService ComposantService
+@inject AppState State;
 
 @for (int i = 0; i < Nodes.Count; i++)
 {
@@ -20,6 +24,10 @@
 <Draggable GetModeDeVue="GetModeDeVue" @bind-X=Node.PosX @bind-Y=Node.PosY>
 
     <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
+    @if (GetModeDeVue() == 1 && pageLink == true)
+    {
+        <circle @onmouseover=@(e => OnMouseHover()) @onclick="@(e => ReLinkPage(Node.NoeudId))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
+    }
     @if (GetModeDeVue() == 2)
     {
         <circle @onmouseup=@(e => SaveChangeNoeud(Node)) @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) @onclick="(e => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
@@ -105,18 +113,25 @@
         </NavLink>
         if (viewPage)
         {
-            <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" width="85" height="105" style="fill: rgba(255,255,255,255)" />
-            <foreignObject @onclick="@(e => ChangePageNoeud(1))" x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" width="80" height="105" style="padding:5px">
-                <span>Template1</span>
-            </foreignObject>
-            <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-50 + Node.Rayon/2)" width="85" height="105" style="fill: rgba(255,255,255,255)" />
-            <foreignObject @onclick="@(e => ChangePageNoeud(2))" x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-50 + Node.Rayon/2)" width="80" height="105" style="padding:5px">
-                <span>Template2</span>
-            </foreignObject>
-            <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(80 + Node.Rayon/2)" width="85" height="105" style="fill: rgba(255,255,255,255)" />
-            <foreignObject @onclick="@(e => ChangePageNoeud(3))" x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(80 + Node.Rayon/2)" width="80" height="105" style="padding:5px">
-                <span>Template3</span>
-            </foreignObject>
+            int offsetX = 0;
+            int offsetY = 0;
+
+            @foreach (var pageAffichage in listePage)
+            {
+                <rect x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX)" y="@(-180 + Node.Rayon / 2 + offsetY)" width="85" height="105" style="fill: rgba(255,255,255,255); stroke: black; stroke-width: 2;" />
+                <foreignObject x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX + 80)" y="@(-180 + Node.Rayon / 2 + offsetY - 12)" width="20" height="20">
+                    <span id="deletePage" title="Supprimer la page @pageAffichage.Ordre" class="oi oi-circle-x" aria-hidden="true" @onclick="@(e => SupprimerPage(pageAffichage.PageId))"></span>
+                </foreignObject>
+                <foreignObject x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX - 15)" y="@(-180 + Node.Rayon / 2 + offsetY + 87)" width="20" height="20">
+                    <span id="AssocierPage" title="Réarranger la page @pageAffichage.PageId" class="oi oi-action-undo" aria-hidden="true" @onclick="@(e => ReLinkPage(pageAffichage.PageId))"></span>
+                </foreignObject>
+                <foreignObject @onclick="@(e => DirectionPage(pageAffichage.PageId))" x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX)" y="@(-180 + Node.Rayon / 2 + offsetY)" width="70" height="110" style="padding:5px;">
+                    <span>#@pageAffichage.Ordre</span>
+                </foreignObject>
+
+                offsetX += 30;
+                offsetY += 30;
+            }
         }
     }
     else if (GetModeDeVue() == 2)
@@ -127,7 +142,7 @@
     }
     else if (GetModeDeVue() == 3)
     {
-        <NavLink @onclick="DirectionPage">
+        <NavLink @onclick="DirectionPages">
             <circle @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) @onclick="(e => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
             <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) class="textLink" text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
         </NavLink>
@@ -138,7 +153,8 @@
     //ChildContent = Noeudception
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
-    [Parameter] public Page page { get; set; }
+    [Parameter] public Page newPage { get; set; } = new();
+    [Parameter] public Page LinkedPage { get; set; } = new();
     [Parameter] public List<Noeud> Nodes { get; set; }
     //Delegate Land
     [Parameter] public Action<Noeud> AjoutNouveauNoeud { get; set; }
@@ -158,12 +174,14 @@
     private int formSizeH = 0;
     private int formSizeW = 0;
     private bool isOpen = false;
+    private bool pageLink = false;
     //Variable couleurs
     private readonly string COULEUR_BLOQUER = "rgb(140,140,140)";
     private readonly string COULEUR_NON_CONSULTER = "rgb(228, 231, 245)";
     private readonly string COULEUR_CONSULTER = "rgb(199,160,53)";
     private readonly string COULEUR_COMPLETER = "rgb(28, 90, 47)";
     private string Couleur { get; set; }
+    public List<Page> listePage { get; set; } = new List<Page>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -185,11 +203,18 @@
         {
             Couleur = COULEUR_COMPLETER;
         }
+        var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
+        var affichPage = pageNoeud.Data;
+
+        listePage.AddRange(affichPage);
+
+        ReRender();
     }
-    private void ViewPageTemplate()
+    private async void ViewPageTemplate()
     {
         if (!viewPage)
         {
+
             viewPage = true;
         }
         else
@@ -224,17 +249,31 @@
         else
             await JsRunTime.InvokeAsync<object>("alert", "Les saisies ne sont pas valides");
         // Dans le cadre de champs vide ou invalide, une alert box apparait
-        ReRender();
         nouveauNoeud = new();
 
         isOpen = false;
     }
     private async void AjoutPage(int id)
     {
-        page.NoeudId = id;
-        page.ImportanceId = 1;
-        page.Ordre = 1;
-        await PageService.Create(page);
+        var pageNoeud = await PageService.GetAllFromNoeud(id);
+        var create = pageNoeud.Data;
+
+        if(create != null)
+        {
+            newPage.NoeudId = id;
+            newPage.ImportanceId = 1;
+            newPage.Ordre = create.Count() + 1;
+            await PageService.Create(newPage);
+        }
+        else
+        {
+            newPage.NoeudId = id;
+            newPage.ImportanceId = 1;
+            newPage.Ordre = 1;
+            await PageService.Create(newPage);
+        }
+
+        ReRender();
     }
     /// <summary>
     /// Appel la fonction en delegate de suppression de noeud
@@ -264,9 +303,37 @@
         displayNouveauNoeud = "hidden";
         isOpen = false;
     }
-    private async void ChangePageNoeud(int id)
+    private async void DeLinkPage(int id)
     {
+        LinkedPage.PageId = id;
+        pageLink = true;
+    }
 
+    private async void ReLinkPage(int id)
+    {
+        var pageNoeud = await PageService.GetAllFromNoeud(id);
+        var relink = pageNoeud.Data;
+
+        LinkedPage.NoeudId = id;
+        LinkedPage.Ordre = relink.Count() + 1;
+        LinkedPage.ImportanceId = 1;
+        await PageService.Update(LinkedPage.PageId, LinkedPage);
+    }
+
+    private async void DirectionPage(int id)
+    {
+        var getPage = await PageService.Get(id);
+        var pageNoeud = getPage.Data;
+
+
+        await sessionStorage.SetItemAsync<int>("idPage", id);
+        await sessionStorage.SetItemAsync<int>("idNoeud", (int)pageNoeud.NoeudId);
+        NavigationManager.NavigateTo("/Theorie");
+    }
+    private async void SupprimerPage(int id)
+    {
+        await PageService.Delete(id);
+        ReRender();
     }
     /// <summary>
     /// Quand on survole un noeud, ses elements lies apparaissent
@@ -286,9 +353,9 @@
     /// <summary>
     /// Permet le changement de page en fonction du noeud choisis
     /// </summary>
-    private async Task DirectionPage()
+    private async Task DirectionPages()
     {
-        await sessionStorage.SetItemAsync<int>("idNoeud", Node.NoeudId);
-        NavigationManager.NavigateTo("/Theorie/");
+        await sessionStorage.SetItemAsync<int>("idNoeud" , Node.NoeudId);
+        NavigationManager.NavigateTo("/Theorie");
     }
 }

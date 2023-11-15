@@ -59,6 +59,7 @@
 
         LoginModel.Identifiant = args.Username;
         LoginModel.Password = args.Password;
+        await sessionStorage.SetItemAsync<string>("idConnexion", args.Username);
         await HandleLogin();
 
         isLoading = false;

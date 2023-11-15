@@ -12,6 +12,7 @@
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject IJSRuntime js
 @inject NavigationManager NavigationManager
+@inject AppState State;
 
 <EditForm Model="groupe" OnSubmit="AjoutGroupe">
     <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
@@ -85,8 +86,8 @@
     {
         try
         {
-            groupe.DateCreation = DateTime.Now.Date;
-            groupe.ProfesseurId = State.Indentifiant;
+            groupe.DateCreation = DateTime.Now;
+            groupe.ProfesseurId = await sessionStorage.GetItemAsync<string>("idConnexion");
 
             var Groupe = await GroupeService.Create(groupe);
             var nouveauGroupe = Groupe.Data;
@@ -105,7 +106,7 @@
 
         catch
         {
-            await js.InvokeVoidAsync("alert", "erreur");
+            await js.InvokeVoidAsync("alert", "Erreur lors de la création du groupe");
         }
 
     }

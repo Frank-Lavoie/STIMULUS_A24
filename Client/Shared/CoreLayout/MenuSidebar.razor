@@ -66,7 +66,6 @@
 
     public async Task SideBarData()
     {
-
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
 
@@ -76,24 +75,26 @@
 
         if (isProfesseur)
         {
-                var responseGroupeActif = await GroupeService.GetAllGroupActif(State.Indentifiant);
-                var groupesActif = responseGroupeActif.Data;
 
-                groupesProf.AddRange(groupesActif);
+            var responseGroupeActif = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
+            var groupesActif = responseGroupeActif.Data;
 
-                foreach (var graphe in groupesActif)
-                {
-                    var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
-                    var graphesDuGroupe = responseGraphe.Data;
 
-                    ListeGraphesProf.AddRange(graphesDuGroupe);
-                }
-                StateHasChanged();
+            groupesProf.AddRange(groupesActif);
+
+            foreach (var graphe in groupesActif)
+            {
+                var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
+                var graphesDuGroupe = responseGraphe.Data;
+
+                ListeGraphesProf.AddRange(graphesDuGroupe);
+            }
+            StateHasChanged();
         }       
 
         if (isEtudiant)
         {
-            var responseGroupeEtudiant = await GroupeEtudiantService.GetAllGroupForStudent(State.Indentifiant);
+            var responseGroupeEtudiant = await GroupeEtudiantService.GetAllGroupForStudent(await sessionStorage.GetItemAsync<string>("idConnexion"));
             var groupes = responseGroupeEtudiant.Data;
 
             foreach (var groupe in groupes)
@@ -113,8 +114,7 @@
 
             StateHasChanged();
         }
-    }
-
+    }   
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);

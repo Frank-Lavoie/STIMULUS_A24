@@ -11,7 +11,7 @@ namespace STIMULUS_V2.Shared.Models.Entities
     {
         public int GroupeId { get; set; }
 
-        [Column(TypeName = "nvarchar(10)")]
+        [Column(TypeName = "nvarchar(max)")]
         public string Nom { get; set; }
 
         [Column(TypeName = "Date")]

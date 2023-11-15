@@ -8,7 +8,7 @@
 @using STIMULUS_V2.Client.Shared.HomeComponent
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 
-
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject AppState State;
 
 @inject ICoursService coursService
@@ -22,27 +22,13 @@
 
 <div>
     <AuthorizeView Roles="ADMIN">
-        <HomeAdminComponent />
-
-        @{
-            State.Indentifiant = context.User.Identity!.Name;
-        }
-
+            <HomeAdminComponent />
     </AuthorizeView>
     <AuthorizeView Roles="PROFESSEUR">
-        <HomeTeacherComponent />
-
-        @{
-            State.Indentifiant = context.User.Identity!.Name;
-        }
+            <HomeTeacherComponent />
     </AuthorizeView>
-
     <AuthorizeView Roles="ETUDIANT">
-        <HomeStudentComponent />
-
-        @{
-            State.Indentifiant = context.User.Identity!.Name;
-        }
+            <HomeStudentComponent />
     </AuthorizeView>
 </div>
 

@@ -14,6 +14,7 @@
 @inject MouseService mouseSrv
 @inject IUpdateService updateService
 @inject NavigationManager NavigationManager
+@inject AppState State;
 @inject IJSRuntime JSRuntim
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject Radzen.DialogService DialogService
@@ -151,6 +152,7 @@
         enfantRechercheParent = noeud;
         enRecherche = true;
     }
+    
     /// <summary>
     /// Recupere les noeuds du graph Numero X et permet la MAJ du graph
     /// </summary>
@@ -170,8 +172,8 @@
 
             Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
 
-            // var response = await NoeudService.GetAllFromGraph(idGraphe);
-            // Nodes = response.Data.ToList();
+            var response = await NoeudService.GetAllFromGraph(idGraphe);
+            Nodes = response.Data.ToList();
             Console.WriteLine("Mise a jour des noeuds du graph");
         }
         StateHasChanged();
@@ -242,6 +244,9 @@
                         }
                         await PageService.Delete(pageDelete.PageId);
                     }
+
+                    await NoeudService.Delete(noeudDelete.NoeudId);
+
                 }
                 foreach (var noeudDeleteParent in noeuds)
                 {
