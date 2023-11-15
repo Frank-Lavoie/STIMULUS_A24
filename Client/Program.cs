@@ -9,6 +9,8 @@ using STIMULUS_V2.Client.CustomAuthentication;
 using STIMULUS_V2.Client.Services;
 using STIMULUS_V2.Client.Services.AuthenticationService;
 using STIMULUS_V2.Shared.Interface.ChildInterface;
+using STIMULUS_V2.Shared.Interface.ParentInterface;
+using STIMULUS_V2.Shared.Models.Entities;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -37,6 +39,11 @@ builder.Services.AddScoped<IProfesseurService, ProfesseurService>();
 builder.Services.AddScoped<IReferenceService, ReferenceService>();
 builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
+
+
+builder.Services.AddScoped<IModelService<Graphe, int>, GrapheService>();
+builder.Services.AddScoped<IModelService<Groupe, int>, GroupeService>();
+builder.Services.AddScoped<IModelService<Cours, int>, CoursService>();
 
 
 builder.Services.AddSingleton<IUpdateService, UpdateService>();

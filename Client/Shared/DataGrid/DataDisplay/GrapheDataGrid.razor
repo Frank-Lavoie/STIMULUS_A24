@@ -1,0 +1,82 @@
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+
+@typeparam TModel
+@inject AppState State;
+@inject IGroupeService GroupeService
+
+
+<RadzenDataGridColumn TItem="Graphe" Property="Nom" Title="Nom" TextAlign="Radzen.TextAlign.Center">
+    <EditTemplate Context="Graphe">
+        <RadzenTextBox @bind-Value="Graphe.Nom"
+                       Name="Nom"
+                       Style="display:block;"
+                       class="w-100" />
+        <RadzenRequiredValidator Text="requis" Component="Nom" Popup="true" Style="position: fixed" />
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+<RadzenDataGridColumn TItem="Graphe" Property="Status" Title="Status" TextAlign="Radzen.TextAlign.Center" Width="150px">
+    <EditTemplate Context="Graphe">
+        <RadzenDropDown @bind-Value="Status"
+                        Placeholder="ACTIVER"
+                        Data="status"
+                        Style="display:block;"
+                        class="w-100"
+                        Name="Status" />
+
+
+        @* <RadzenRequiredValidator Text="requis" Component="Status" Popup="true" Style="position: fixed" /> *@
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+<RadzenDataGridColumn TItem="Graphe" Property="GroupeId" Title="GroupeId" TextAlign="Radzen.TextAlign.Center" Width="250px">
+    <EditTemplate Context="Graphe">
+        <RadzenDropDown @bind-Value="Graphe.GroupeId"
+                        AllowClear="true"
+                        Placeholder="Sélectionné un groupe"
+                        Data="@listGroupe"
+                        Style="display:block;"
+                        class="w-100"
+                        TextProperty="Nom"
+                        ValueProperty="GroupeId"
+                        Name="Nom" />
+        @*<RadzenRequiredValidator Text="requis" Component="GroupeId" Popup="true" Style="position: fixed" />*@
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+
+@code
+{
+    [Parameter]
+    public IEnumerable<TModel> data { get; set; }
+
+    public List<Groupe> listGroupe { get; set; } = new();
+    public string Status { get; set; }
+
+    List<string> status = new List<string>() //Permet un affichage correct du Status
+    {
+        "ACTIVER",
+        "DESACTIVER"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            var result = await GroupeService.GetAll();
+
+            listGroupe = result.Data.AsODataEnumerable().ToList();
+            //grapheList = grapheList.OrderByDescending(d => d.Nom).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}

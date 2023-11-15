@@ -1,0 +1,19 @@
+﻿@typeparam TModel
+
+<RadzenButton Style="background-color:var(--rz-secondary); color:white; height:5%;" Click="@InsertRow" Disabled=@(DataToInsert != null || DataToUpdate != null)><RadzenIcon Icon="add"><span>add</span></RadzenIcon></RadzenButton>
+
+@code {
+    [Parameter]
+    public EventCallback OnInsertRow { get; set; }
+
+    [Parameter]
+    public TModel DataToInsert { get; set; }
+
+    [Parameter]
+    public TModel DataToUpdate { get; set; }
+
+    private async Task InsertRow()
+    {
+        await OnInsertRow.InvokeAsync();
+    }
+}

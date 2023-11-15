@@ -1,0 +1,75 @@
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+
+@typeparam TModel
+@inject AppState State;
+@inject ICoursService CoursService
+
+<RadzenDataGridColumn TItem="Groupe" Property="Nom" Title="Nom" TextAlign="Radzen.TextAlign.Center" Width="250px">
+    <EditTemplate Context="Groupe">
+        <RadzenTextBox @bind-Value="Groupe.Nom"
+                       Name="Nom"
+                       Style="display:block;"
+                       class="w-100" />
+        <RadzenRequiredValidator Text="requis" Component="Nom" Popup="true" Style="position: fixed" />
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+<RadzenDataGridColumn TItem="Groupe" Property="DateCloture" Title="DateCloture" TextAlign="Radzen.TextAlign.Center" Width="250px">
+    <Template Context="Groupe">
+        @String.Format("{0:d}", Groupe.DateCloture)
+    </Template>
+    <EditTemplate Context="Groupe">
+        
+        <RadzenDatePicker @bind-Value="Groupe.DateCloture"
+                          Name="DateCloture"
+                          Style="display:block;"
+                          class="w-100" />
+        <RadzenRequiredValidator Text="requis" Component="DateCloture" Popup="true" Style="position: fixed" />
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+<RadzenDataGridColumn TItem="Groupe" Property="CoursId" Title="Cours" TextAlign="Radzen.TextAlign.Center" Width="150px">
+    <EditTemplate Context="Groupe">
+        <RadzenDropDown @bind-Value="Groupe.CoursId"
+                        AllowClear="true"
+                        Placeholder="Sélectionné un cours"
+                        Data="@listCours"
+                        Style="display:block;"
+                        class="w-100"
+                        TextProperty="CoursId"
+                        ValueProperty="CoursId"
+                        Name="Code" />
+
+        @* <RadzenRequiredValidator Text="requis" Component="CoursId" Popup="true" Style="position: fixed" /> *@
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+
+@code {
+    [Parameter]
+    public IEnumerable<TModel> data { get; set; }
+
+    public List<Cours> listCours { get; set; } = new();
+    public string Status { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            var result = await CoursService.GetAll();
+
+            listCours = result.Data.AsODataEnumerable().ToList();
+            //grapheList = grapheList.OrderByDescending(d => d.Nom).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}

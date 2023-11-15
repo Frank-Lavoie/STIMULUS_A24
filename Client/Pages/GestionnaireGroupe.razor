@@ -1,0 +1,48 @@
+﻿@using STIMULUS_V2.Client.Shared.DataGrid
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+
+@inject IGroupeService GroupeService
+
+@page "/GestionnaireGroupe"
+
+<div class="mainGrid">
+    <InlineGrid TModel="Groupe" TKey="int" data="groupeList" count="count" isLoading="isLoading" OnLoadData="LoadData" gridTitle="Gestionnaire des Groupes" />
+</div>
+
+@code {
+    private RadzenDataGrid<Groupe> groupeGrid;
+    private IEnumerable<Groupe> groupeList;
+    private bool isLoading;
+    private int count;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        groupeList = Enumerable.Empty<Groupe>().ToList();
+
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+
+        try
+        {
+            var result = await GroupeService.GetAll();
+
+            groupeList = result.Data.AsODataEnumerable().ToList();
+            //grapheList = grapheList.OrderByDescending(d => d.Nom).ToList();
+
+            count = groupeList.Count();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        isLoading = false;
+    }
+}

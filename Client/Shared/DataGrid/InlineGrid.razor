@@ -1,0 +1,219 @@
+﻿@using STIMULUS_V2.Client.Shared.DataGrid.DataDisplay
+@using STIMULUS_V2.Shared.Interface.ParentInterface
+@using STIMULUS_V2.Shared.Models.Entities;
+
+@inject NavigationManager NavManager
+@inject DialogService DialogService
+
+@typeparam TModel
+@typeparam TKey
+
+<div class="customGridHeader">
+    <label class="gridHeaderLabel">@gridTitle</label>
+    <AddButton TModel="TModel" DataToInsert="DataToInsert" DataToUpdate="DataToUpdate" OnInsertRow="InsertRow" />
+</div>
+
+<RadzenDataGrid @ref="dataGrid" AllowAlternatingRows="false" Count="@count" AllowFiltering="false" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="Radzen.DataGridEditMode.Single" FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" PagerHorizontalAlign="Radzen.HorizontalAlign.Center"
+                Data="@data" KeyProperty="@itemId" TItem="TModel" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@OnSort" Page="@Reset" Filter="@Reset" Style="border-radius:5px">
+    <EmptyTemplate>
+        @if (isLoading)
+        {
+            <RadzenStack AlignItems="Radzen.AlignItems.Center" Class="rz-m-12" Gap="2rem">
+                <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            </RadzenStack>
+        }
+        else
+        {
+            <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">VIDE</p>
+        }
+    </EmptyTemplate>
+    <Columns>
+        @if (typeof(TModel) == typeof(Graphe))
+        {
+            <GrapheDataGrid TModel="TModel" data="@data"/>
+        }
+        @if (typeof(TModel) == typeof(Groupe))
+        {
+            <GroupeDataGrid TModel="TModel" data="@data" />
+        }
+        @if (typeof(TModel) == typeof(Cours))
+        {
+            <CoursDataGrid/>
+        }
+        <ColumnsButton TModel="TModel" OnCancelEdit="CancelEdit" OnNavigationToForm="NavigationToForm" OnSaveRow="SaveRow" OnTransportItemState="TransportItemState" OnShowDeleteConfirmationDialog="ShowDeleteConfirmationDialog" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Inject]
+    protected IModelService<TModel, TKey> ModelService { get; set; }
+
+    [Parameter]
+    public IEnumerable<TModel> data { get; set; }
+    [Parameter]
+    public int count { get; set; }
+    [Parameter]
+    public bool isLoading { get; set; }
+    [Parameter]
+    public EventCallback OnLoadData { get; set; }
+    [Parameter]
+    public EventCallback<TModel> OnReturnCurrentItem { get; set; }
+    [Parameter]
+    public string gridTitle { get; set; }
+
+    public RadzenDataGrid<TModel> dataGrid;
+
+    private string itemId = typeof(TModel).Name + "Id";
+
+    public TModel DataToInsert;
+    public TModel DataToUpdate;
+
+    private async Task LoadData()
+    {
+        await OnLoadData.InvokeAsync();
+    }
+
+    public void OnSort(DataGridColumnSortEventArgs<TModel> args)
+    {
+        // keep empty
+    }
+
+    public async Task Reset()
+    {
+        DataToInsert = default(TModel);
+        DataToUpdate = default(TModel);
+    }
+
+    public async Task InsertRow()
+    {
+        DataToInsert = Activator.CreateInstance<TModel>();
+        if (dataGrid.Count == 0) count++;
+
+        await dataGrid.InsertRow(DataToInsert);
+    }
+
+    public async Task EditRow(TModel item)
+    {
+        DataToUpdate = item;
+
+        await dataGrid.EditRow(item);
+    }
+
+    public async Task SaveRow(TModel item)
+    {
+        await dataGrid.UpdateRow(item);
+    }
+
+    public async Task OnUpdateRow(TModel item)
+    {
+        Reset();
+
+        try
+        {
+            var idProperty = typeof(TModel).GetProperty("Id");
+            TKey itemId = GetItemId(item);
+
+            await ModelService.Update(itemId, item);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    public async Task CancelEdit(TModel item)
+    {
+        Reset();
+
+        await DeleteRow(item);
+    }
+
+    public async Task DeleteRow(TModel item)
+    {
+        Reset();
+
+        try
+        {
+            var idProperty = typeof(TModel).GetProperty("Id");
+            TKey itemId = GetItemId(item);
+            if (dataGrid.Data.Contains(item))
+            {
+                await ModelService.Delete(itemId);
+            }
+            else
+            {
+                dataGrid.CancelEditRow(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        await LoadData();
+        await dataGrid.Reload();
+        StateHasChanged();
+    }
+
+    public async Task OnCreateRow(TModel item)
+    {
+        await ModelService.Create(item);
+
+        DataToInsert = default(TModel);
+
+        await LoadData();
+        await dataGrid.Reload();
+    }
+
+    public void NavigationToForm(TModel item)
+    {
+        if (typeof(TModel).Name == "Devis")
+        {
+            string route = $"/Formulaire/{typeof(TModel).Name}/{GetItemId(item)}";
+            NavManager.NavigateTo(route);
+        }
+        else
+        {
+            ReturnCurrentItem(item);
+        }
+    }
+
+    public void TransportItemState(TModel item)
+    {
+        string route = $"/Visionnement/{typeof(TModel).Name}/{GetItemId(item)}";
+        NavManager.NavigateTo(route);
+    }
+
+    private void ReturnCurrentItem(TModel item)
+    {
+        OnReturnCurrentItem.InvokeAsync(item);
+    }
+
+    private TKey GetItemId(TModel item)
+    {
+        var className = typeof(TModel).Name;
+        var propertyName = className + "Id";
+        var idProperty = typeof(TModel).GetProperty(propertyName);
+
+        if (idProperty != null && idProperty.PropertyType == typeof(TKey))
+        {
+            var idValue = idProperty.GetValue(item);
+            if (idValue is TKey)
+            {
+                return (TKey)idValue;
+            }
+        }
+        return default(TKey);
+    }
+
+    private async Task ShowDeleteConfirmationDialog(TModel item)
+    {
+        var result = await DialogService.Confirm($"Êtes-vous sûr de vouloir supprimer", "Supprimer " + typeof(TModel).Name + "?", new ConfirmOptions() { OkButtonText = "Oui", CancelButtonText = "Non" });
+
+        if (result == true)
+        {
+            await DeleteRow(item);
+        }
+    }
+}

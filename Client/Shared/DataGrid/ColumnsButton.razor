@@ -1,0 +1,83 @@
+﻿@typeparam TModel
+
+<RadzenDataGridColumn TItem="TModel" Filterable="false" Sortable="false" TextAlign="Radzen.TextAlign.End" Width="150px">
+    @*TODO:Add button to create devis here*@
+    <Template Context="item">
+        @if (typeof(TModel).Name == "Graphe")
+        {
+            <button type="button" class="low-opacity-button row-button why" @onclick="() => TransportItemState(item)">
+                <span class="material-icons">visibility</span>
+            </button>
+        }
+        <button type="button" class="low-opacity-button row-button" @onclick="() => NavigationToForm(item)">
+            <span class="material-icons">edit</span>
+        </button>
+        <button type="button" class="low-opacity-button row-button" @onclick="() => ShowDeleteConfirmationDialog(item)">
+            <span class="material-icons">delete</span>
+        </button>
+    </Template>
+    <EditTemplate Context="item">
+        <button type="button" class="low-opacity-button row-button" @onclick="() => SaveRow(item)">
+            <span class="material-icons">check_circle</span>
+        </button>
+        <button type="button" class="low-opacity-button row-button" @onclick="() => CancelEdit(item)">
+            <span class="material-icons">cancel</span>
+        </button>
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+@code {
+    [Parameter]
+    public EventCallback<TModel> OnNavigationToForm { get; set; }
+    [Parameter]
+    public EventCallback<TModel> OnTransportItemState { get; set; }
+    [Parameter]
+    public EventCallback<TModel> OnShowDeleteConfirmationDialog { get; set; }
+    [Parameter]
+    public EventCallback<TModel> OnSaveRow { get; set; }
+    [Parameter]
+    public EventCallback<TModel> OnCancelEdit { get; set; }
+
+    private async Task NavigationToForm(TModel item)
+    {
+        await OnNavigationToForm.InvokeAsync(item);
+    }
+
+    private async Task TransportItemState(TModel item)
+    {
+        await OnTransportItemState.InvokeAsync(item);
+    }
+
+    private async Task ShowDeleteConfirmationDialog(TModel item)
+    {
+        await OnShowDeleteConfirmationDialog.InvokeAsync(item);
+    }
+
+    private async Task SaveRow(TModel item)
+    {
+        await OnSaveRow.InvokeAsync(item);
+    }
+
+    private async Task CancelEdit(TModel item)
+    {
+        await OnCancelEdit.InvokeAsync(item);
+    }
+
+    private int GetItemId(TModel item)
+    {
+        var className = typeof(TModel).Name;
+        var propertyName = className + "Id";
+        var idProperty = typeof(TModel).GetProperty(propertyName);
+
+        if (idProperty != null && idProperty.PropertyType == typeof(int))
+        {
+            var idValue = idProperty.GetValue(item);
+            if (idValue is int)
+            {
+                return (int)idValue;
+            }
+        }
+
+        return 0;
+    }
+}

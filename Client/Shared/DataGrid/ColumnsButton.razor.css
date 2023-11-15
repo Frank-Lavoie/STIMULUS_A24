@@ -1,0 +1,20 @@
+﻿.low-opacity-button {
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+    .low-opacity-button:hover {
+        opacity: 100%;
+    }
+
+.row-button {
+    background: none;
+    border: none;
+    padding: 0px;
+    cursor: pointer;
+    outline: none;
+}
+
+.why {
+    margin-right: 10px
+}

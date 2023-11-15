@@ -1,17 +1,20 @@
-﻿@page "/Graphe"
+﻿@using Blazored.SessionStorage;
 @using STIMULUS_V2.Client.Shared.GrapheComponents
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
 @using Blazored.LocalStorage;
 @using Microsoft.AspNetCore.Components.Authorization;
+
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject IGrapheService GrapheService
 @inject ILocalStorageService localStorageService
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject ISessionStorageService sessionStorage
+@inject IConfiguration config;
 @inject AuthenticationStateProvider authStateProvider
-@inject Microsoft.Extensions.Configuration.IConfiguration config;
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AppState State;
+
+@page "/Graphe"
 
 
 <AuthorizeView Roles="PROFESSEUR">

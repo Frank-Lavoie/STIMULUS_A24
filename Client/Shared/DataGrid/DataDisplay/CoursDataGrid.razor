@@ -1,0 +1,25 @@
+﻿@using STIMULUS_V2.Shared.Models.Entities;
+
+<RadzenDataGridColumn TItem="Cours" Property="Code" Title="Code" TextAlign="Radzen.TextAlign.Center" Width="150px">
+    <EditTemplate Context="Cours">
+        <RadzenTextBox @bind-Value="Cours.Code"
+                       Name="Code"
+                       Style="display:block;"
+                       class="w-100" />
+        <RadzenRequiredValidator Text="requis" Component="Code" Popup="true" Style="position: fixed" />
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+<RadzenDataGridColumn TItem="Cours" Property="Description" Title="Description" TextAlign="Radzen.TextAlign.Center" Width="250px">
+    <EditTemplate Context="Cours">
+        <RadzenTextArea @bind-Value="Cours.Description"
+                        Name="Description"
+                        Style="display:block;"
+                        class="w-100" />
+        <RadzenRequiredValidator Text="requis" Component="Description" Popup="true" Style="position: fixed" />
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+@code {
+
+}
