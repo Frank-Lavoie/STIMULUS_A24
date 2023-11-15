@@ -31,7 +31,6 @@
     <None Include="Pages\AboutPage.razor" />
     <None Include="Shared\HomeComponent\HomeStudentComponent.razor" />
     <None Include="Shared\HomeComponent\HomeTeacherComponent.razor" />
-    <None Include="wwwroot\css\Footer.css" />
   </ItemGroup>
 
   <ItemGroup>
