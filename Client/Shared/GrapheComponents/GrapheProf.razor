@@ -10,6 +10,7 @@
 @inject INoeudService NoeudService
 @inject IGrapheService GrapheService
 @inject IPageService PageService
+@inject IComposantService ComposantService
 @inject MouseService mouseSrv
 @inject IUpdateService updateService
 @inject NavigationManager NavigationManager
@@ -229,6 +230,16 @@
                 {
                     foreach (var pageDelete in pages)
                     {
+                        var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
+                        var composant = allComposant.Data;
+
+                        if(composant != null)
+                        {
+                            foreach (var composantDelete in composant)
+                            {
+                                await ComposantService.Delete(composantDelete.ComposantId);
+                            }
+                        }
                         await PageService.Delete(pageDelete.PageId);
                     }
                 }

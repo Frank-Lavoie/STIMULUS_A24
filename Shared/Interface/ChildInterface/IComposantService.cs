@@ -1,4 +1,5 @@
 ﻿using STIMULUS_V2.Shared.Interface.ParentInterface;
+using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;

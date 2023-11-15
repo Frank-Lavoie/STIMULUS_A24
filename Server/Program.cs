@@ -68,8 +68,8 @@ using (var scope = app.Services.CreateScope())
 
     var context = services.GetRequiredService<STIMULUSContext>();
 
-    context.Database.EnsureDeleted();
-    context.Database.EnsureCreated();
+    //context.Database.EnsureDeleted();
+    //context.Database.EnsureCreated();
 
     context.EnsureAdminUserCreated();
     context.EnsureEtuUserCreated();

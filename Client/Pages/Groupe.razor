@@ -10,35 +10,72 @@
 @inject IGroupeEtudiantService GroupeEtudiantService
 
 
+<RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
+        <RadzenImage Path="@imageActif" Style="width: 100px; height: 100px; border-radius: 50%;" />
+        <RadzenStack Gap="2">
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Nom</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeProf != null) ? groupeProf.Nom : "")</b></RadzenText>
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Status</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1"><b>@siActif</b></RadzenText>
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Cours associé</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
+        </RadzenStack>
+    </RadzenStack>   
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Graphe(s) associé(s) : </RadzenText>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="3">
+        @foreach (var graphe in listGrapheGroupe)
+        {
+            <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;" />
+        }
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
+    <RadzenRow RowGap="2" Class="justify-content-center">
+        <RadzenDataGrid TItem="Etudiant" Data="@listEtudiant" EmptyText="Aucun élève dans ce groupe." AllowPaging="true" AllowSorting="true" Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
+            <Columns>
+                <RadzenDataGridColumn TextAlign="TextAlign.Center"  TItem="Etudiant" Property="Identifiant" Title="Code DA" />
+                <RadzenDataGridColumn TextAlign="TextAlign.Center"  TItem="Etudiant" Property="Prenom" Title="Prénom" />
+                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Nom" Title="Nom" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenRow>   
+</RadzenCard>
 
-<div class="container text-center">
-    <h1 class="display-4">@((groupeProf != null) ? groupeProf.Nom : "")</h1>
-    <p class="lead">Cours : @((groupeCours != null) ? groupeCours.Code : "")</p>
-    <p class="lead">Graphe(s) associé(s) : </p>
-    @foreach (var graphe in listGrapheGroupe)
-    {
-        <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" />
-    }
-    <p class="lead">Liste des élèves :</p>
-    <RadzenDataGrid Data="@listEtudiant" TItem="Etudiant" AllowSorting="true" AllowFiltering="true" Sortable="true">
-        <Columns>
-            <RadzenDataGridColumn TItem="Etudiant" Property="Identifiant" Title="DA" />
-            <RadzenDataGridColumn TItem="Etudiant" Property="Prenom" Title="Prenom" />
-            <RadzenDataGridColumn TItem="Etudiant" Property="Nom" Title="Nom" />
-        </Columns>
-    </RadzenDataGrid>
-</div>
 @code {
     public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
     public List<Etudiant> listEtudiant { get; set; }  = new List<Etudiant>();
+    public DateTime dateDuJour = DateTime.Now.Date;
+    public string imageActif;
+    public string siActif;
 
 
     protected override async Task OnInitializedAsync()
     {
-        var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));      
+        await GetDataGroupe();
+    }  
+
+    private async Task GetDataGroupe()
+    {
+        var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
         groupeProf = groupe.Data;
+
+        if (groupeProf.DateCloture >= dateDuJour)
+        {
+            imageActif = "/RessourceVisuel/groupeactif.jpg";
+            siActif = "Actif";
+        }
+        else
+        {
+            imageActif = "/RessourceVisuel/groupeinactif.jpg";
+            siActif = "Inactif";
+        }
+
+
+
 
         var cours = await CoursService.Get((int)groupeProf.CoursId);
         groupeCours = cours.Data;
@@ -51,7 +88,6 @@
             if (grapheGroupe != null)
             {
                 listGrapheGroupe.Add(grapheGroupe);
-
             }
         }
 
@@ -68,10 +104,11 @@
             if (etudiantGroupe != null)
             {
                 listEtudiant.Add(etudiantGroupe);
-
             }
         }
-    }  
+        StateHasChanged();
+    }
+
     private async void RedirectionGraphe(int id)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", id);
