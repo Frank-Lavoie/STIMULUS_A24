@@ -1,0 +1,26 @@
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Models.Authentication;
+@using STIMULUS_V2.Shared.Models.Entities;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject AuthenticationStateProvider authStateProvider;
+@inject ITexteFormaterService TextFormaterService; 
+
+
+<h3 class="custom-theory-texte-letter">Composant texte</h3>
+
+@code {
+	[Parameter]
+	public int TexteFormaterId { get; set; }
+
+
+	// private async void AddTextFormater()
+	// {
+	// 	var texteFormater = new TexteFormater();
+	// 	texteFormater.TexteFormaterId = TexteFormaterId;
+	// 	await TextFormaterService.Create(texteFormater);
+	// 	StateHasChanged();
+	// }
+
+} 

@@ -34,7 +34,7 @@
     }
     @if (GetModeDeVue() == 2 || GetModeDeVue() == 3)
     {
-        <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />    
+        <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
         <foreignObject x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
             <span> Nom :  @Node.Nom </span><br />
             <span>Parent : @TestParent()</span><br /> @*Pour ne pas avoir de champ vide*@
@@ -48,7 +48,7 @@
             <foreignObject x="@(-Node.Rayon )" y="@(-Node.Rayon )" width="20" height="20">
                 <span id="deleteNoeud" title="Supprimer le noeud @Node.Status" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"></span>
             </foreignObject>
-        }   
+        }
         @if (Node.NoeudParentId == null || Node.NoeudId == Node.NoeudParentId)
         {
             <foreignObject x="@((-Node.Rayon) )" y="@((Node.Rayon)/2 )" width="20" height="20">
@@ -56,14 +56,14 @@
             </foreignObject>
         }
         <foreignObject x="@(Node.Rayon/2 )" y="@(Node.Rayon/2 )" width="20" height="20">
-        @if (!isOpen)
-        {
-            <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-plus" aria-hidden="true" @onclick="@NouveauNoeud"></span>
-        }
-        else
-        {
-            <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-minus" aria-hidden="true" @onclick="@FermeForm"></span>
-        }
+            @if (!isOpen)
+            {
+                <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-plus" aria-hidden="true" @onclick="@NouveauNoeud"></span>
+            }
+            else
+            {
+                <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-minus" aria-hidden="true" @onclick="@FermeForm"></span>
+            }
         </foreignObject>
         <rect x="@(Node.Rayon/2 + 20)" y="@(Node.Rayon/2 + 20)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="fill: rgba(0, 0, 0, 0.5); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
         <foreignObject x="@(Node.Rayon/2 +20 )" y="@(Node.Rayon/2 +20)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="padding:5px">
@@ -136,9 +136,9 @@
     }
     else if (GetModeDeVue() == 2)
     {
-        <NavLink >
+        <NavLink>
             <text @onclick=@(e => RelinkBindNode(Node)) @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) class="textLink" text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
-        </NavLink>    
+        </NavLink>
     }
     else if (GetModeDeVue() == 3)
     {
@@ -149,7 +149,7 @@
     }
 </Draggable>
 @code {
-    private bool delete = false; 
+    private bool delete = false;
     //ChildContent = Noeudception
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
@@ -187,7 +187,7 @@
     {
         Couleur = COULEUR_BLOQUER;
 
-        if(Node.Status == 1)
+        if (Node.Status == 1)
         {
             Couleur = COULEUR_BLOQUER;
         }
@@ -243,7 +243,7 @@
         nouveauNoeud.Disponibilite = DateTime.Now;
 
         if (nouveauNoeud.Nom != null && nouveauNoeud.Description != null && nouveauNoeud.Nom.Length >= 3 && nouveauNoeud.Nom.Length <= 10 && nouveauNoeud.Description.Length >= 3 && nouveauNoeud.Description.Length <= 100 && nouveauNoeud.Rayon != null)
-        {            
+        {
             AjoutNouveauNoeud(nouveauNoeud);
         }
         else
@@ -258,7 +258,7 @@
         var pageNoeud = await PageService.GetAllFromNoeud(id);
         var create = pageNoeud.Data;
 
-        if(create != null)
+        if (create != null)
         {
             newPage.NoeudId = id;
             newPage.ImportanceId = 1;
@@ -278,7 +278,7 @@
     /// <summary>
     /// Appel la fonction en delegate de suppression de noeud
     /// </summary>
-    private void SupprimerNoeud() 
+    private void SupprimerNoeud()
     {
         SupprNoeud(Node.NoeudId);
     }
@@ -355,7 +355,7 @@
     /// </summary>
     private async Task DirectionPages()
     {
-        await sessionStorage.SetItemAsync<int>("idNoeud" , Node.NoeudId);
+        await sessionStorage.SetItemAsync<int>("idNoeud", Node.NoeudId);
         NavigationManager.NavigateTo("/Theorie");
     }
 }
