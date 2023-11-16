@@ -1,4 +1,5 @@
-﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Client.Shared.DataGrid
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
 
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -25,7 +26,7 @@
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Cours associé</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
         </RadzenStack>
-    </RadzenStack>   
+    </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Graphe(s) associé(s) : </RadzenText>
     </RadzenStack>
@@ -37,24 +38,24 @@
     </RadzenStack>
     <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
     <RadzenRow RowGap="2" Class="justify-content-center">
-        <RadzenDataGrid TItem="Etudiant" Data="@listEtudiant" EmptyText="Aucun élève dans ce groupe." AllowPaging="true" AllowSorting="true" Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
-            <Columns>
-                <RadzenDataGridColumn TextAlign="TextAlign.Center"  TItem="Etudiant" Property="Identifiant" Title="Code DA" />
-                <RadzenDataGridColumn TextAlign="TextAlign.Center"  TItem="Etudiant" Property="Prenom" Title="Prénom" />
-                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Nom" Title="Nom" />
-            </Columns>
-        </RadzenDataGrid>
-    </RadzenRow>   
+        <div class="mainGrid">
+            <InlineGrid TModel="Etudiant" TKey="string" data="etudiantList" count="count" isLoading="isLoading" OnLoadData="LoadData" gridTitle="Gestionnaire des Etudiants" />
+        </div>       
+    </RadzenRow>
 </RadzenCard>
 
 @code {
     [Parameter]
     public int GroupeId { get; set; }
 
-    public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
-    public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
-    public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
-    public List<Etudiant> listEtudiant { get; set; }  = new List<Etudiant>();
+    private RadzenDataGrid<Etudiant> etudiantGrid;
+    List<Etudiant> etudiantList = new List<Etudiant>();
+    private bool isLoading;
+    private int count;
+
+    public Groupe groupeProf { get; set; }
+    public Cours groupeCours { get; set; }
+    public List<Graphe> listGrapheGroupe { get; set; } = new();
     public DateTime dateDuJour = DateTime.Now.Date;
     public string imageActif;
     public string siActif;
@@ -62,58 +63,71 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await GetDataGroupe();
-    }  
+        await LoadData();
+    }
 
-    private async Task GetDataGroupe()
+    private async Task LoadData()
     {
-        var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
-        groupeProf = groupe.Data;
+        isLoading = true;
 
-        if (groupeProf.DateCloture >= dateDuJour)
+        try
         {
-            imageActif = "/RessourceVisuel/groupeactif.jpg";
-            siActif = "Actif";
-        }
-        else
-        {
-            imageActif = "/RessourceVisuel/groupeinactif.jpg";
-            siActif = "Inactif";
-        }
+            var groupe = await GroupeService.Get(GroupeId);
+            groupeProf = groupe.Data;
 
-
-
-
-        var cours = await CoursService.Get((int)groupeProf.CoursId);
-        groupeCours = cours.Data;
-
-
-        var graphe = await GrapheService.GetAllFromGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
-        var graphes = graphe.Data;
-        foreach (var grapheGroupe in graphes)//Va chercher tous les graphes, de tous les groupes
-        {
-            if (grapheGroupe != null)
+            if (groupeProf.DateCloture >= dateDuJour)
             {
-                listGrapheGroupe.Add(grapheGroupe);
+                imageActif = "/RessourceVisuel/groupeactif.jpg";
+                siActif = "Actif";
             }
-        }
-
-
-        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
-        var etudiants = eleve.Data;
-
-        foreach (var etudiant in etudiants)
-        {
-            var responseEtudiant = await EtudiantService.Get(etudiant.CodeDA);
-            var etudiantGroupe = responseEtudiant.Data;
-
-            // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
-            if (etudiantGroupe != null)
+            else
             {
-                listEtudiant.Add(etudiantGroupe);
+                imageActif = "/RessourceVisuel/groupeinactif.jpg";
+                siActif = "Inactif";
             }
+
+
+
+
+            var cours = await CoursService.Get((int)groupeProf.CoursId);
+            groupeCours = cours.Data;
+
+
+            var graphe = await GrapheService.GetAllFromGroup(GroupeId);
+            var graphes = graphe.Data;
+            foreach (var grapheGroupe in graphes)//Va chercher tous les graphes, de tous les groupes
+            {
+                if (grapheGroupe != null)
+                {
+                    listGrapheGroupe.Add(grapheGroupe);
+                }
+            }
+
+
+            var eleve = await GroupeEtudiantService.GetAllStudentForGroup(GroupeId);
+            var etudiants = eleve.Data;
+
+            foreach (var etudiant in etudiants)
+            {
+                var responseEtudiant = await EtudiantService.Get(etudiant.CodeDA);
+                var etudiantGroupe = responseEtudiant.Data;
+
+                // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
+                if (etudiantGroupe != null)
+                {
+                    etudiantList.Add(etudiantGroupe);
+                }
+            }
+            StateHasChanged();
+
+            count = etudiantList.Count();
         }
-        StateHasChanged();
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        isLoading = false;
     }
 
     private async void RedirectionGraphe(int id)

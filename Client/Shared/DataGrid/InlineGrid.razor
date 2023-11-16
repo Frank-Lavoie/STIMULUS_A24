@@ -43,6 +43,10 @@
         {
             <CoursDataGrid/>
         }
+        @if (typeof(TModel) == typeof(Etudiant))
+        {
+            <GroupeEtudiantDataGrid />
+        }
         <ColumnsButton TModel="TModel" OnCancelEdit="CancelEdit" OnNavigationToForm="NavigationToForm" OnSaveRow="SaveRow" OnTransportItemState="TransportItemState" OnShowDeleteConfirmationDialog="ShowDeleteConfirmationDialog" />
     </Columns>
 </RadzenDataGrid>

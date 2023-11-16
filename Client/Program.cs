@@ -44,6 +44,7 @@ builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<IModelService<Graphe, int>, GrapheService>();
 builder.Services.AddScoped<IModelService<Groupe, int>, GroupeService>();
 builder.Services.AddScoped<IModelService<Cours, int>, CoursService>();
+builder.Services.AddScoped<IModelService<Etudiant, string>, EtudiantService>();
 
 
 builder.Services.AddSingleton<IUpdateService, UpdateService>();

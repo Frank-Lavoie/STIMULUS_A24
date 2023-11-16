@@ -156,6 +156,55 @@ namespace STIMULUS_V2.Server.Services
                 return new APIResponse<IEnumerable<Groupe_Etudiant>>(null, 500, $"Erreur lors de la récupération du model par son parent {typeof(Groupe_Etudiant).Name}. Message : {ex.Message}.");
             }
         }
+
+        public async Task<APIResponse<IEnumerable<Groupe_Etudiant>>> AddStudentsToGroup(int groupId, List<string> studentIds)
+        {
+            try
+            {
+                // Vérifier si le groupe existe
+                var existingGroup = await sTIMULUSContext.Groupe_Etudiant.FindAsync(groupId);
+
+                // Si le groupe n'existe pas, le créer
+                if (existingGroup == null)
+                {
+                    existingGroup = new Groupe_Etudiant
+                    {
+                        // Initialisez les propriétés du groupe si nécessaire
+                        GroupeId = groupId,
+                        // ...
+                    };
+
+                    sTIMULUSContext.Groupe_Etudiant.Add(existingGroup);
+                }
+
+                // Ajouter les étudiants au groupe
+                foreach (var studentId in studentIds)
+                {
+                    var groupeEtudiant = new Groupe_Etudiant
+                    {
+                        GroupeId = groupId,
+                        CodeDA = studentId
+                    };
+
+                    sTIMULUSContext.Groupe_Etudiant.Add(groupeEtudiant);
+                }
+
+                await sTIMULUSContext.SaveChangesAsync();
+
+                // Récupérer la liste des Groupe_Etudiant créés
+                var addedGroupEtudiants = await sTIMULUSContext.Groupe_Etudiant
+                    .Where(ge => ge.GroupeId == groupId && studentIds.Contains(ge.CodeDA))
+                    .ToListAsync();
+
+                return new APIResponse<IEnumerable<Groupe_Etudiant>>(addedGroupEtudiants, 201, "Étudiants ajoutés au groupe avec succès.");
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<Groupe_Etudiant>>(null, 500, $"Erreur lors de l'ajout d'étudiants au groupe. Message : {ex.Message}");
+            }
+        }
+
+
         public async Task<APIResponse<Groupe_Etudiant>> Update(int id, Groupe_Etudiant item)
         {
             try

@@ -1,0 +1,61 @@
+﻿@using STIMULUS_V2.Shared.Models.Entities;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
+@inject IEtudiantService EtudiantService
+
+@*  <RadzenDataGrid TItem="Etudiant" Data="@etudiantList" EmptyText="Aucun élève dans ce groupe." AllowPaging="true" AllowSorting="true" Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
+            <Columns>
+                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Identifiant" Title="Code DA" />
+                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Prenom" Title="Prénom" />
+                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Nom" Title="Nom" />
+            </Columns>
+        </RadzenDataGrid> *@
+
+<RadzenDataGridColumn TItem="Etudiant" Property="Identifiant" Title="Identifiant" TextAlign="Radzen.TextAlign.Center" Width="150px">
+    <EditTemplate Context="Etudiant">
+        <RadzenDropDown @bind-Value="Etudiant.Identifiant"
+                        AllowClear="true"
+                        Placeholder="Sélectionné un cours"
+                        Data="@listEtudiant"
+                        Style="display:block;"
+                        class="w-100"
+                        TextProperty="Identifiant"
+                        ValueProperty="Identifiant"
+                        Name="Identifiant" />
+
+        @* <RadzenRequiredValidator Text="requis" Component="CoursId" Popup="true" Style="position: fixed" /> *@
+    </EditTemplate>
+</RadzenDataGridColumn>
+
+<RadzenDataGridColumn TItem="Etudiant" Property="Prenom" Title="Prenom" TextAlign="Radzen.TextAlign.Center" Width="250px">
+    
+</RadzenDataGridColumn>
+
+<RadzenDataGridColumn TItem="Etudiant" Property="Nom" Title="Nom" TextAlign="Radzen.TextAlign.Center" Width="250px">
+    
+</RadzenDataGridColumn>
+
+@code {
+    public List<Etudiant> listEtudiant { get; set; } = new();
+    public string Status { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            var result = await EtudiantService.GetAll();
+
+            listEtudiant = result.Data.AsODataEnumerable().ToList();
+            //grapheList = grapheList.OrderByDescending(d => d.Nom).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}

@@ -43,12 +43,12 @@ namespace STIMULUS_V2.Server.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("Fetch/All/{id}")]
-        public async Task<IActionResult> GetAllById(int id)
-        {
-            var response = await etudiantService.GetAllById(id);
-            return StatusCode(response.StatusCode, response);
-        }
+        //[HttpGet("Fetch/All/{id}")]
+        //public async Task<IActionResult> GetAllById(int id)
+        //{
+        //    var response = await etudiantService.GetAllById(id);
+        //    return StatusCode(response.StatusCode, response);
+        //}
         [HttpGet("Fetch/All/{id}")]
         public async Task<IActionResult> GetAllByIdentifiant(string id)
         {

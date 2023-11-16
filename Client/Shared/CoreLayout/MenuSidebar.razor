@@ -27,20 +27,38 @@
             }
         </AuthorizeView>
         <AuthorizeView Roles="PROFESSEUR">
+
             <RadzenPanelMenuItem Text="Gestionnaire des Graphe" Icon="account_tree" Path="GestionnaireGraphe" />
-            <RadzenPanelMenuItem Text="Gestion de Groupe" Icon="assignment_ind" Path="GestionnaireGroupe" />
-            <RadzenPanelMenuItem Text="Gestion de Cours" Icon="chrome_reader_mode" Path="GestionnaireCours" />
-            @foreach (var groupe in groupesProf)
+            @if (ListeGraphesProf.Any())
             {
-                <RadzenPanelMenuItem Icon="face" Text="@groupe.Nom" Click="(() => ChargerGroupe(groupe.GroupeId))"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Graphe Actif" Icon="account_tree">
+                    @foreach (var graphe in ListeGraphesProf)
+                    {
+                        <RadzenPanelMenuItem Icon="build" Text="@graphe.Nom" Click="(() => ChargerGraphe(graphe.GrapheId))"/>
+                    }
+                </RadzenPanelMenuItem>
             }
-            <RadzenPanelMenuItem Text="Créer un nouveau Groupe" Icon="input" Path="/CreerGroupe" />
-            <RadzenPanelMenuItem Text="Gestion de Cours" Icon="chrome_reader_mode">
-                <RadzenPanelMenuItem Text="Créer un nouveau Cours" Icon="input" Path="/CreerCours" />
-            </RadzenPanelMenuItem>
+
+
+            <RadzenPanelMenuItem Text="Gestion de Groupe" Icon="assignment_ind" Path="GestionnaireGroupe" />
+            @if (ListeGraphesProf.Any())
+            {
+                <RadzenPanelMenuItem Text="Groupe Actif" Icon="assignment_ind">
+                    @foreach (var groupe in groupesProf)
+                    {
+                        <RadzenPanelMenuItem Icon="face" Text="@groupe.Nom" Click="(() => ChargerGroupe(groupe.GroupeId))"/>
+                    }
+                </RadzenPanelMenuItem>
+            }
+
+
+            <RadzenPanelMenuItem Text="Gestion de Cours" Icon="chrome_reader_mode" Path="GestionnaireCours" />
+
         </AuthorizeView>
         <AuthorizeView Roles="ADMIN">
+
             <RadzenPanelMenuItem Text="Ajouter un utiliateur" Icon="person_add" Path="/AjouterUtilisateur" />
+
         </AuthorizeView>
     </RadzenPanelMenu>
 </RadzenSidebar>
