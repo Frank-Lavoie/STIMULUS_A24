@@ -10,10 +10,12 @@ namespace STIMULUS_V2.Server.Services
     public class GrapheService : IGrapheService
     {
         private readonly STIMULUSContext sTIMULUSContext;
+        private readonly INoeudService NoeudService;
 
-        public GrapheService(STIMULUSContext sTIMULUSContext)
+        public GrapheService(STIMULUSContext sTIMULUSContext, INoeudService NoeudService)
         {
             this.sTIMULUSContext = sTIMULUSContext;
+            this.NoeudService = NoeudService;
         }
 
         public async Task<APIResponse<Graphe>> Create(Graphe item)
@@ -22,6 +24,10 @@ namespace STIMULUS_V2.Server.Services
             {
                 sTIMULUSContext.Graphe.Add(item);
                 await sTIMULUSContext.SaveChangesAsync();
+
+                Noeud nouveauNoeud = CreateDefaultNode(item);
+
+                await NoeudService.Create(nouveauNoeud);
 
                 if (sTIMULUSContext.Graphe.Contains(item))
                 {
@@ -161,6 +167,22 @@ namespace STIMULUS_V2.Server.Services
             {
                 return new APIResponse<Graphe>(null, 500, $"Erreur lors de la mise à jour du model {typeof(Graphe).Name}. Message : {ex.Message}.");
             }
+        }
+        private Noeud CreateDefaultNode(Graphe item)
+        {
+            return new Noeud
+            {
+                GrapheId = item.GrapheId,
+                Nom = item.Nom,
+                Description = "Structure",
+                Disponibilite = DateTime.Now,
+                Obligatoire = false,
+                Status = 4,
+                PosX = 0.0,
+                PosY = 0.0,
+                Rayon = 50,
+                Type = NoeudType.STRUCTURE
+            };
         }
     }
 }

@@ -35,17 +35,17 @@
         </foreignObject>
         <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
             <foreignObject x="0" y="5" width="180" height="205" style="border-radius: 5px;">
-             <RadzenPanel style="background-color: #32587a; padding: 10px;">
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                <RadzenPanel style="background-color: #32587a; padding: 10px;">
+                    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
                         <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>
-                      <RadzenLabel style="color:rgb(140,140,140);">Bloqué</RadzenLabel>
-                      <RadzenLabel style="color:rgb(228, 231, 245);">Disponible</RadzenLabel>
-                      <RadzenLabel style="color:rgb(199,160,53);">Consulté</RadzenLabel>
-                      <RadzenLabel style="color:rgb(88,150,105);">Complété</RadzenLabel>
-                </RadzenStack>
-            </RadzenPanel>
+                        <RadzenLabel style="color:rgb(140,140,140);">Bloqué</RadzenLabel>
+                        <RadzenLabel style="color:rgb(228, 231, 245);">Disponible</RadzenLabel>
+                        <RadzenLabel style="color:rgb(199,160,53);">Consulté</RadzenLabel>
+                        <RadzenLabel style="color:rgb(88,150,105);">Complété</RadzenLabel>
+                    </RadzenStack>
+                </RadzenPanel>
             </foreignObject>
-            <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox = "@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth"
+            <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth"
             @onmousemove=@(e => mouseSrv.FireMove(this, e))
             @onmouseup=@(e => mouseSrv.FireUp(this, e))
             @onmousewheel="Zoom">
@@ -54,14 +54,18 @@
                     @foreach (var noeud in Nodes)
                     {
                         <NoeudsProf UpdateGraphe="UpdateGraphe" GetModeDeVue="GetModeDeVue" RelinkBindNode="RelinkBindNode" ReLinkNoeud="ReLinkNoeud"
-                         Node="@noeud" Nodes="@Nodes" SaveChangeNoeud="SaveChange" AjoutNouveauNoeud="AjoutNouveauNoeud" SupprNoeud="SupprimerNoeud"/>
+                                    Node="@noeud" Nodes="@Nodes" SaveChangeNoeud="SaveChange" AjoutNouveauNoeud="AjoutNouveauNoeud" SupprNoeud="SupprimerNoeud" />
                     }
                 </Draggable>
             </svg>
         </svg>
     </div>
 </div>
+
 @code {
+    [Parameter]
+    public int GrapheId { get; set; }
+
     private string displayHover = "hidden";
     private double viewBoxX = 0;
     private double viewBoxY = 0;
@@ -80,7 +84,7 @@
     public List<Noeud> Nodes { get; set; } = new();
 
     protected async override void OnInitialized()
-    {        
+    {
         await UpdateGraphe();
     }
     /// <summary>
@@ -88,16 +92,16 @@
     /// </summary>
     /// <param name="v">valeur de la vue</param>
     ///
-    private void ModeDeVue(int v) 
+    private void ModeDeVue(int v)
     {
-        if(v == 1)
+        if (v == 1)
         {
             modeDeVuInfo = "Gestion de Pages";
             modeDeVuButtonPage = "btn-warning";
             modeDeVuButtonEdition = "btn-info";
             modeDeVuButtonEtudiant = "btn-info";
         }
-        else if(v == 2)
+        else if (v == 2)
         {
             modeDeVuInfo = "Édition";
             modeDeVuButtonPage = "btn-info";
@@ -152,30 +156,22 @@
         enfantRechercheParent = noeud;
         enRecherche = true;
     }
-    
+
     /// <summary>
     /// Recupere les noeuds du graph Numero X et permet la MAJ du graph
     /// </summary>
     private async Task UpdateGraphe()
     {
         Nodes = new();
-        if (sessionStorage != null)
-        {
-            int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
 
-            // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
-            while (idGraphe == 0)
-            {
-                //Plus chill qu'une boucle industrielle
-                await Task.Delay(100);
-            }
 
-            Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+        Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(GrapheId)).Data.ToList();
+        Console.WriteLine("Mise a jour des noeuds du graph" + GrapheId);
 
-            var response = await NoeudService.GetAllFromGraph(idGraphe);
-            Nodes = response.Data.ToList();
-            Console.WriteLine("Mise a jour des noeuds du graph");
-        }
+        var response = await NoeudService.GetAllFromGraph(GrapheId);
+        Nodes = response.Data.ToList();
+        Console.WriteLine("Mise a jour des noeuds du graph");
+
         StateHasChanged();
     }
     /// <summary>
@@ -206,7 +202,7 @@
     /// <param name="noeud"></param>
     public async Task SaveNouveauNoeud(Noeud noeud)
     {
-        if(noeud != null)
+        if (noeud != null)
         {
             await NoeudService.Create(noeud);
             Console.WriteLine($"Nouveau noeud : {noeud.Nom}");
@@ -235,7 +231,7 @@
                         var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
                         var composant = allComposant.Data;
 
-                        if(composant != null)
+                        if (composant != null)
                         {
                             foreach (var composantDelete in composant)
                             {

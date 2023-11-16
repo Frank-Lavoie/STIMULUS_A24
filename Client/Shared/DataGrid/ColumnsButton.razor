@@ -9,6 +9,12 @@
                 <span class="material-icons">visibility</span>
             </button>
         }
+        @if (typeof(TModel).Name == "Groupe")
+        {
+            <button type="button" class="low-opacity-button row-button why" @onclick="() => TransportItemState(item)">
+                <span class="material-icons">visibility</span>
+            </button>
+        }
         <button type="button" class="low-opacity-button row-button" @onclick="() => NavigationToForm(item)">
             <span class="material-icons">edit</span>
         </button>

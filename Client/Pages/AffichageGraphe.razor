@@ -7,6 +7,7 @@
 
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject IGrapheService GrapheService
+@inject INoeudService NoeudService
 @inject ILocalStorageService localStorageService
 @inject ISessionStorageService sessionStorage
 @inject IConfiguration config;
@@ -14,16 +15,19 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AppState State;
 
-@page "/Graphe"
+@page "/Graphe/{GrapheId:int}"
 
 
 <AuthorizeView Roles="PROFESSEUR">
-        <GrapheProf />
+    <GrapheProf GrapheId="GrapheId" />
 </AuthorizeView>
 <AuthorizeView Roles="ETUDIANT">
-        <GrapheEtudiant />
+    <GrapheEtudiant />
 </AuthorizeView>
 
+
+
 @code {
-    
+    [Parameter]
+    public int GrapheId { get; set; }
 }

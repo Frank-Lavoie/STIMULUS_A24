@@ -1,9 +1,11 @@
 ﻿@using STIMULUS_V2.Client.Shared.DataGrid.DataDisplay
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Interface.ParentInterface
 @using STIMULUS_V2.Shared.Models.Entities;
 
 @inject NavigationManager NavManager
 @inject DialogService DialogService
+@inject INoeudService NoeudService
 
 @typeparam TModel
 @typeparam TKey
@@ -159,7 +161,7 @@
     public async Task OnCreateRow(TModel item)
     {
         await ModelService.Create(item);
-
+        
         DataToInsert = default(TModel);
 
         await LoadData();
@@ -181,7 +183,7 @@
 
     public void TransportItemState(TModel item)
     {
-        string route = $"/Visionnement/{typeof(TModel).Name}/{GetItemId(item)}";
+        string route = $"{typeof(TModel).Name}/{GetItemId(item)}";
         NavManager.NavigateTo(route);
     }
 
@@ -205,7 +207,7 @@
             }
         }
         return default(TKey);
-    }
+    }    
 
     private async Task ShowDeleteConfirmationDialog(TModel item)
     {

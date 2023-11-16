@@ -1,14 +1,17 @@
-﻿@page "/Groupe"
-@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IGroupeService GroupeService
 @inject IEtudiantService EtudiantService
 @inject ICoursService CoursService
-@inject NavigationManager NavigationManager
 @inject IGrapheService GrapheService
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject AppState State;
+@inject NavigationManager NavigationManager
+
+
+@page "/Groupe/{GroupeId:int}"
 
 
 <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
@@ -45,6 +48,9 @@
 </RadzenCard>
 
 @code {
+    [Parameter]
+    public int GroupeId { get; set; }
+
     public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
