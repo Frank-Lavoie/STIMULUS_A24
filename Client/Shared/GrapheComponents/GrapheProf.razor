@@ -1,4 +1,4 @@
-﻿@using Microsoft.CodeAnalysis;
+﻿﻿@using Microsoft.CodeAnalysis;
 @using System.Text;
 @using STIMULUS_V2.Client.Services;
 @using STIMULUS_V2.Client.Shared.NoeudComponents
@@ -7,6 +7,7 @@
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.NoeudsProf;
+
 @inject INoeudService NoeudService
 @inject IGrapheService GrapheService
 @inject IPageService PageService
@@ -20,47 +21,67 @@
 @inject Radzen.DialogService DialogService
 
 <div class="row mt-2">
-    <div class="col">
-        <foreignObject x="5" y="5" width="1300" height="40">
-            <RadzenStack class="divGrapheEntete" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-                <RadzenButton Click=AugmenterZoom Text="+" ButtonStyle="ButtonStyle.Secondary" />
-                <RadzenButton Click=ReduireZoom Text="-" ButtonStyle="ButtonStyle.Secondary" />
-                <RadzenButton Click=ResetViewbox Text="Réinitialisé" Icon="refresh" ButtonStyle="ButtonStyle.Dark" />
-                <RadzenLabel style="color: blue;">Zoom: @AfficheZoom()</RadzenLabel>
-                <RadzenButton Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="ButtonStyle.Primary" />
-                <RadzenButton Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="ButtonStyle.Primary" />
-                <RadzenButton Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Primary" />
-                <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" ButtonStyle="ButtonStyle.Danger" style="margin-left: auto;" />
-            </RadzenStack>
-        </foreignObject>
-        <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
-            <foreignObject x="0" y="5" width="180" height="205" style="border-radius: 5px;">
-             <RadzenPanel style="background-color: #32587a; padding: 10px;">
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-                        <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>
-                      <RadzenLabel style="color:rgb(140,140,140);">Bloqué</RadzenLabel>
-                      <RadzenLabel style="color:rgb(228, 231, 245);">Disponible</RadzenLabel>
-                      <RadzenLabel style="color:rgb(199,160,53);">Consulté</RadzenLabel>
-                      <RadzenLabel style="color:rgb(88,150,105);">Complété</RadzenLabel>
+    <foreignObject class="custom-graphe-foreignobject-bg" x="5" y="5" width="150" height="50">
+        <RadzenStack class="divGrapheEntete" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenButton Style="background-color: darkblue" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
+            <RadzenButton Style="background-color: darkblue" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
+            <RadzenButton Style="background-color: darkblue" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
+            <RadzenText class="custom-graphe-zoom-text" TextStyle="TextStyle.DisplayH3">Zoom: @AfficheZoom()</RadzenText>
+            <RadzenButton Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="ButtonStyle.Primary"  />
+            <RadzenButton Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto;" />
+        </RadzenStack>
+    </foreignObject>
+    <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
+        @*<rect width="180" height="180" x="0" y="5" fill="#32587a"></rect>*@
+        <foreignObject class="bg-transparent" x="0" y="5" width="160" height="205">
+            <RadzenPanel class="custom-graphe-legend-panel">
+                <RadzenStack class="custom-graphe-legend-stack"  Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                    <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>
+                    <div class="custom-graphe-legend-color-position">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <RadzenLabel>Bloqué</RadzenLabel>
+                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/140-140-140.png"></RadzenImage>
+                        </div>
+                    </div>
+                    <div class="custom-graphe-legend-color-position">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <RadzenLabel>Disponible</RadzenLabel>
+                             <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/228-231-245.png"></RadzenImage>
+                        </div>
+                    </div>
+                    <div class="custom-graphe-legend-color-position">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <RadzenLabel>Consulté</RadzenLabel>
+                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/199-160-53.png"></RadzenImage>
+                        </div>
+                    </div>
+                    <div class="custom-graphe-legend-color-position">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <RadzenLabel>Complété</RadzenLabel>
+                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/88-150-105.png"></RadzenImage>
+                        </div>
+                    </div>
                 </RadzenStack>
             </RadzenPanel>
-            </foreignObject>
-            <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox = "@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth"
+        </foreignObject>
+        <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth"
             @onmousemove=@(e => mouseSrv.FireMove(this, e))
             @onmouseup=@(e => mouseSrv.FireUp(this, e))
             @onmousewheel="Zoom">
-                <Draggable X="@((viewBoxWidth - 1800) / 2)" Y="@((viewBoxWidth - 1500) / 2)" GetModeDeVue="GetModeFond">
-                    <rect x="-1000" y="-1000" width="4000" height="4000" style="fill:rgb(0,0,0,0);stroke-width:0;stroke:rgb(0,0,0)" />
-                    @foreach (var noeud in Nodes)
-                    {
-                        <NoeudsProf UpdateGraphe="UpdateGraphe" GetModeDeVue="GetModeDeVue" RelinkBindNode="RelinkBindNode" ReLinkNoeud="ReLinkNoeud"
-                         Node="@noeud" Nodes="@Nodes" SaveChangeNoeud="SaveChange" AjoutNouveauNoeud="AjoutNouveauNoeud" SupprNoeud="SupprimerNoeud"/>
-                    }
-                </Draggable>
-            </svg>
+            <Draggable X="@((viewBoxWidth - 1800) / 2)" Y="@((viewBoxWidth - 1500) / 2)" GetModeDeVue="GetModeFond">
+                <rect x="-1000" y="-1000" width="4000" height="4000" style="fill:rgb(0,0,0,0);stroke-width:0;stroke:rgb(0,0,0)" />
+                @foreach (var noeud in Nodes)
+                {
+                    <NoeudsProf UpdateGraphe="UpdateGraphe" GetModeDeVue="GetModeDeVue" RelinkBindNode="RelinkBindNode" ReLinkNoeud="ReLinkNoeud"
+                    Node="@noeud" Nodes="@Nodes" SaveChangeNoeud="SaveChange" AjoutNouveauNoeud="AjoutNouveauNoeud" SupprNoeud="SupprimerNoeud" />
+                }
+            </Draggable>
         </svg>
-    </div>
+    </svg>
 </div>
+
 @code {
     private string displayHover = "hidden";
     private double viewBoxX = 0;
@@ -80,7 +101,7 @@
     public List<Noeud> Nodes { get; set; } = new();
 
     protected async override void OnInitialized()
-    {        
+    {
         await UpdateGraphe();
     }
     /// <summary>
@@ -88,16 +109,16 @@
     /// </summary>
     /// <param name="v">valeur de la vue</param>
     ///
-    private void ModeDeVue(int v) 
+    private void ModeDeVue(int v)
     {
-        if(v == 1)
+        if (v == 1)
         {
             modeDeVuInfo = "Gestion de Pages";
             modeDeVuButtonPage = "btn-warning";
             modeDeVuButtonEdition = "btn-info";
             modeDeVuButtonEtudiant = "btn-info";
         }
-        else if(v == 2)
+        else if (v == 2)
         {
             modeDeVuInfo = "Édition";
             modeDeVuButtonPage = "btn-info";
@@ -124,7 +145,7 @@
     /// </summary>
     /// <returns></returns>
     private int GetModeFond() => 2; //Hardcode
-                                    //Quand la souris survole
+    //Quand la souris survole
     private void OnMouseHover() => displayHover = "show";
     //Quand la souris ne survole plus
     private void OnMouseLeave() => displayHover = "hidden";
@@ -152,7 +173,7 @@
         enfantRechercheParent = noeud;
         enRecherche = true;
     }
-    
+
     /// <summary>
     /// Recupere les noeuds du graph Numero X et permet la MAJ du graph
     /// </summary>
@@ -196,17 +217,19 @@
         await UpdateGraphe();
         Console.WriteLine($"Suppression du noeud : id={id}");
     }
+
     /// <summary>
     /// Sauvegarde les mises a jour du graph
     /// </summary>
     public async void SaveChange(Noeud noeud) => await NoeudService.Update(noeud.NoeudId, noeud);
+
     /// <summary>
     /// Ajoute un noeud dans la BD
     /// </summary>
     /// <param name="noeud"></param>
     public async Task SaveNouveauNoeud(Noeud noeud)
     {
-        if(noeud != null)
+        if (noeud != null)
         {
             await NoeudService.Create(noeud);
             Console.WriteLine($"Nouveau noeud : {noeud.Nom}");
@@ -235,7 +258,7 @@
                         var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
                         var composant = allComposant.Data;
 
-                        if(composant != null)
+                        if (composant != null)
                         {
                             foreach (var composantDelete in composant)
                             {
@@ -244,16 +267,13 @@
                         }
                         await PageService.Delete(pageDelete.PageId);
                     }
-
                     await NoeudService.Delete(noeudDelete.NoeudId);
-
                 }
                 foreach (var noeudDeleteParent in noeuds)
                 {
                     await NoeudService.Delete(noeudDeleteParent.NoeudId);
                 }
             }
-
             // Supprimer le graphe
             await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
             NavigationManager.NavigateTo("/");
@@ -275,6 +295,7 @@
         zoomIncrement = 100;
         AfficheZoom();
     }
+
     /// <summary>
     /// Augmenter le zoom
     /// </summary>
@@ -296,6 +317,7 @@
             AfficheZoom();
         }
     }
+
     /// <summary>
     /// Reduit le zoom
     /// </summary>
@@ -317,6 +339,7 @@
             AfficheZoom();
         }
     }
+
     /// <summary>
     /// Zoom scroll molette
     /// </summary>
@@ -368,6 +391,7 @@
             }
         }
     }
+
     public string AfficheZoom()
     {
         if (zoomIncrement <= 0)
