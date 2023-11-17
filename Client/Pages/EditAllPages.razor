@@ -440,8 +440,9 @@
         composant.Type = typeComposant;
 
         await ComposantService.Create(composant);
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
         await popup.CloseAsync();
     }
 
@@ -471,8 +472,9 @@
 
         await PageService.Create(newPage);
 
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        var allPage = await PageService.GetAllFromNoeud(noeud.NoeudId);
+        listePage = allPage.Data.ToList();
+        StateHasChanged();
     }
     private async void DeletePage()
     {
@@ -499,13 +501,15 @@
                 var firstPage = listePage.FirstOrDefault();
                 await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
             }
-            NavigationManager.NavigateTo("/");
-            NavigationManager.NavigateTo("/ModifierPages");
+            allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+            listComposant = allComposant.Data.ToList();
+            StateHasChanged();
         }
         else
         {
-            NavigationManager.NavigateTo("/");
-            NavigationManager.NavigateTo("/ModifierPages");
+            var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+            listComposant = allComposant.Data.ToList();
+            StateHasChanged();
         }
     }
 
@@ -650,7 +654,7 @@
 
         // 8. Rafraîchir la page
         NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        NavigationManager.NavigateTo("/ModifierPages"); 
     }
 
     void TogglePopup()
