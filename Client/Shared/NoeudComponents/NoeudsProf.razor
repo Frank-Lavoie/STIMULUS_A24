@@ -24,10 +24,6 @@
 <Draggable GetModeDeVue="GetModeDeVue" @bind-X=Node.PosX @bind-Y=Node.PosY>
 
     <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
-    @if (GetModeDeVue() == 1 && pageLink == true)
-    {
-        <circle @onmouseover=@(e => OnMouseHover()) @onclick="@(e => ReLinkPage(Node.NoeudId))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
-    }
     @if (GetModeDeVue() == 2)
     {
         <circle @onmouseup=@(e => SaveChangeNoeud(Node)) @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) @onclick="(e => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
@@ -109,10 +105,10 @@
             @if (Node.Type == NoeudType.CONTENU)
             {
                 <foreignObject x="@((-Node.Rayon) )" y="@((Node.Rayon)/2 )" width="20" height="20">
-                <span title="Aller vers l'édition"  class="oi oi-book" id="EditionPages" @onclick="DirectionPages"></span>
+                    <span title="Aller vers l'édition" class="oi oi-book" id="reLink" @onclick="DirectionPages"></span>
                 </foreignObject>
                 <foreignObject x="@(Node.Rayon/2 )" y="@(Node.Rayon/2 )" width="20" height="20">
-                <span title="Ajouter une nouvelle page à @Node.Nom" id="addPage" class="oi oi-plus" aria-hidden="true" @onclick="@(args => AjoutPage(Node.NoeudId))"></span>
+                <span title="Ajouter une nouvelle page à @Node.Nom" id="addNoeud" class="oi oi-plus" aria-hidden="true" @onclick="@(args => AjoutPage(Node.NoeudId))"></span>
                 </foreignObject>
             }
             <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) class="textLink" text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
@@ -126,10 +122,10 @@
             {
                 <rect x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX)" y="@(-180 + Node.Rayon / 2 + offsetY)" width="85" height="105" style="fill: rgba(255,255,255,255); stroke: black; stroke-width: 2;" />
                 <foreignObject x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX + 80)" y="@(-180 + Node.Rayon / 2 + offsetY - 12)" width="20" height="20">
-                    <span id="deletePage" title="Supprimer la page @pageAffichage.Ordre" class="oi oi-circle-x" aria-hidden="true" @onclick="@(e => SupprimerPage(pageAffichage.PageId))"></span>
+                    <span id="deleteNoeud" title="Supprimer la page @pageAffichage.Ordre" class="oi oi-circle-x" aria-hidden="true" @onclick="@(e => SupprimerPage(pageAffichage.PageId))"></span>
                 </foreignObject>
                 <foreignObject x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX - 15)" y="@(-180 + Node.Rayon / 2 + offsetY + 87)" width="20" height="20">
-                    <span id="AssocierPage" title="Réarranger la page @pageAffichage.PageId" class="oi oi-action-undo" aria-hidden="true" @onclick="@(e => ReLinkPage(pageAffichage.PageId))"></span>
+                    <span id="AssocierPage" title="Réarranger la page @pageAffichage.PageId" class="oi oi-action-undo" aria-hidden="true" @onclick="@(e => ReLinkPage(pageAffichage))"></span>
                 </foreignObject>
                 <foreignObject @onclick="@(e => DirectionPage(pageAffichage.PageId))" x="@(Node.Rayon * 2 - Node.Rayon / 2 - 10 + offsetX)" y="@(-180 + Node.Rayon / 2 + offsetY)" width="70" height="110" style="padding:5px;">
                     <span>#@pageAffichage.Ordre</span>
@@ -179,8 +175,11 @@
     [Parameter] public Action<Noeud> SaveChangeNoeud { get; set; }
     [Parameter] public Action<Noeud> RelinkBindNode { get; set; }
     [Parameter] public Action<Noeud> ReLinkNoeud { get; set; }
+    [Parameter] public Func<Noeud, Task<bool>> ReLinkBindPage { get; set; }
+    [Parameter] public Action<Page> ReLinkPage { get; set; }
     [Parameter] public Func<int> GetModeDeVue { get; set; }
     [Parameter] public Func<Task> UpdateGraphe { get; set; }
+
     private string displayHover = "hidden";
     private bool viewPage = false;
     //Type de noeud
@@ -226,20 +225,38 @@
 
         listePage.AddRange(affichPage);
 
-        ReRender();
+        StateHasChanged();
     }
     private async void ViewPageTemplate()
     {
         if (!viewPage)
         {
+            // Ajoutez ici l'appel à la fonction ReLinkBindPage avant d'afficher et trier les pages
+            await ReLinkBindPage(Node); //erreur 404
+            var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
+            var affichPage = pageNoeud.Data.ToList();
+            affichPage = affichPage.OrderBy(p => p.Ordre).ToList();
 
+            // Met à jour les valeurs de la propriété Ordre de manière séquentielle
+            for (int i = 0; i < affichPage.Count(); i++)
+            {
+                affichPage[i].Ordre = i + 1;
+                PageService.Update(affichPage[i].PageId, affichPage[i]);
+
+            }
+            listePage.Clear();
+            listePage.AddRange(affichPage);
+            StateHasChanged();
             viewPage = true;
+
         }
         else
         {
             viewPage = false;
         }
     }
+
+
     /// <summary>
     /// (Visuel) permet de check si le noeud a un parent, et l'affiche dans le bulle d'info du noeud
     /// </summary>
@@ -273,28 +290,55 @@
     }
     private async Task AjoutPage(int id)
     {
-        var pageNoeud = await PageService.GetAllFromNoeud(id);
-        var create = pageNoeud.Data;
+        // Récupère toutes les pages du nœud avant l'ajout
+        var pageNoeudBefore = await PageService.GetAllFromNoeud(id);
+        var createBefore = pageNoeudBefore.Data;
 
-        if (create  != null)
+        // Initialise une nouvelle page
+        var newPage = new Page();
+        newPage.NoeudId = id;
+        newPage.ImportanceId = 1;
+
+        if (createBefore != null)
         {
-            newPage.NoeudId = id;
-            newPage.ImportanceId = 1;
-            newPage.Ordre = create.Count() + 1;
-            var NewPage = await PageService.Create(newPage);
-            newPage = NewPage.Data;
+            // Si des pages existent déjà, organise la valeur de la propriété Ordre de manière séquentielle
+            newPage.Ordre = createBefore.Count() + 1;
         }
         else
         {
-            newPage.NoeudId = id;
-            newPage.ImportanceId = 1;
+            // Si aucune page n'existe, initialise la valeur de la propriété Ordre à 1
             newPage.Ordre = 1;
-            var NewPage = await PageService.Create(newPage);
-            newPage = NewPage.Data;
         }
 
+        // Crée la nouvelle page
+        await PageService.Create(newPage);
 
+        // Récupère toutes les pages du nœud après l'ajout
+        var pageNoeudAfter = await PageService.GetAllFromNoeud(id);
+        var affichPage = pageNoeudAfter.Data.ToList();
+
+        // Trie les pages en fonction de la propriété Ordre
+        affichPage = affichPage.OrderBy(p => p.Ordre).ToList();
+
+        // Met à jour les valeurs de la propriété Ordre de manière séquentielle
+        for (int i = 0; i < affichPage.Count(); i++)
+        {
+            affichPage[i].Ordre = i + 1;
+            PageService.Update(affichPage[i].PageId, affichPage[i]);
+
+        }
+
+        // Met à jour la liste des pages
+        listePage.Clear();
+        listePage.AddRange(affichPage);
+
+        // Active l'affichage des pages
+        viewPage = true;
+
+        // Met à jour l'affichage
+        StateHasChanged();
     }
+
     /// <summary>
     /// Appel la fonction en delegate de suppression de noeud
     /// </summary>
@@ -323,52 +367,23 @@
         displayNouveauNoeud = "hidden";
         isOpen = false;
     }
-    private async void DeLinkPage(int id)
-    {
-        LinkedPage.PageId = id;
-        pageLink = true;
-
-        var pageDelete = await PageService.Get(id);
-        var page = pageDelete.Data;
-
-        var allPages = await PageService.GetAllById(Node.NoeudId);
-        var pages = allPages.Data;
-
-        foreach (var reOrdered in pages)
-        {
-            if (page.Ordre < reOrdered.Ordre)
-            {
-                reOrdered.Ordre = reOrdered.Ordre - 1;
-                await PageService.Update(reOrdered.PageId, reOrdered);
-            }
-        }
-    }
-
-    private async void ReLinkPage(int id)
-    {
-        var pageNoeud = await PageService.GetAllFromNoeud(id);
-        var relink = pageNoeud.Data;
-
-
-
-        LinkedPage.NoeudId = id;
-        LinkedPage.Ordre = relink.Count() + 1;
-        LinkedPage.ImportanceId = null;
-        await PageService.Update(LinkedPage.PageId, LinkedPage);
-    }
 
     private async void SupprimerPage(int id)
     {
-        var allComposant = await ComposantService.GetAllById(id);
-        var composants = allComposant.Data;
-
-        foreach (var deleteComposant in composants)
-        {
-            await ComposantService.Delete(deleteComposant.ComposantId);
-        }
-
         await PageService.Delete(id);
-        ReRender();
+        var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
+        var affichPage = pageNoeud.Data.ToList();
+        affichPage = affichPage.OrderBy(p => p.Ordre).ToList();
+        // Met à jour la propriété Ordre de manière séquentielle
+        for (int i = 0; i < affichPage.Count(); i++)
+        {
+            affichPage[i].Ordre = i + 1;
+            PageService.Update(affichPage[i].PageId, affichPage[i]);
+        }
+        listePage.Clear();
+        listePage.AddRange(affichPage);
+        StateHasChanged();
+
     }
     /// <summary>
     /// Quand on survole un noeud, ses elements lies apparaissent

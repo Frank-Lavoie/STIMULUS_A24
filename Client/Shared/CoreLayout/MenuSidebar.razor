@@ -20,25 +20,25 @@
         <AuthorizeView Roles="ETUDIANT">
             @foreach (var cours in ListeCours)
             {
-                    @foreach (var graphe in ListeGraphesEtudiant)
-                    {
+                @foreach (var graphe in ListeGraphesEtudiant)
+                {
                     <RadzenPanelMenuItem Icon="account_tree" Text="@cours.Code" Click="(() => ChargerGraphe(graphe.GrapheId))"></RadzenPanelMenuItem>
-                    }               
+                }
             }
         </AuthorizeView>
         <AuthorizeView Roles="PROFESSEUR">
-        <RadzenPanelMenuItem Text="Gestion de Graphe" Icon="account_tree">
-            @foreach (var graphe in ListeGraphesProf)
-            {
-                <RadzenPanelMenuItem Icon="build" Text="@graphe.Nom" Click="(() => ChargerGraphe(graphe.GrapheId))"></RadzenPanelMenuItem>
-             }
+            <RadzenPanelMenuItem Text="Gestion de Graphe" Icon="account_tree">
+                @foreach (var graphe in ListeGraphesProf)
+                {
+                    <RadzenPanelMenuItem Icon="build" Text="@graphe.Nom" Click="(() => ChargerGraphe(graphe.GrapheId))"></RadzenPanelMenuItem>
+                }
                 <RadzenPanelMenuItem Text="Créer un nouveau Graphe" Icon="input" Path="/CreerGraphe" />
-        </RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Gestion de Groupe" Icon="assignment_ind">
-            @foreach (var groupe in groupesProf)
-            {
+                @foreach (var groupe in groupesProf)
+                {
                     <RadzenPanelMenuItem Icon="face" Text="@groupe.Nom" Click="(() => ChargerGroupe(groupe.GroupeId))"></RadzenPanelMenuItem>
-            }
+                }
                 <RadzenPanelMenuItem Text="Créer un nouveau Groupe" Icon="input" Path="/CreerGroupe" />
             </RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Gestion de Cours" Icon="chrome_reader_mode">
@@ -90,7 +90,7 @@
                 ListeGraphesProf.AddRange(graphesDuGroupe);
             }
             StateHasChanged();
-        }       
+        }
 
         if (isEtudiant)
         {
@@ -114,7 +114,7 @@
 
             StateHasChanged();
         }
-    }   
+    }
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);

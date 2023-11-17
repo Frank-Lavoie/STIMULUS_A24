@@ -27,9 +27,9 @@
             <RadzenButton Style="background-color: darkblue" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
             <RadzenButton Style="background-color: darkblue" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
             <RadzenText class="custom-graphe-zoom-text" TextStyle="TextStyle.DisplayH3">Zoom: @AfficheZoom()</RadzenText>
-            <RadzenButton Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="ButtonStyle.Primary"  />
-            <RadzenButton Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="ButtonStyle.Primary" />
-            <RadzenButton Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="@modeDeVuButtonEdition" />
+            <RadzenButton Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="@modeDeVuButtonPage" />
+            <RadzenButton Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="@modeDeVuButtonEtudiant" />
             <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto;" />
         </RadzenStack>
     </foreignObject>
@@ -37,7 +37,7 @@
         @*<rect width="180" height="180" x="0" y="5" fill="#32587a"></rect>*@
         <foreignObject class="bg-transparent" x="0" y="5" width="160" height="205">
             <RadzenPanel class="custom-graphe-legend-panel">
-                <RadzenStack class="custom-graphe-legend-stack"  Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                <RadzenStack class="custom-graphe-legend-stack" Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
                     <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>
                     <div class="custom-graphe-legend-color-position">
                         <div style="display: flex; align-items: center; justify-content: center;">
@@ -48,7 +48,7 @@
                     <div class="custom-graphe-legend-color-position">
                         <div style="display: flex; align-items: center; justify-content: center;">
                             <RadzenLabel>Disponible</RadzenLabel>
-                             <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/228-231-245.png"></RadzenImage>
+                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/228-231-245.png"></RadzenImage>
                         </div>
                     </div>
                     <div class="custom-graphe-legend-color-position">
@@ -67,21 +67,29 @@
             </RadzenPanel>
         </foreignObject>
         <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth"
-            @onmousemove=@(e => mouseSrv.FireMove(this, e))
-            @onmouseup=@(e => mouseSrv.FireUp(this, e))
-            @onmousewheel="Zoom">
+             @onmousemove=@(e => mouseSrv.FireMove(this, e))
+             @onmouseup=@(e => mouseSrv.FireUp(this, e))
+             @onmousewheel="Zoom">
             <Draggable X="@((viewBoxWidth - 1800) / 2)" Y="@((viewBoxWidth - 1500) / 2)" GetModeDeVue="GetModeFond">
                 <rect x="-1000" y="-1000" width="4000" height="4000" style="fill:rgb(0,0,0,0);stroke-width:0;stroke:rgb(0,0,0)" />
                 @foreach (var noeud in Nodes)
                 {
-                    <NoeudsProf UpdateGraphe="UpdateGraphe" GetModeDeVue="GetModeDeVue" RelinkBindNode="RelinkBindNode" ReLinkNoeud="ReLinkNoeud"
-                    Node="@noeud" Nodes="@Nodes" SaveChangeNoeud="SaveChange" AjoutNouveauNoeud="AjoutNouveauNoeud" SupprNoeud="SupprimerNoeud" />
+                    <NoeudsProf 
+                        UpdateGraphe="UpdateGraphe" 
+                        GetModeDeVue="GetModeDeVue" 
+                        RelinkBindNode="RelinkBindNode" 
+                        ReLinkNoeud="ReLinkNoeud"
+                        Node="@noeud" 
+                        Nodes="@Nodes" SaveChangeNoeud="SaveChange" 
+                        AjoutNouveauNoeud="AjoutNouveauNoeud" 
+                        SupprNoeud="SupprimerNoeud"
+                        ReLinkBindPage="ReLinkBindPage"
+                        ReLinkPage="ReLinkPage"/>
                 }
             </Draggable>
         </svg>
     </svg>
 </div>
-
 @code {
     private string displayHover = "hidden";
     private double viewBoxX = 0;
@@ -91,11 +99,13 @@
     private double zoomIncrement = 100;
     private Noeud enfantRechercheParent = new();
     private bool enRecherche = false;
+    private Page pageRechercheNoeud = new();
+    private bool enRecherchePage = new();
+    private bool upt = false;
     private int modeDeVue = 2;
-    private string modeDeVuInfo = "Édition";
-    private string modeDeVuButtonPage = "btn-info";
-    private string modeDeVuButtonEdition = "btn-warning";
-    private string modeDeVuButtonEtudiant = "btn-info";
+    private ButtonStyle modeDeVuButtonEdition = ButtonStyle.Warning;
+    private ButtonStyle modeDeVuButtonPage = ButtonStyle.Primary;
+    private ButtonStyle modeDeVuButtonEtudiant = ButtonStyle.Primary;
 
     private Noeud nouveauNoeud = new();
     public List<Noeud> Nodes { get; set; } = new();
@@ -113,24 +123,21 @@
     {
         if (v == 1)
         {
-            modeDeVuInfo = "Gestion de Pages";
-            modeDeVuButtonPage = "btn-warning";
-            modeDeVuButtonEdition = "btn-info";
-            modeDeVuButtonEtudiant = "btn-info";
+            modeDeVuButtonPage = ButtonStyle.Warning;
+            modeDeVuButtonEdition = ButtonStyle.Primary;
+            modeDeVuButtonEtudiant = ButtonStyle.Primary;
         }
         else if (v == 2)
         {
-            modeDeVuInfo = "Édition";
-            modeDeVuButtonPage = "btn-info";
-            modeDeVuButtonEdition = "btn-warning";
-            modeDeVuButtonEtudiant = "btn-info";
+            modeDeVuButtonPage = ButtonStyle.Primary;
+            modeDeVuButtonEdition = ButtonStyle.Warning;
+            modeDeVuButtonEtudiant = ButtonStyle.Primary;
         }
         else
         {
-            modeDeVuInfo = "Vue étudiante";
-            modeDeVuButtonPage = "btn-info";
-            modeDeVuButtonEdition = "btn-info";
-            modeDeVuButtonEtudiant = "btn-warning";
+            modeDeVuButtonPage = ButtonStyle.Primary;
+            modeDeVuButtonEdition = ButtonStyle.Primary;
+            modeDeVuButtonEtudiant = ButtonStyle.Warning;
         }
         modeDeVue = v;
         Console.WriteLine($"Mode de vu : {v}");
@@ -145,10 +152,60 @@
     /// </summary>
     /// <returns></returns>
     private int GetModeFond() => 2; //Hardcode
-    //Quand la souris survole
+                                    //Quand la souris survole
     private void OnMouseHover() => displayHover = "show";
     //Quand la souris ne survole plus
     private void OnMouseLeave() => displayHover = "hidden";
+
+    /// <summary>
+    /// Detache une page de son noeud
+    /// </summary>
+    /// <param name="page"></param>
+    private void ReLinkPage(Page page)
+    {
+        Console.WriteLine($"Page {page.PageId} a besoin d'un parent");
+        pageRechercheNoeud = page;
+        enRecherchePage = true;
+    }
+    private async Task<bool> ReLinkBindPage(Noeud noeud)
+    {
+        if (enRecherchePage)
+        {
+            Console.WriteLine($"Changement de page sur : {noeud.Nom}");
+
+            // Récupère toutes les pages du nœud avant le relink
+            var pageNoeudBefore = await PageService.GetAllFromNoeud(noeud.NoeudId);
+            var pagesBefore = pageNoeudBefore.Data;
+            // Initialise les propriétés de la page de recherche du nœud
+            pageRechercheNoeud.NoeudId = noeud.NoeudId;
+            if (pagesBefore != null && pagesBefore.Any())
+            {
+                pageRechercheNoeud.Ordre = pagesBefore.Last().Ordre + 1;
+            }
+            else
+            {
+                pageRechercheNoeud.Ordre = 1;
+            }
+            // Enregistre les changements
+            SaveChange(pageRechercheNoeud);
+            // Récupère toutes les pages du nœud après le relink
+            var pageNoeudAfter = await PageService.GetAllFromNoeud(noeud.NoeudId);
+            var pagesAfter = pageNoeudAfter.Data.ToList();
+            // Trie les pages en fonction de la propriété Ordre
+            pagesAfter = pagesAfter.OrderBy(p => p.Ordre).ToList();
+            // Met à jour les valeurs de la propriété Ordre de manière séquentielle
+            for (int i = 0; i < pagesAfter.Count(); i++)
+            {
+                pagesAfter[i].Ordre = i + 1;
+                SaveChange(pagesAfter[i]);
+            };
+            // Met à jour l'affichage
+            StateHasChanged();
+            enRecherchePage = false;
+            return true;
+        }
+        return false;
+    }
     /// <summary>
     /// Permet de rattacher un noeud enfant a un parent clique
     /// </summary>
@@ -257,6 +314,7 @@
     /// Sauvegarde les mises a jour du graph
     /// </summary>
     public async void SaveChange(Noeud noeud) => await NoeudService.Update(noeud.NoeudId, noeud);
+    public async void SaveChange(Page page) => await PageService.Update(page.PageId, page);
 
     /// <summary>
     /// Ajoute un noeud dans la BD

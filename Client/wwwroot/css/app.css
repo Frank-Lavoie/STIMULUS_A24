@@ -112,3 +112,79 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+#AssocierPage:hover {
+    color: green;
+    cursor: pointer;
+}
+/*Css connector component*/
+.cutting:hover {
+    fill: green;
+    cursor: pointer;
+}
+/*Css text link noeud*/
+.textLink:hover {
+    fill: black;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+h5 {
+    margin: 4px;
+    color: white;
+}
+
+.spaceButton {
+    margin: 2px;
+}
+/*Css cercle component*/
+#reLink:hover {
+    cursor: pointer;
+    color: yellowgreen;
+}
+
+Connecteur:hover {
+    cursor: pointer;
+}
+
+#deleteNoeud {
+    color: darkred;
+}
+
+    #deleteNoeud:hover {
+        color: red;
+        cursor: pointer;
+    }
+
+#addNoeud {
+    color: black;
+}
+
+    #addNoeud:hover {
+        color: yellow;
+        cursor: pointer;
+    }
+
+a {
+    text-decoration: none;
+}
+
+text {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    fill: white;
+}
+
+.cercle-title {
+    fill: #fff;
+    pointer-events: none !important;
+}
+
+.cercle {
+    z-index: 1;
+    stroke: #fff;
+    stroke-width: 1;
+}
