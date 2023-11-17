@@ -5,6 +5,7 @@
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject INoeudService NoeudService;
+@inject IPageService PageService;
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRunTime
 
@@ -134,6 +135,24 @@
     {
         displayHover = "hidden";
     }
-    private void DirectionPage() => NavigationManager.NavigateTo("/Theorie/"/*  + Node.NoeudId */);
+    private async void DirectionPage()
+    {
+        await sessionStorage.SetItemAsync<int>("idNoeud", Node.NoeudId);
+
+        // Récupérer toutes les pages associées au nœud actuel
+        var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
+        var affichPage = pageNoeud.Data;
+
+        if (affichPage != null && affichPage.Any())
+        {
+            // Trouver la page avec l'ordre minimum (la première page)
+            var firstPage = affichPage.OrderBy(p => p.Ordre).First();
+
+            // Stocker l'ID de la première page dans la session
+            await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
+        }
+
+        NavigationManager.NavigateTo("/Pages");
+    }
 
 }

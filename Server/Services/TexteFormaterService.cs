@@ -10,6 +10,12 @@ namespace STIMULUS_V2.Server.Services
     {
         private readonly STIMULUSContext sTIMULUSContext;
 
+
+        public TexteFormaterService(STIMULUSContext sTIMULUSContext)
+        {
+            this.sTIMULUSContext = sTIMULUSContext;
+        }
+
         public async Task<APIResponse<TexteFormater>> Create(TexteFormater item)
         {
             try

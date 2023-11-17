@@ -13,6 +13,8 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         public int Ordre { get; set; }
 
+        public int Reference { get; set; }
+
         [Column(TypeName = "nvarchar(20)")]
         public string? Type { get; set; }
 

@@ -113,9 +113,25 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
-        public Task<APIResponse<IEnumerable<Exercice>>> GetAllById(int id)
+        public async Task<APIResponse<IEnumerable<Exercice>>> GetAllById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var itemList = await sTIMULUSContext.Exercice.Where(item => item.ExerciceId == id).ToListAsync();
+
+                if (itemList != null)
+                {
+                    return new APIResponse<IEnumerable<Exercice>>(itemList, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<IEnumerable<Exercice>>(null, 404, $"{typeof(Exercice).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<Exercice>>(null, 500, $"Erreur lors de la récupération de la liste du model {typeof(Exercice).Name}. Message : {ex.Message}.");
+            }
         }
 
         public async Task<APIResponse<Exercice>> Update(int id, Exercice item)

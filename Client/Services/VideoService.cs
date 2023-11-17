@@ -29,7 +29,7 @@ namespace STIMULUS_V2.Client.Services
         {
             var result = await _httpClient.GetFromJsonAsync<APIResponse<Video>>($"api/Video/Fetch/{id}");
             return result;
-        }
+        }      
 
         public async Task<APIResponse<IEnumerable<Video>>> GetAll()
         {
@@ -37,9 +37,10 @@ namespace STIMULUS_V2.Client.Services
             return result;
         }
 
-        public Task<APIResponse<IEnumerable<Video>>> GetAllById(int id)
+        public async Task<APIResponse<IEnumerable<Video>>> GetAllById(int id)
         {
-            throw new NotImplementedException();
+            var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Video>>>($"api/Video/Fetch/All{id}");
+            return result;
         }
 
         public async Task<APIResponse<Video>> Update(int id, Video item)

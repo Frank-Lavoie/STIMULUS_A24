@@ -134,7 +134,28 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
-        public async Task<APIResponse<Composant>> Update(int id, Composant item)
+		public async Task<APIResponse<IEnumerable<Composant>>> GetAllVideo(int id)
+		{
+			try
+			{
+				var itemList = await sTIMULUSContext.Composant.Where(item => item.ComposantId == id && item.Type == "Video").ToListAsync();
+
+				if (itemList != null)
+				{
+					return new APIResponse<IEnumerable<Composant>>(itemList, 200, "Succès");
+				}
+				else
+				{
+					return new APIResponse<IEnumerable<Composant>>(null, 404, $"{typeof(Composant).Name} non trouvé");
+				}
+			}
+			catch (Exception ex)
+			{
+				return new APIResponse<IEnumerable<Composant>>(null, 500, $"Erreur lors de la récupération du model par son parent {typeof(Composant).Name}. Message : {ex.Message}.");
+			}
+		}
+
+		public async Task<APIResponse<Composant>> Update(int id, Composant item)
         {
             try
             {

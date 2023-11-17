@@ -11,5 +11,6 @@ namespace STIMULUS_V2.Shared.Interface.ChildInterface
 {
     public interface IComposantService : IModelService<Composant, int>
     {
-    }
+		Task<APIResponse<IEnumerable<Composant>>> GetAllVideo(int id);
+	}
 }

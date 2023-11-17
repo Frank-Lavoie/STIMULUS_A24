@@ -11,6 +11,7 @@
 @inject AppState State;
 
 
+
 <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
         <RadzenImage Path="@imageActif" Style="width: 100px; height: 100px; border-radius: 50%;" />
@@ -22,7 +23,7 @@
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Cours associé</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
         </RadzenStack>
-    </RadzenStack>   
+    </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Graphe(s) associé(s) : </RadzenText>
     </RadzenStack>
@@ -36,12 +37,12 @@
     <RadzenRow RowGap="2" Class="justify-content-center">
         <RadzenDataGrid TItem="Etudiant" Data="@listEtudiant" EmptyText="Aucun élève dans ce groupe." AllowPaging="true" AllowSorting="true" Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
             <Columns>
-                <RadzenDataGridColumn TextAlign="TextAlign.Center"  TItem="Etudiant" Property="Identifiant" Title="Code DA" />
-                <RadzenDataGridColumn TextAlign="TextAlign.Center"  TItem="Etudiant" Property="Prenom" Title="Prénom" />
+                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Identifiant" Title="Code DA" />
+                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Prenom" Title="Prénom" />
                 <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Nom" Title="Nom" />
             </Columns>
         </RadzenDataGrid>
-    </RadzenRow>   
+    </RadzenRow>
 </RadzenCard>
 
 @code {

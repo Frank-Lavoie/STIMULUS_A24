@@ -213,9 +213,44 @@
     /// <param name="id"></param>
     private async void SupprimerNoeud(int id)
     {
-        await NoeudService.Delete(id);
-        await UpdateGraphe();
-        Console.WriteLine($"Suppression du noeud : id={id}");
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer ce noeud?", "Supprimer");
+
+        if (result.HasValue && result.Value)
+        {
+                // Supprimer les pages associées au nœud
+                var allPage = await PageService.GetAllFromNoeud(id);
+                var pages = allPage.Data;
+
+                if (pages != null)
+                {
+                    foreach (var pageDelete in pages)
+                    {
+                        var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
+                        var composant = allComposant.Data;
+
+                        if (composant != null)
+                        {
+                            foreach (var composantDelete in composant)
+                            {
+                                await ComposantService.Delete(composantDelete.ComposantId);
+                            }
+                        }
+                        await PageService.Delete(pageDelete.PageId);
+                    }
+
+                    await NoeudService.Delete(id);
+
+                }
+
+            // Supprimer le graphe
+            await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
+            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/Graphe");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/Graphe");
+        }
     }
 
     /// <summary>

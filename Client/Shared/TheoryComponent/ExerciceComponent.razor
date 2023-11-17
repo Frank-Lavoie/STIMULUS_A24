@@ -1,5 +1,29 @@
-﻿<h3 class="custom-theory-texte-letter">Composant Exercice</h3>
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+@inject IExerciceService ExerciceService
+
+@if(exercice != null)
+{
+    <h3 class="custom-theory-texte-letter">Composant Exercice</h3>
+}
+else
+{
+    <p>Chargement...</p>
+}
 
 @code {
+    [Parameter] public int Reference { get; set; }
 
+    public Exercice exercice { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var Exercice = await ExerciceService.Get(Reference);
+        exercice = Exercice.Data;
+
+
+
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
 }

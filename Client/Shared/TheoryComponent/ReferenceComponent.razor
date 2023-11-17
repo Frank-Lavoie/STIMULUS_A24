@@ -1,5 +1,29 @@
-﻿<h3 class="custom-theory-texte-letter">Composant références</h3>
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+@inject IReferenceService ReferenceService;
+
+@if(reference!=null)
+{
+    <h1>@((reference.Description != null) ? reference.Description : "")</h1>
+    <a>@((reference.Url != null) ? reference.Url : "")</a>
+}
+else
+{
+    <p>Chargement...</p>
+}
 
 @code {
+    [Parameter] public int Reference { get; set; }
+    public Reference reference { get; set; }
 
+    protected async override Task OnInitializedAsync()
+    {
+        var ReferenceUnit = await ReferenceService.Get(Reference);
+        reference = ReferenceUnit.Data;
+
+
+
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
 }

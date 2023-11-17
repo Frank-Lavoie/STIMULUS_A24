@@ -89,11 +89,10 @@ namespace STIMULUS_V2.Server.Services
             {
                 return new APIResponse<Video>(null, 500, $"Erreur lors de la récupération du model {typeof(Video).Name}. Message : {ex.Message}.");
             }
-        }
-
+        }      
         public async Task<APIResponse<IEnumerable<Video>>> GetAll()
         {
-            try
+            try                
             {
                 var itemList = await sTIMULUSContext.Video.ToListAsync();
 
