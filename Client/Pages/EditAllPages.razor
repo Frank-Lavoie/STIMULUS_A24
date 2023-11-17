@@ -321,7 +321,7 @@
         }
         catch
         {
-            DeletePage();
+            NavigationManager.NavigateTo("/Graphe");
         }
 
         var noeudActuelle = await NoeudService.Get(await sessionStorage.GetItemAsync<int>("idNoeud"));
