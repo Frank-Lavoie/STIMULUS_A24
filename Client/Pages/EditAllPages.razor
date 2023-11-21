@@ -201,14 +201,13 @@
                 {
                     <div style="margin: 0 auto; width: 50%; padding: 10px; text-align: center;">
                         <!-- Conteneur du bouton -->
-                        <div style="text-align: right; margin-bottom: 10px;">
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Style="height:35px;" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteComposant(composant.ComposantId))" />
+                        <div style="text-align: right; margin-bottom: 10px;">                           
                             <div style="text-align: center;">
                                 <!-- Bouton pour la flèche vers le haut -->
                                 <RadzenButton Style="position: relative; margin-bottom: -20px;" Icon="arrow_upward" Click="@(args => ChangeComposantOrdreUp(composant.ComposantId))" />
-
                                 <!-- Bouton pour la flèche vers le bas -->
                                 <RadzenButton Icon="arrow_downward" Click="@(args => ChangeComposantOrdreDown(composant.ComposantId))" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Style="height:35px;" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteComposant(composant.ComposantId))" />
                             </div>
                         </div>
 
@@ -266,7 +265,7 @@
     private Image image { get; set; } = new();
     private Exercice exercice { get; set; } = new();
     public string typeComposant { get; set; }
-    public int PageAffichage { get; set; }
+    public int CurrentPage { get; set; }
 
     //pour la video
     private string urlVideo { get; set; }
@@ -306,8 +305,6 @@
 
     protected async override Task OnInitializedAsync()
     {
-
-
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
 
@@ -333,7 +330,7 @@
 
         listePage.AddRange(affichPage);
 
-
+        StateHasChanged();
     }
 
     private async void DeleteComposant(int id)
@@ -357,8 +354,10 @@
                 }
             }
             await ComposantService.Delete(id);
-            NavigationManager.NavigateTo("/");
-            NavigationManager.NavigateTo("/ModifierPages");
+
+            var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+            listComposant = composantsRefresh.Data.ToList();
+            StateHasChanged();
         }
         else
         {
@@ -428,7 +427,7 @@
             composant.Reference = newVideo.VideoId;
         }
 
-        composant.PageId = await sessionStorage.GetItemAsync<int>("idPage");
+        composant.PageId = await sessionStorage.GetItemAsync<int>("idPage"); ;
 
         if (composants == null)
         {
@@ -449,8 +448,8 @@
     private async Task ChangePageWithNavBar(int id)
     {
         await sessionStorage.SetItemAsync<int>("idPage", id);
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        CurrentPage = id;
+        StateHasChanged();
     }
 
     private async Task AddPage()
@@ -501,14 +500,14 @@
                 var firstPage = listePage.FirstOrDefault();
                 await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
             }
-            allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
-            listComposant = allComposant.Data.ToList();
+            var allPage = await PageService.GetAllFromNoeud(noeud.NoeudId);
+            listePage = allPage.Data.ToList();
             StateHasChanged();
         }
         else
         {
-            var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
-            listComposant = allComposant.Data.ToList();
+            var allPage = await PageService.GetAllFromNoeud(noeud.NoeudId);
+            listePage = allPage.Data.ToList();
             StateHasChanged();
         }
     }
@@ -541,7 +540,7 @@
 
     private async void PreviousPage()
     {
-        var currentPageId = await sessionStorage.GetItemAsync<int>("idPage");
+        var currentPageId = await sessionStorage.GetItemAsync<int>("idPage"); ;
         var pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
         var affichPage = pageNoeud.Data;
 
@@ -607,8 +606,9 @@
         }
 
         // 8. Rafraîchir la page
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 
     private async void ChangeComposantOrdreDown(int id)
@@ -653,8 +653,9 @@
         }
 
         // 8. Rafraîchir la page
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages"); 
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 
     void TogglePopup()
