@@ -2,6 +2,7 @@
 @using STIMULUS_V2.Client.Shared.TheoryComponent
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRunTime
 @inject IPageService PageService
@@ -19,7 +20,6 @@
 
 @page "/Pages"
 
-
 <RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'">
     <RadzenSidebar>
         <RadzenPanelMenu>
@@ -34,47 +34,45 @@
             <RadzenButton Text="Page Précédente" Click="@(args => PreviousPage())" />
             <RadzenButton Text="Page Suivante" Click="@(args => NextPage())" />
         </div>
-         <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1500px; margin : 30px">
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
+        <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1500px; margin : 30px">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
                 <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Page</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1"><b>@((page.Ordre != null) ? "#" + page.Ordre : "")</b></RadzenText>
             </RadzenStack>
-        <RadzenRow RowGap="2" Class="justify-content-center">
+            <RadzenRow RowGap="2" Class="justify-content-center">
                 @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
                 {
-
-                        <!-- Conteneur du composant spécifique -->
-                            @if (composant.Type == "Code")
-                            {
-                                <CodeComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Exercice")
-                            {
-                                <ExerciceComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Image")
-                            {
-                                <ImageComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Reference")
-                            {
-                                <ReferenceComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Texte")
-                            {
-                                <TextComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Video")
-                            {
-                                <VideoComponent Reference="composant.Reference" />
-                            }
+                    <!-- Conteneur du composant spécifique -->
+                    @if (composant.Type == "Code")
+                    {
+                        <CodeComponent Reference="composant.Reference" />
+                    }   
+                    @if (composant.Type == "Exercice")
+                    {   
+                        <ExerciceComponent Reference="composant.Reference" />
+                    }    
+                    @if (composant.Type == "Image")
+                    {
+                        <ImageComponent Reference="composant.Reference" />
+                    }
+                    @if (composant.Type == "Reference")
+                    {
+                        <ReferenceComponent Reference="composant.Reference" />
+                    }
+                    @if (composant.Type == "Texte")
+                    {   
+                    <TextComponent Reference="composant.Reference" />
+                    }
+                    @if (composant.Type == "Video")
+                    {
+                        <VideoComponent Reference="composant.Reference" />
+                    }
                 }
+                          
             </RadzenRow>
-            </RadzenCard>
+        </RadzenCard>
     </RadzenBody>
 </RadzenLayout>
-
-
 
 @code {
     bool sidebar1Expanded = true;
@@ -150,12 +148,14 @@
 
         listePage.AddRange(affichPage);
     }
+
     private async Task ChangePage(int id)
     {
         await sessionStorage.SetItemAsync<int>("idPage", id);
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Pages");
-    }   
+    }  
+    
     private async void NextPage()
     {
         var currentPageId = await sessionStorage.GetItemAsync<int>("idPage");
@@ -207,6 +207,4 @@
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Pages");
     }
-
 }
-

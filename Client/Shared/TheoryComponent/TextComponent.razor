@@ -26,11 +26,7 @@ else
         var Texte = await TextFormaterService.Get(Reference);
         texte = Texte.Data;
 
-
-
         await base.OnInitializedAsync();
         StateHasChanged();
     }
-
-
 } 

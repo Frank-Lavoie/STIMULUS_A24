@@ -49,6 +49,7 @@ namespace STIMULUS_V2.Server.Controllers
             var response = await pageService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
+
         [HttpGet("Fetch/All/FromNoeud/{id}")]
         public async Task<IActionResult> GetAllFromNoeud(int id)
         {

@@ -43,8 +43,6 @@ namespace STIMULUS_V2.Client.Services.AuthenticationService
             return response;
         }
 
-
-
         // Protected Methods which need Token.
         public async Task<int> GetUserCount()
         {
@@ -69,8 +67,6 @@ namespace STIMULUS_V2.Client.Services.AuthenticationService
             var info = await GetMyInfo(id);
             return info;
         }
-
-
 
         // General & Frequent Call-up Methods
         private async Task<bool> GetNewToken()

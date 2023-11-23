@@ -24,7 +24,6 @@ builder.Host.UseSerilog((ctx, lc) =>
 builder.Services.AddDbContextPool<STIMULUSContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("STIMULUSConnection")));
 
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -58,7 +57,6 @@ builder.Services.AddScoped<IReferenceService, ReferenceService>();
 builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<UtilisateurFactory>();
-
 
 var app = builder.Build();
 

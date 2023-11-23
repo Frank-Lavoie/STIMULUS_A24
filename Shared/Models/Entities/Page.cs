@@ -19,6 +19,5 @@ namespace STIMULUS_V2.Shared.Models.Entities
         [ForeignKey("Importance")]
         public int? ImportanceId { get; set; }
         public Importance? Importance { get; set; }
-
     }
 }

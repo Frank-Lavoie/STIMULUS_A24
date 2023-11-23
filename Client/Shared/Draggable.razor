@@ -8,31 +8,31 @@
 
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public Func<int> GetModeDeVue { get; set; }
 
+    [Parameter] public Func<int> GetModeDeVue { get; set; }
     double? x;
+
     [Parameter]
     public double X { 
         get { return x ?? 0; }
         set { if (!x.HasValue || (!isDown & XChanged.HasDelegate)) { x = value; } } 
     }
     [Parameter] public EventCallback<double> XChanged { get; set; }
-
     double? y;
+
     [Parameter]
     public double Y {
         get { return y ?? 0; }
         set { if (!y.HasValue || (!isDown & YChanged.HasDelegate)) { y = value; } }
     }
-    [Parameter] public EventCallback<double> YChanged { get; set; }
 
+    [Parameter] public EventCallback<double> YChanged { get; set; }
     protected override void OnInitialized() {
         mouseSrv.OnMove += OnMove;
         mouseSrv.OnUp += OnUpLeave;
         mouseSrv.OnLeave += OnUpLeave;
         base.OnInitialized();
     }
-
 
     string cursor = "grab";
     bool _isDown;
@@ -46,6 +46,7 @@
 
     double cursorX;
     double cursorY;
+
     void OnDown(MouseEventArgs e) {
         isDown = true;
         cursorX = e.ClientX;

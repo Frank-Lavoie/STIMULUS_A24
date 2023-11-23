@@ -76,6 +76,7 @@ namespace STIMULUS_V2.Server.Controllers
                 return StatusCode(500, "Une erreur interne s'est produite.");
             }
         }
+
         private static string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
@@ -105,7 +106,6 @@ namespace STIMULUS_V2.Server.Controllers
 
         // Account Registration
         [HttpPost("Inscription")]
-
         public async Task<IActionResult> UtilisateurInscription(InscriptionVerification inscriptionVerification)
         {
             var result = await utilisateurFactory.CreerUtilisateur(inscriptionVerification.Nom, inscriptionVerification.Prenom, inscriptionVerification.Email, inscriptionVerification.Password);

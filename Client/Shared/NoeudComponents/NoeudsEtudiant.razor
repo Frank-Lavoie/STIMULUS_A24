@@ -3,6 +3,7 @@
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @* @using STIMULUS_V2.Client.Shared.TheorieComponents; *@
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
+
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject INoeudService NoeudService;
 @inject IPageService PageService;
@@ -84,6 +85,7 @@
         stroke-width: 1;
     }
 </style>
+
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
@@ -105,7 +107,6 @@
     private readonly string COULEUR_NON_CONSULTER = "rgb(228, 231, 245)";
     private readonly string COULEUR_CONSULTER = "rgb(199,160,53)";
     private readonly string COULEUR_COMPLETER = "rgb(28, 90, 47)";
-
 
     private int GetModeVue() => -1;
     protected override async Task OnInitializedAsync()
@@ -129,12 +130,15 @@
             Couleur = COULEUR_COMPLETER;
         }
     }
+
     private string TestParent() => (Node.NoeudParentId != null) ? Node.NoeudParentId.ToString() : "Aucun";
     private void OnMouseHover() => displayHover = "visible";
+
     private void OnMouseLeave()
     {
         displayHover = "hidden";
     }
+
     private async void DirectionPage()
     {
         await sessionStorage.SetItemAsync<int>("idNoeud", Node.NoeudId);
@@ -151,8 +155,6 @@
             // Stocker l'ID de la première page dans la session
             await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
         }
-
         NavigationManager.NavigateTo("/Pages");
     }
-
 }

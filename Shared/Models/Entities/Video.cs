@@ -18,6 +18,5 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [Column(TypeName = "nvarchar(max)")]
         public string? Description { get; set; }
-
     }
 }

@@ -13,6 +13,7 @@ namespace STIMULUS_V2.Client.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<APIResponse<Graphe>> Create(Graphe item)
         {
             var result = await _httpClient.PostAsJsonAsync<Graphe>("api/Graphe/Create", item);
@@ -41,6 +42,7 @@ namespace STIMULUS_V2.Client.Services
         {
             throw new NotImplementedException();
         }
+
         public async Task<APIResponse<IEnumerable<Graphe>>> GetAllFromGroup(int id)
         {
             var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Graphe>>>($"api/Graphe/Fetch/All/FromGroup/{id}");

@@ -42,12 +42,12 @@ namespace STIMULUS_V2.Client.Services
             var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Composant>>>($"api/Composant/Fetch/All/{id}");
             return result;
         }
+
 		public async Task<APIResponse<IEnumerable<Composant>>> GetAllVideo(int id)
 		{
 			var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Composant>>>($"api/Composant/Fetch/AllVideo/{id}");
 			return result;
 		}
-
 
 		public async Task<APIResponse<Composant>> Update(int id, Composant item)
         {

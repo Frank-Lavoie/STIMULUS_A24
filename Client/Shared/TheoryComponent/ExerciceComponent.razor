@@ -1,5 +1,6 @@
 ﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject IExerciceService ExerciceService
 
 @if(exercice != null)
@@ -20,8 +21,6 @@ else
     {
         var Exercice = await ExerciceService.Get(Reference);
         exercice = Exercice.Data;
-
-
 
         await base.OnInitializedAsync();
         StateHasChanged();

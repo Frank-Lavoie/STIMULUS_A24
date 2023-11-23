@@ -11,11 +11,13 @@
     [Parameter] public Func<int> GetModeDeVue { get; set; }
 
     double? x;
+
     [Parameter]
     public double X { 
         get { return x ?? 0; }
         set { if (!x.HasValue || (!isDown & XChanged.HasDelegate)) { x = value; } } 
     }
+
     [Parameter] public EventCallback<double> XChanged { get; set; }
 
     double? y;
@@ -24,6 +26,7 @@
         get { return y ?? 0; }
         set { if (!y.HasValue || (!isDown & YChanged.HasDelegate)) { y = value; } }
     }
+
     [Parameter] public EventCallback<double> YChanged { get; set; }
 
     // protected override void OnInitialized() {
@@ -32,7 +35,6 @@
     //     mouseSrv.OnLeave += OnUpLeave;
     //     base.OnInitialized();
     // }
-
 
     string cursor = "grab";
     bool _isDown;

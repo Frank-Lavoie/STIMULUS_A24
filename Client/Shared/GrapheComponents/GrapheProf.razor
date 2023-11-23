@@ -66,10 +66,7 @@
                 </RadzenStack>
             </RadzenPanel>
         </foreignObject>
-        <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth"
-             @onmousemove=@(e => mouseSrv.FireMove(this, e))
-             @onmouseup=@(e => mouseSrv.FireUp(this, e))
-             @onmousewheel="Zoom">
+        <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth" @onmousemove=@(e => mouseSrv.FireMove(this, e)) @onmouseup=@(e => mouseSrv.FireUp(this, e)) @onmousewheel="Zoom">
             <Draggable X="@((viewBoxWidth - 1800) / 2)" Y="@((viewBoxWidth - 1500) / 2)" GetModeDeVue="GetModeFond">
                 <rect x="-1000" y="-1000" width="4000" height="4000" style="fill:rgb(0,0,0,0);stroke-width:0;stroke:rgb(0,0,0)" />
                 @foreach (var noeud in Nodes)
@@ -90,6 +87,7 @@
         </svg>
     </svg>
 </div>
+
 @code {
     private string displayHover = "hidden";
     private double viewBoxX = 0;
@@ -114,6 +112,7 @@
     {
         await UpdateGraphe();
     }
+
     /// <summary>
     /// Permet de set le mode de vu. 1 => Page, 2 => Edit, 3 => Etudiant
     /// </summary>
@@ -142,11 +141,13 @@
         modeDeVue = v;
         Console.WriteLine($"Mode de vu : {v}");
     }
+
     /// <summary>
     /// Permet a tout les noeuds d'adapter leur mode (fonction delegate au noeud et connecteur)
     /// </summary>
     /// <returns></returns>
     private int GetModeDeVue() => modeDeVue;
+
     /// <summary>
     /// Pour conserver le fond dragable quand en mode "vue etudiant"
     /// </summary>
@@ -167,6 +168,7 @@
         pageRechercheNoeud = page;
         enRecherchePage = true;
     }
+
     private async Task<bool> ReLinkBindPage(Noeud noeud)
     {
         if (enRecherchePage)
@@ -206,6 +208,7 @@
         }
         return false;
     }
+
     /// <summary>
     /// Permet de rattacher un noeud enfant a un parent clique
     /// </summary>
@@ -220,6 +223,7 @@
             SaveChange(enfantRechercheParent);
         }
     }
+
     /// <summary>
     /// Detache un noeud enfant de son parent
     /// </summary>
@@ -256,6 +260,7 @@
         }
         StateHasChanged();
     }
+
     /// <summary>
     /// Permet l'ajout de noveau noeud
     /// </summary>
@@ -264,6 +269,7 @@
         await SaveNouveauNoeud(nouveauNoeud);
         await UpdateGraphe();
     }
+
     /// <summary>
     /// Supprime le noeud avec l'id selectionner
     /// </summary>
@@ -294,9 +300,7 @@
                         }
                         await PageService.Delete(pageDelete.PageId);
                     }
-
                     await NoeudService.Delete(id);
-
                 }
 
             // Supprimer le graphe
@@ -376,6 +380,7 @@
             NavigationManager.NavigateTo("/Graphe");
         }
     }
+
     /// <summary>
     /// Reset le zoom a 100%
     /// </summary>
@@ -501,5 +506,4 @@
             return (zoomIncrement + "%");
         }
     }
-
 }

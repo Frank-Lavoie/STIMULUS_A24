@@ -72,13 +72,10 @@
         var isProfesseur = user.IsInRole("PROFESSEUR");
         var isEtudiant = user.IsInRole("ETUDIANT");
 
-
         if (isProfesseur)
         {
-
             var responseGroupeActif = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
             var groupesActif = responseGroupeActif.Data;
-
 
             groupesProf.AddRange(groupesActif);
 
@@ -111,21 +108,21 @@
 
                 ListeCours.AddRange(nomDesCours);
             }
-
             StateHasChanged();
         }
     }
+
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Graphe");
     }
+
     public async Task ChargerGroupe(int idGroupe)
     {
         await sessionStorage.SetItemAsync<int>("idGroupe", idGroupe);
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Groupe");
     }
-
 }

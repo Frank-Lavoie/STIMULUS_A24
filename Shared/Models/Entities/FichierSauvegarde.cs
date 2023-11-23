@@ -20,7 +20,6 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [ForeignKey("Etudiant")]
         public string? CodeDA { get; set; }
-        public Etudiant? Etudiant { get; set; }
-        
+        public Etudiant? Etudiant { get; set; }        
     }
 }

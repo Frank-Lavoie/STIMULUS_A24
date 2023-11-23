@@ -13,6 +13,7 @@ namespace STIMULUS_V2.Client.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<APIResponse<FichierSource>> Create(FichierSource item)
         {
             var result = await _httpClient.PostAsJsonAsync<FichierSource>("api/FichierSource/Create", item);

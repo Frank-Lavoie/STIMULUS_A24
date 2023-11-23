@@ -115,6 +115,7 @@ namespace STIMULUS_V2.Server.Services
         {
             throw new NotImplementedException();
         }
+
         public async Task<APIResponse<IEnumerable<Groupe_Etudiant>>> GetAllGroupForStudent(string id)
         {
             try
@@ -156,6 +157,7 @@ namespace STIMULUS_V2.Server.Services
                 return new APIResponse<IEnumerable<Groupe_Etudiant>>(null, 500, $"Erreur lors de la récupération du model par son parent {typeof(Groupe_Etudiant).Name}. Message : {ex.Message}.");
             }
         }
+
         public async Task<APIResponse<Groupe_Etudiant>> Update(int id, Groupe_Etudiant item)
         {
             try
