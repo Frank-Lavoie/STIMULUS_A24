@@ -13,6 +13,7 @@ namespace STIMULUS_V2.Client.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<APIResponse<Composant>> Create(Composant item)
         {
             var result = await _httpClient.PostAsJsonAsync<Composant>("api/Composant/Create", item);

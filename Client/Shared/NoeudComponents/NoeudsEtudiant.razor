@@ -18,7 +18,7 @@
     }
 }
 
-    <NonDraggable @bind-X=Node.PosX @bind-Y=Node.PosY>
+<NonDraggable @bind-X=Node.PosX @bind-Y=Node.PosY>
     <NavLink @onclick="DirectionPage" id="lien">
         <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
         <circle @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) r="@Node.Rayon" class="cercle" style="fill:@Couleur"/>
@@ -29,8 +29,8 @@
             <span> Desc : @Node.Description</span>       
         </foreignObject>
         <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
-        </NavLink>                                                
-    </NonDraggable>
+    </NavLink>                                                
+</NonDraggable>
 
 <style>
     #lien:hover{

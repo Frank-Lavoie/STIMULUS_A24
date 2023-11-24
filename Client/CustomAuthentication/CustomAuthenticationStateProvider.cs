@@ -36,13 +36,11 @@ namespace STIMULUS_V2.Client.CustomAuthentication
             {
                 return await Task.FromResult(new AuthenticationState(anonymous));
             }
-
         }
 
         // Update Token by setting up or deleting from local storage
         public async Task UpdateAuthenticationState(SessionUtilisateur userSession)
         {
-
             ClaimsPrincipal claimsPrincipal;
             if (!string.IsNullOrEmpty(userSession.Token))
             {

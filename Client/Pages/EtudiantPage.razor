@@ -133,7 +133,6 @@
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
 
-
         listComposant.AddRange(composants);
 
         var pageActuelle = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
@@ -141,7 +140,6 @@
 
         var noeudActuelle = await NoeudService.Get(await sessionStorage.GetItemAsync<int>("idNoeud"));
         noeud = noeudActuelle.Data;
-
 
         var pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
         var affichPage = pageNoeud.Data;

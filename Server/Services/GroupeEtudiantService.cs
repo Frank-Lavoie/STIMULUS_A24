@@ -14,6 +14,7 @@ namespace STIMULUS_V2.Server.Services
         {
             this.sTIMULUSContext = sTIMULUSContext;
         }
+
         public async Task<APIResponse<Groupe_Etudiant>> Create(Groupe_Etudiant item)
         {
             try

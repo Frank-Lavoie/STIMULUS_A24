@@ -111,7 +111,8 @@
         StateHasChanged();
         // NavigationManager.NavigateTo("/graphe");
     }
-    private int GetModeFond() => 2; //Hardcode
+    //Hardcode
+    private int GetModeFond() => 2; 
 
     private void OnMouseHover() => displayHover = "show";
     private void OnMouseLeave() => displayHover = "hidden";
@@ -182,7 +183,6 @@
             if (mouse.DeltaY < 0)
             {
                 // Faire zoom vers le haut
-
                 if (zoomIncrement != 150)
                 {
                     viewBoxX = viewBoxX + 10;
@@ -202,7 +202,6 @@
             else if (mouse.DeltaY > 0)
             {
                 // Faire zoom vers le bas
-
                 if (zoomIncrement != 0)
                 {
                     viewBoxX = viewBoxX - 10;

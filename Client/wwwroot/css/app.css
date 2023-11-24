@@ -83,7 +83,6 @@ a, .btn-link {
     color: red;
 }
 
-
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
@@ -117,11 +116,13 @@ a, .btn-link {
     color: green;
     cursor: pointer;
 }
+
 /*Css connector component*/
 .cutting:hover {
     fill: green;
     cursor: pointer;
 }
+
 /*Css text link noeud*/
 .textLink:hover {
     fill: black;
@@ -137,6 +138,7 @@ h5 {
 .spaceButton {
     margin: 2px;
 }
+
 /*Css cercle component*/
 #reLink:hover {
     cursor: pointer;

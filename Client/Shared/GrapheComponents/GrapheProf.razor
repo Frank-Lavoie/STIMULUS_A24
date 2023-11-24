@@ -117,7 +117,6 @@
     /// Permet de set le mode de vu. 1 => Page, 2 => Edit, 3 => Etudiant
     /// </summary>
     /// <param name="v">valeur de la vue</param>
-    ///
     private void ModeDeVue(int v)
     {
         if (v == 1)
@@ -150,11 +149,14 @@
 
     /// <summary>
     /// Pour conserver le fond dragable quand en mode "vue etudiant"
+    //Hardcode    /// 
     /// </summary>
     /// <returns></returns>
-    private int GetModeFond() => 2; //Hardcode
-                                    //Quand la souris survole
+    private int GetModeFond() => 2; 
+      
+    //Quand la souris survole
     private void OnMouseHover() => displayHover = "show";
+
     //Quand la souris ne survole plus
     private void OnMouseLeave() => displayHover = "hidden";
 
@@ -188,6 +190,7 @@
             {
                 pageRechercheNoeud.Ordre = 1;
             }
+
             // Enregistre les changements
             SaveChange(pageRechercheNoeud);
             // Récupère toutes les pages du nœud après le relink
@@ -450,7 +453,6 @@
             if (mouse.DeltaY < 0)
             {
                 // Faire zoom vers le haut
-
                 if (zoomIncrement != 150)
                 {
                     viewBoxX = viewBoxX + 10;
@@ -470,7 +472,6 @@
             else if (mouse.DeltaY > 0)
             {
                 // Faire zoom vers le bas
-
                 if (zoomIncrement != 0)
                 {
                     viewBoxX = viewBoxX - 10;

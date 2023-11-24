@@ -14,30 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
-builder.Services.AddSwaggerGen();
-
 builder.Host.UseSerilog((ctx, lc) =>
     lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 
-builder.Services.AddDbContextPool<STIMULUSContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("STIMULUSConnection")));
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-    };
-});
-
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICodeService, CodeService>();
 builder.Services.AddScoped<IComposantService, ComposantService>();
 builder.Services.AddScoped<ICoursService, CoursService>();
@@ -57,13 +39,27 @@ builder.Services.AddScoped<IReferenceService, ReferenceService>();
 builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<UtilisateurFactory>();
+builder.Services.AddDbContextPool<STIMULUSContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("STIMULUSConnection")));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+});
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     var context = services.GetRequiredService<STIMULUSContext>();
 
     //context.Database.EnsureDeleted();
@@ -91,6 +87,7 @@ else
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
+
 app.UseStaticFiles();
 
 app.UseRouting();

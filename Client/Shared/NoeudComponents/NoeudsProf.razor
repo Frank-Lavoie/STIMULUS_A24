@@ -163,12 +163,14 @@
 
 @code {
     private bool delete = false;
+
     //ChildContent = Noeudception
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
     [Parameter] public Page newPage { get; set; } = new();
     [Parameter] public Page LinkedPage { get; set; } = new();
     [Parameter] public List<Noeud> Nodes { get; set; }
+
     //Delegate Land
     [Parameter] public Action<Noeud> AjoutNouveauNoeud { get; set; }
     [Parameter] public Action<int> SupprNoeud { get; set; }
@@ -182,6 +184,7 @@
 
     private string displayHover = "hidden";
     private bool viewPage = false;
+
     //Type de noeud
     private string modelNoeud = "CONTENU";
     private string statusNom = "";
@@ -192,6 +195,7 @@
     private bool isOpen = false;
     private bool pageLink = false;
     private int newPageId;
+
     //Variable couleurs
     private readonly string COULEUR_BLOQUER = "rgb(140,140,140)";
     private readonly string COULEUR_NON_CONSULTER = "rgb(228, 231, 245)";
@@ -220,6 +224,7 @@
         {
             Couleur = COULEUR_COMPLETER;
         }
+
         var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
         var affichPage = pageNoeud.Data;
 
@@ -283,7 +288,10 @@
             AjoutNouveauNoeud(nouveauNoeud);
         }
         else
+        {
             await JsRunTime.InvokeAsync<object>("alert", "Les saisies ne sont pas valides");
+        }
+
         // Dans le cadre de champs vide ou invalide, une alert box apparait
         nouveauNoeud = new();
 
@@ -384,6 +392,7 @@
             affichPage[i].Ordre = i + 1;
             PageService.Update(affichPage[i].PageId, affichPage[i]);
         }
+
         listePage.Clear();
         listePage.AddRange(affichPage);
         StateHasChanged();

@@ -33,7 +33,6 @@ namespace STIMULUS_V2.Client.Services.AuthenticationService
                 Console.WriteLine($"Une erreur s'est produite lors de l'appel API : {ex.Message}");
                 throw;
             }
-
         }
 
         public async Task<object> RegisterAccountAsync(InscriptionVerification model)

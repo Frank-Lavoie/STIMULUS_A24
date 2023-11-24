@@ -172,6 +172,7 @@
                     <!-- Conteneur du bouton -->
                     <div style="text-align: right; margin-bottom: 10px;">
                         <div style="text-align: center;">
+
                             <!-- Bouton pour la flèche vers le haut -->
                             <RadzenButton Style="position: relative; margin-bottom: -20px;" Icon="arrow_upward" Click="@(args => ChangeComposantOrdreUp(composant.ComposantId))" />
 
@@ -271,7 +272,6 @@
     {
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
-
 
         listComposant.AddRange(composants);
 
@@ -501,6 +501,7 @@
         StateHasChanged();
 
     }
+
     private async void DeletePage()
     {
         var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer cette page?", "Supprimer");
