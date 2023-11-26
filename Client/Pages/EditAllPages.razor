@@ -449,6 +449,10 @@
     {
         await sessionStorage.SetItemAsync<int>("idPage", id);
         CurrentPage = id;
+        listComposant.Clear();
+        StateHasChanged();
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
         StateHasChanged();
     }
 
@@ -502,12 +506,16 @@
             }
             var allPage = await PageService.GetAllFromNoeud(noeud.NoeudId);
             listePage = allPage.Data.ToList();
+            var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+            listComposant = composantsRefresh.Data.ToList();
             StateHasChanged();
         }
         else
         {
             var allPage = await PageService.GetAllFromNoeud(noeud.NoeudId);
             listePage = allPage.Data.ToList();
+            var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+            listComposant = composantsRefresh.Data.ToList();
             StateHasChanged();
         }
     }
@@ -534,8 +542,12 @@
         }
 
         // Naviguer vers la page correspondante
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        currentPageId = await sessionStorage.GetItemAsync<int>("idPage"); ;
+        pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
+        affichPage = pageNoeud.Data;
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 
     private async void PreviousPage()
@@ -560,8 +572,12 @@
         }
 
         // Naviguer vers la page correspondante
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        currentPageId = await sessionStorage.GetItemAsync<int>("idPage"); ;
+        pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
+        affichPage = pageNoeud.Data;
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 
     private async void ChangeComposantOrdreUp(int id)
@@ -606,8 +622,10 @@
         }
 
         // 8. Rafraîchir la page
-        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
-        listComposant = composantsRefresh.Data.ToList();
+        listComposant = new();
+        StateHasChanged(); //Fait un flash rapide mais pas trop le choix, fonctionne pas sans
+        var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = allComposant.Data.ToList();
         StateHasChanged();
     }
 
@@ -653,8 +671,10 @@
         }
 
         // 8. Rafraîchir la page
-        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
-        listComposant = composantsRefresh.Data.ToList();
+        listComposant = new();
+        StateHasChanged();
+        var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = allComposant.Data.ToList();
         StateHasChanged();
     }
 
