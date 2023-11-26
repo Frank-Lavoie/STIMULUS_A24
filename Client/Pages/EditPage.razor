@@ -17,7 +17,7 @@
 @inject IJSRuntime JSRuntime
 @inject Radzen.DialogService DialogService
 
-@page "/ModifierPage"
+@page "/ModifierPageV1"
 
     <RadzenBody>
         <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1500px; margin : 30px">
@@ -299,9 +299,6 @@
 
         var noeudActuelle = await NoeudService.Get(await sessionStorage.GetItemAsync<int>("idNoeud"));
         noeud = noeudActuelle.Data;
-
-
-
     }
 
     private async void DeleteComposant(int id)
@@ -326,12 +323,18 @@
             }
             await VideoService.Delete(id);
             await ComposantService.Delete(id);
-            NavigationManager.NavigateTo("/");
-            NavigationManager.NavigateTo("/ModifierPage");
+            listComposant = new();
+            StateHasChanged();
+            allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+            listComposant = allComposant.Data.ToList();
+            StateHasChanged();
         }
         else
         {
-            NavigationManager.NavigateTo("/ModifierPage");
+            StateHasChanged();
+            allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+            listComposant = allComposant.Data.ToList();
+            StateHasChanged();
         }
 
     }
@@ -339,12 +342,12 @@
     {
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
-
+        Console.WriteLine("Ajout nouveau composant");
         if (typeComposant == "Code")
         {
             code.Titre = titreCode;
             code.Contenue = contenuCode;
-            
+
             var codeNew = await CodeService.Create(code);
             var newCode = codeNew.Data;
             composant.Reference = newCode.CodeId;
@@ -372,7 +375,7 @@
         {
             reference.Url = urlReference;
             reference.Description = descriptionReference;
-            
+
             var referenceNew = await ReferenceService.Create(reference);
             var newReference = referenceNew.Data;
             composant.Reference = newReference.ReferenceId;
@@ -409,8 +412,11 @@
         composant.Type = typeComposant;
 
         await ComposantService.Create(composant);
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPage");
+        listComposant = new();
+        StateHasChanged();
+        allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = allComposant.Data.ToList();
+        StateHasChanged();
         await popup.CloseAsync();
     }
     private async void ChangeComposantOrdreUp(int id)
@@ -455,12 +461,16 @@
         }
 
         // 8. Rafraîchir la page
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        listComposant = new();
+        StateHasChanged();
+        var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = allComposant.Data.ToList();
+        StateHasChanged();
     }
 
     private async void ChangeComposantOrdreDown(int id)
     {
+        Console.WriteLine($"composant : {id}");
         // 1. Obtenir le composant que vous souhaitez déplacer vers le bas
         var composantChange = (await ComposantService.Get(id)).Data;
 
@@ -469,7 +479,7 @@
 
         // 3. Trouver le composant actuellement à l'ordre désiré
         var composantAChangerPlaceAvec = composants.FirstOrDefault(c => c.Ordre == composantChange.Ordre + 1);
-
+        Console.WriteLine(composantAChangerPlaceAvec.ComposantId);
         if (composantAChangerPlaceAvec != null)
         {
             // 4. Échanger les ordres des deux composants
@@ -501,8 +511,12 @@
         }
 
         // 8. Rafraîchir la page
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/ModifierPages");
+        listComposant = new();
+        StateHasChanged();
+        var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = allComposant.Data.ToList();
+        StateHasChanged();
+
     }
     private async void DeletePage()
     {

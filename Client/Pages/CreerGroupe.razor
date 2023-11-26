@@ -99,7 +99,6 @@
 
                 await GroupeEtudiantService.Create(groupe_etudiant);
                 await sessionStorage.SetItemAsync<int>("idGroupe", nouveauGroupe.GroupeId);
-                ReRender();
                 NavigationManager.NavigateTo("/Groupe");              
             }
         }
