@@ -2,11 +2,14 @@
 @using STIMULUS_V2.Shared.Models.Entities;
 @inject IImageService ImageService
 
-<div class="container text-center"> 
-	<RadzenStack AlignItems="AlignItems.Center">
+<div class="container text-center">
+    <RadzenStack AlignItems="AlignItems.Center">
         @if (image != null)
         {
-            <RadzenImage Path="@((image.url != null) ? image.url : "")" Style="width: 15rem" />
+            <div>
+                <RadzenImage Path="@((image.url != null) ? image.url : "")" Style="width: 15rem" />
+                <p style="font-style: italic; margin-top: 10px;">@((image.Description != null) ? image.Description : "")</p>
+            </div>
         }
         else
         {

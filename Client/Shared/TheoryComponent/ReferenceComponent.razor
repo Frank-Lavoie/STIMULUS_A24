@@ -2,10 +2,16 @@
 @using STIMULUS_V2.Shared.Models.Entities;
 @inject IReferenceService ReferenceService;
 
-@if(reference!=null)
+@if (reference != null)
 {
-    <h1>@((reference.Description != null) ? reference.Description : "")</h1>
-    <a>@((reference.Url != null) ? reference.Url : "")</a>
+    <div>
+        <h1 style="font-size: 1.5em;">@((reference.Description != null) ? reference.Description : "")</h1>
+        <p>
+            <a href="@((reference.Url != null) ? reference.Url : "")" target="_blank">
+                @((reference.Url != null) ? "Voir la référence" : "")
+            </a>
+        </p>
+    </div>
 }
 else
 {

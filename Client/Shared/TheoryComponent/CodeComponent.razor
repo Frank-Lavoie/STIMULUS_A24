@@ -3,59 +3,27 @@
 @using STIMULUS_V2.Shared.Models.Entities;
 @inject ICodeService CodeService
 
-@if(code != null)
-{
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Code Example</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/themes/prism.min.css" />
-    </head>
-    <body>
-        <style>
-            .code-container {
-                background-color: #282c34;
-                color: #abb2bf;
-                padding: 1rem;
-                border-radius: 8px;
-                overflow-x: auto;
-            }
-
-            .code {
-                font-family: 'Courier New', Courier, monospace;
-            }
-        </style>
-
-        <div class="code-container">
-            <pre class="code">
-            <code>
-                // C# code example with comments
-                using System;
-
-                class Program
-                {
-                    // Main method
-                    static void Main()
-                    {
-                        // Writing a message to the console
-                        Console.WriteLine("Hello, World!");
-                    }
-                }
-            </code>
-        </pre>
+    @if (code != null)
+    {
+    <div class="codeSample component">
+        <div class="headCode">
+            <p class="titleCode">
+                @((code.Titre != null) ? code.Titre : "")
+            </p>
         </div>
-    </body>
-    </html>
-}
-else
-{
-    <p>Chargement...</p>
-}
+        <pre class="code"><code class="python">
+                @((code.Contenue != null) ? code.Contenue : "")
+        </code></pre>
+    </div>
+    }
+    else
+    {
+        <p>Chargement...</p>
+    }
 
 @code {
     [Parameter] public int Reference { get; set; }
-
+    [Inject] private IJSRuntime js { get; set; }
 
     public Code code { get; set; }
 
@@ -68,5 +36,9 @@ else
 
         await base.OnInitializedAsync();
         StateHasChanged();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await js.InvokeVoidAsync("HighlightFunctions.highlightSnippets");
     }
 }
