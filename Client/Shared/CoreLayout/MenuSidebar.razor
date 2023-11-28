@@ -60,12 +60,7 @@
     public List<Cours> ListeCours { get; set; } = new List<Cours>();
     public List<Groupe> groupesProf { get; set; } = new List<Groupe>();
 
-    protected async override void OnInitialized()
-    {
-        await SideBarData();
-    }
-
-    public async Task SideBarData()
+    protected async Task OnInitializedAsync()
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
@@ -79,16 +74,23 @@
 
             groupesProf.AddRange(groupesActif);
 
+            var UpdateGroupe = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
+            groupesProf = UpdateGroupe.Data.ToList();
+            StateHasChanged();
+
             foreach (var graphe in groupesActif)
             {
                 var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
                 var graphesDuGroupe = responseGraphe.Data;
 
                 ListeGraphesProf.AddRange(graphesDuGroupe);
-            }
-            StateHasChanged();
-        }
 
+                var UpdateGraph = await GrapheService.GetAllFromGroup(graphe.GroupeId);
+                ListeGraphesProf = UpdateGraph.Data.ToList();
+                StateHasChanged();
+            }
+
+        }
         if (isEtudiant)
         {
             var responseGroupeEtudiant = await GroupeEtudiantService.GetAllGroupForStudent(await sessionStorage.GetItemAsync<string>("idConnexion"));
@@ -113,6 +115,7 @@
         }
     }
 
+   
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);
