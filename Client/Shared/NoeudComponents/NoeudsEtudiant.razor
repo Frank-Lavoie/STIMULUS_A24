@@ -32,60 +32,6 @@
     </NavLink>                                                
 </NonDraggable>
 
-<style>
-    #lien:hover{
-        cursor:pointer;
-    }
-    #deleteNoeud {
-        color: darkred;
-    }
-
-    #deleteNoeud:hover {
-        color: red;
-        cursor: pointer;
-    }
-    #addNoeud {
-        color: black;
-    }
-
-    #addNoeud:hover {
-        color: yellow;
-        cursor: pointer;
-    }
-    a{
-        text-decoration: none;
-    }
-    text {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-weight:bolder;
-        fill: white;
-    }
-
-    text:hover {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-weight: bold;
-        fill: black;
-    }
-    .cercle-title {
-        fill: #fff;
-        pointer-events: none !important;
-    }
-
-    .cercle {
-        z-index: 1;
-        stroke: #fff;
-        stroke-width: 1;
-    }
-</style>
-
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
