@@ -1,15 +1,30 @@
-﻿<div class="container text-center">
-    <p class="lead">Vous êtes un Professeur</p>
+﻿
+
+<div class="teacher-info-container">
+    <div class="container text-center">
+        <p class="lead">Vous êtes un Professeur</p>
+    </div>
 </div>
 
-<RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
-<div class="">
+<div class="box-display">
+    <RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
     <div class="row">
         <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
             <RadzenCard class="w-100 mb-4">
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
                 <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
+        </div>
+
+        <div class="col-sm-11 col-lg-6 my-5">
+            <RadzenChart>
+                <RadzenPieSeries Data="@progression" Title="Student" CategoryProperty="Progression" ValueProperty="Progression">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenPieSeries>
+            </RadzenChart>
+        </div>
+
+        <div class="col-sm-11 col-lg-6 my-5">
             <RadzenChart>
                 <RadzenPieSeries Data="@progression" Title="Student" CategoryProperty="Progression" ValueProperty="Progression">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
@@ -18,6 +33,17 @@
         </div>
     </div>
 </div>
+<style>
+    .box-display {
+        text-align: center;
+        align-items: center;
+        background-color: lightgrey;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+</style>
 
 @code {
     bool showDataLabels = false;

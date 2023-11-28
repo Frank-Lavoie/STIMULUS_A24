@@ -58,7 +58,7 @@ builder.Services.AddScoped<IReferenceService, ReferenceService>();
 builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<UtilisateurFactory>();
-
+builder.Services.AddScoped<IPageEtudiantService, PageEtudiantService>();
 
 var app = builder.Build();
 
@@ -68,8 +68,8 @@ using (var scope = app.Services.CreateScope())
 
     var context = services.GetRequiredService<STIMULUSContext>();
 
-    //context.Database.EnsureDeleted();
-    //context.Database.EnsureCreated();
+    context.Database.EnsureDeleted();
+    context.Database.EnsureCreated();
 
     context.EnsureAdminUserCreated();
     context.EnsureEtuUserCreated();
