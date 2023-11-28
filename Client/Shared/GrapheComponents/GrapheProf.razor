@@ -274,35 +274,36 @@
 
         if (result.HasValue && result.Value)
         {
-                // Supprimer les pages associées au nœud
-                var allPage = await PageService.GetAllFromNoeud(id);
-                var pages = allPage.Data;
+            // Supprimer les pages associées au nœud
+            var allPage = await PageService.GetAllFromNoeud(id);
+            var pages = allPage.Data;
 
-                if (pages != null)
+            if (pages != null)
+            {
+                foreach (var pageDelete in pages)
                 {
-                    foreach (var pageDelete in pages)
+                    var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
+                    var composant = allComposant.Data;
+
+                    if (composant != null)
                     {
-                        var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
-                        var composant = allComposant.Data;
-
-                        if (composant != null)
+                        foreach (var composantDelete in composant)
                         {
-                            foreach (var composantDelete in composant)
-                            {
-                                await ComposantService.Delete(composantDelete.ComposantId);
-                            }
+                            await ComposantService.Delete(composantDelete.ComposantId);
                         }
-                        await PageService.Delete(pageDelete.PageId);
                     }
-
-                    await NoeudService.Delete(id);
-
+                    await PageService.Delete(pageDelete.PageId);
                 }
+
+                await NoeudService.Delete(id);
+
+            }
 
             // Supprimer le graphe
             await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
-            NavigationManager.NavigateTo("/");
-            NavigationManager.NavigateTo("/Graphe");
+            var allNodesFromGraph = await NoeudService.GetAllFromGraph(await sessionStorage.GetItemAsync<int>("idGraphe"));
+            Nodes = allNodesFromGraph.Data.ToList();
+            StateHasChanged();
         }
         else
         {
