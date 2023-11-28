@@ -19,6 +19,22 @@ namespace STIMULUS_V2.Server.Services
         {
             try
             {
+                // Vérifier si l'importance existe déjà
+                if (item.ImportanceId.HasValue)
+                {
+                    var existingImportance = await sTIMULUSContext.Importance.FindAsync(item.ImportanceId.Value);
+                    if (existingImportance != null)
+                    {
+                        item.Importance = existingImportance;
+                    }
+                    else
+                    {
+                        // Si l'importance n'existe pas, vous pouvez choisir de lever une exception ou de créer une nouvelle importance par défaut.
+                        // Dans cet exemple, nous allons créer une nouvelle importance par défaut.
+                        item.Importance = new Importance { Code=1, Pts=1, Description="" };
+                    }
+                }
+
                 sTIMULUSContext.Page.Add(item);
                 await sTIMULUSContext.SaveChangesAsync();
 
@@ -33,7 +49,7 @@ namespace STIMULUS_V2.Server.Services
             }
             catch (Exception ex)
             {
-                return new APIResponse<Page>(null, 500, $"Erreur lors de la création du model : {typeof(Page).Name}. Message : {ex.Message}");
+                return new APIResponse<Page>(null, 500, $"Erreur lors de la création du modèle : {typeof(Page).Name}. Message : {ex.Message}");
             }
         }
 

@@ -297,15 +297,15 @@
 
         isOpen = false;
     }
-
     private async Task AjoutPage(int id)
     {
         // Récupère toutes les pages du nœud avant l'ajout
         var pageNoeudBefore = await PageService.GetAllFromNoeud(id);
         var createBefore = pageNoeudBefore.Data;
 
+
+
         // Initialise une nouvelle page
-        var newPage = new Page();
         newPage.NoeudId = id;
         newPage.ImportanceId = 1;
 
@@ -321,7 +321,9 @@
         }
 
         // Crée la nouvelle page
-        await PageService.Create(newPage);
+        var nouvPage = await PageService.Create(newPage);
+        var nouvellePage = nouvPage.Data;
+        await sessionStorage.SetItemAsync<int>("idPage", nouvellePage.PageId);
 
         // Récupère toutes les pages du nœud après l'ajout
         var pageNoeudAfter = await PageService.GetAllFromNoeud(id);
@@ -425,7 +427,6 @@
         if (listePage.Count() == 0)
         {
             await AjoutPage(await sessionStorage.GetItemAsync<int>("idNoeud"));
-            await sessionStorage.SetItemAsync<int>("idPage", newPage.PageId);
         }
         else
         {

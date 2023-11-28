@@ -22,7 +22,6 @@
 
 
 <RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'; height: 3200px;">­
-<RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'">
     <RadzenSidebar>
         <RadzenPanelMenu>
             @foreach (var page in listePage.OrderBy(c => c.Ordre))
@@ -48,7 +47,7 @@
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Noeud</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1"><b>@((noeud.Nom != null) ? noeud.Nom : "")</b></RadzenText>
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Page</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@((page.Ordre != null) ? "#" + page.Ordre : "")</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@((page.Ordre != null || page.Ordre != 0) ? "#" + page.Ordre : "")</b></RadzenText>
                 </RadzenStack>
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
@@ -228,7 +227,7 @@
         </RadzenCard>
     </RadzenBody>
     </RadzenLayout>
-</RadzenLayout>
+
 
 @code {
     bool sidebar1Expanded = true;
@@ -287,20 +286,17 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
-        var composants = allComposant.Data;
-
-        listComposant.AddRange(composants);
-
         try
         {
-            var pageActuelle = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
-            page = pageActuelle.Data;
+           await sessionStorage.GetItemAsync<int>("idPage");
         }
         catch
         {
             NavigationManager.NavigateTo("/Graphe");
         }
+
+        var pageActuelle = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+        page = pageActuelle.Data;
 
         var noeudActuelle = await NoeudService.Get(await sessionStorage.GetItemAsync<int>("idNoeud"));
         noeud = noeudActuelle.Data;
@@ -309,6 +305,10 @@
         var affichPage = pageNoeud.Data;
 
         listePage.AddRange(affichPage);
+
+        var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        var composants = allComposant.Data;
+        listComposant.AddRange(composants);
 
         StateHasChanged();
     }
@@ -470,6 +470,7 @@
 
         if (result.HasValue && result.Value)
         {
+            //Delete tous les composants
             var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
             var composants = allComposant.Data;
 
@@ -478,7 +479,23 @@
                 await ComposantService.Delete(deleteComposant.ComposantId);
             }
 
+            //ReOrderPage
+            var AllPage = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+            var livePage = AllPage.Data;
+
+            foreach (var reOrdered in listePage)
+            {
+                if (livePage.Ordre < reOrdered.Ordre)
+                {
+                    reOrdered.Ordre = reOrdered.Ordre - 1;
+                    await PageService.Update(reOrdered.PageId, reOrdered);
+                }
+            }
+
             await PageService.Delete(await sessionStorage.GetItemAsync<int>("idPage"));
+
+            var allPage1 = await PageService.GetAllFromNoeud(noeud.NoeudId);
+            listePage = allPage1.Data.ToList();
 
             if (listePage.Count() == 0)
             {
@@ -489,8 +506,10 @@
                 var firstPage = listePage.FirstOrDefault();
                 await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
             }
-            var allPage = await PageService.GetAllFromNoeud(noeud.NoeudId);
-            listePage = allPage.Data.ToList();
+            
+            var allPage2 = await PageService.GetAllFromNoeud(noeud.NoeudId);
+            listePage = allPage2.Data.ToList();
+            StateHasChanged();
             var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
             listComposant = composantsRefresh.Data.ToList();
             StateHasChanged();
