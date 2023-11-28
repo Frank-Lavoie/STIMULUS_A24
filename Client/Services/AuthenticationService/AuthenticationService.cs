@@ -22,18 +22,14 @@ namespace STIMULUS_V2.Client.Services.AuthenticationService
         {
             try
             {
-                var result = await httpClient.PostAsJsonAsync("api/Authentication/Connexion", model);
-                              
-
+                var result = await httpClient.PostAsJsonAsync("api/Authentication/Connexion", model);               
                return await result.Content.ReadFromJsonAsync<APIResponse<SessionUtilisateur>>();
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Une erreur s'est produite lors de l'appel API : {ex.Message}");
                 throw;
             }
-
         }
 
         public async Task<object> RegisterAccountAsync(InscriptionVerification model)
@@ -42,8 +38,6 @@ namespace STIMULUS_V2.Client.Services.AuthenticationService
             var response = await result.Content.ReadAsStringAsync();
             return response;
         }
-
-
 
         // Protected Methods which need Token.
         public async Task<int> GetUserCount()
@@ -69,8 +63,6 @@ namespace STIMULUS_V2.Client.Services.AuthenticationService
             var info = await GetMyInfo(id);
             return info;
         }
-
-
 
         // General & Frequent Call-up Methods
         private async Task<bool> GetNewToken()

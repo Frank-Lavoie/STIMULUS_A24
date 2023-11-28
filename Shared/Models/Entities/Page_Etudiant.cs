@@ -19,10 +19,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [ForeignKey("Page")]
         public int? PageId { get; set; }
+
         public Page? Page { get; set; }
 
         [ForeignKey("Etudiant")]
         public string? CodeDA { get; set; }
+
         public Etudiant? Etudiant { get; set; }
     }
 }

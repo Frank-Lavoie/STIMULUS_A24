@@ -1,10 +1,10 @@
 @using STIMULUS_V2.Client.Services;
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
-@inject IJSRuntime JSRuntime
-
 @* @using STIMULUS_V2.Client.Shared.TheorieComponents; *@
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
+
+@inject IJSRuntime JSRuntime
 @inject Radzen.DialogService RadzenDialogService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject INoeudService NoeudService;
@@ -21,8 +21,8 @@
         <Connector ReRender="ReRender" GetModeDeVue="GetModeDeVue" SaveChangeNoeud="SaveChangeNoeud" Noeud="Nodes[i]" X1=Node.PosX Y1=Node.PosY X2=Nodes[i].PosX Y2=Nodes[i].PosY />
     }
 }
-<Draggable GetModeDeVue="GetModeDeVue" @bind-X=Node.PosX @bind-Y=Node.PosY>
 
+<Draggable GetModeDeVue="GetModeDeVue" @bind-X=Node.PosX @bind-Y=Node.PosY>
     <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
     @if (GetModeDeVue() == 2)
     {
@@ -159,16 +159,18 @@
             </NavLink>
         }
     }
- }
 </Draggable>
+
 @code {
     private bool delete = false;
+
     //ChildContent = Noeudception
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
     [Parameter] public Page newPage { get; set; } = new();
     [Parameter] public Page LinkedPage { get; set; } = new();
     [Parameter] public List<Noeud> Nodes { get; set; }
+
     //Delegate Land
     [Parameter] public Action<Noeud> AjoutNouveauNoeud { get; set; }
     [Parameter] public Action<int> SupprNoeud { get; set; }
@@ -182,6 +184,7 @@
 
     private string displayHover = "hidden";
     private bool viewPage = false;
+
     //Type de noeud
     private string modelNoeud = "CONTENU";
     private string statusNom = "";
@@ -192,6 +195,7 @@
     private bool isOpen = false;
     private bool pageLink = false;
     private int newPageId;
+
     //Variable couleurs
     private readonly string COULEUR_BLOQUER = "rgb(140,140,140)";
     private readonly string COULEUR_NON_CONSULTER = "rgb(228, 231, 245)";
@@ -220,6 +224,7 @@
         {
             Couleur = COULEUR_COMPLETER;
         }
+
         var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
         var affichPage = pageNoeud.Data;
 
@@ -227,6 +232,7 @@
 
         StateHasChanged();
     }
+
     private async void ViewPageTemplate()
     {
         if (!viewPage)
@@ -244,11 +250,11 @@
                 PageService.Update(affichPage[i].PageId, affichPage[i]);
 
             }
+
             listePage.Clear();
             listePage.AddRange(affichPage);
             StateHasChanged();
             viewPage = true;
-
         }
         else
         {
@@ -256,12 +262,12 @@
         }
     }
 
-
     /// <summary>
     /// (Visuel) permet de check si le noeud a un parent, et l'affiche dans le bulle d'info du noeud
     /// </summary>
     /// <returns></returns>
     private string TestParent() => (Node.NoeudParentId != null && Node.NoeudParentId != Node.NoeudId) ? Node.NoeudParentId.ToString() : "Aucun";
+
     /// <summary>
     /// Quand le formulaire d'ajout est valide, ajoute un noeud
     /// </summary>
@@ -282,12 +288,16 @@
             AjoutNouveauNoeud(nouveauNoeud);
         }
         else
+        {
             await JsRunTime.InvokeAsync<object>("alert", "Les saisies ne sont pas valides");
+        }
+
         // Dans le cadre de champs vide ou invalide, une alert box apparait
         nouveauNoeud = new();
 
         isOpen = false;
     }
+
     private async Task AjoutPage(int id)
     {
         // Récupère toutes les pages du nœud avant l'ajout
@@ -325,7 +335,6 @@
         {
             affichPage[i].Ordre = i + 1;
             PageService.Update(affichPage[i].PageId, affichPage[i]);
-
         }
 
         // Met à jour la liste des pages
@@ -346,6 +355,7 @@
     {
         SupprNoeud(Node.NoeudId);
     }
+
     /// <summary>
     /// Affiche le formulaire pour un nouveau noeud
     /// </summary>
@@ -357,6 +367,7 @@
         displayNouveauNoeud = "visible";
         isOpen = true;
     }
+
     /// <summary>
     /// Rend le formulaire d'ajout de noeud invisible
     /// </summary>
@@ -380,19 +391,22 @@
             affichPage[i].Ordre = i + 1;
             PageService.Update(affichPage[i].PageId, affichPage[i]);
         }
+
         listePage.Clear();
         listePage.AddRange(affichPage);
         StateHasChanged();
-
     }
+
     /// <summary>
     /// Quand on survole un noeud, ses elements lies apparaissent
     /// </summary>
     private void OnMouseHover() => displayHover = "visible";
+
     /// <summary>
     /// Quand on survole plus un noeud, ses elements lies apparaissent disparait
     /// </summary>
     private void OnMouseLeave() => displayHover = "hidden";
+
     /// <summary>
     /// Permet de refaire de rendu d'un composant
     /// </summary>
@@ -400,6 +414,7 @@
     {
         StateHasChanged();
     }
+
     /// <summary>
     /// Permet le changement de page en fonction du noeud choisis
     /// </summary>
@@ -417,19 +432,19 @@
             var firstPage = listePage.FirstOrDefault();
             await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
         }
-
         NavigationManager.NavigateTo("/ModifierPages");
     }
+
     private async void DirectionPage(int id)
     {
         var getPage = await PageService.Get(id);
         var pageNoeud = getPage.Data;
 
-
         await sessionStorage.SetItemAsync<int>("idPage", id);
         await sessionStorage.SetItemAsync<int>("idNoeud", (int)pageNoeud.NoeudId);
         NavigationManager.NavigateTo("/ModifierPage");
     }
+
     private async void DirectionPagesEtudiant()
     {
         await sessionStorage.SetItemAsync<int>("idNoeud", Node.NoeudId);
@@ -446,7 +461,6 @@
             // Stocker l'ID de la première page dans la session
             await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
         }
-
         NavigationManager.NavigateTo("/Pages");
     }
 }

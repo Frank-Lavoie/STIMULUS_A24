@@ -139,7 +139,6 @@ namespace STIMULUS_V2.Server.Services
         {
             try
             {
-
                 var itemList = await sTIMULUSContext.Groupe.Where(item => item.ProfesseurId == id && item.DateCloture >= dateDuJour).ToListAsync();
 
                 if (itemList != null)

@@ -1,7 +1,7 @@
-﻿@page "/CreerGraphe"
-@using Blazored.LocalStorage;
+﻿@using Blazored.LocalStorage;
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject IGrapheService GrapheService
 @inject INoeudService NoeudService
 @inject ILocalStorageService localStorageService
@@ -13,47 +13,48 @@
 @inject AppState State;
 @inject NavigationManager NavigationManager
 
+@page "/CreerGraphe"
+
 <EditForm Model="graphe" OnSubmit="AjoutGraphe">
-        <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
-            <RadzenColumn Size="12" SizeMD="6">
-                <RadzenStack>
-                    <RadzenFieldset Text="Créer un nouveau Graphe">
-                        <RadzenStack Gap="1rem">
-                            <RadzenRow AlignItems="AlignItems.Center">
-                                <RadzenColumn Size="12" SizeMD="4">
-                                    <RadzenLabel Text="Nom" />
-                                </RadzenColumn>
-                                <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Style="width: 100%;" Name="Nom" @bind-Value="graphe.Nom" />
-                                </RadzenColumn>
-                            </RadzenRow>
-                            <RadzenRow AlignItems="AlignItems.Center">
+    <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack>
+                <RadzenFieldset Text="Créer un nouveau Graphe">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
                             <RadzenColumn Size="12" SizeMD="4">
-                             <RadzenLabel Text="Status" />
-                             </RadzenColumn>
-                                <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenDropDown @bind-Value="Status" Placeholder="ACTIVER" Data="status" Style="width: 100%;" Name="Status">
-                                    </RadzenDropDown>
-                                </RadzenColumn>
-                            </RadzenRow>
-                            <RadzenRow AlignItems="AlignItems.Center">
-                                <RadzenColumn Size="12" SizeMD="4">
-                                    <RadzenLabel Text="Groupe associé" />
-                                </RadzenColumn>
-                                <RadzenColumn Size="12" SizeMD="8">
-                                    <RadzenDropDown @bind-Value="graphe.GroupeId" AllowClear="true" Placeholder="Sélectionné un groupe" Data="@listGroupe" Style="width: 100%;" TextProperty="Nom" ValueProperty="GroupeId" Name="Nom"></RadzenDropDown>
-                                </RadzenColumn>
-                            </RadzenRow>                           
-                        </RadzenStack>
-                    </RadzenFieldset>                    
-                </RadzenStack>
-            </RadzenColumn>            
-        </RadzenRow>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
-            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
-            <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
-        </RadzenStack>
-    </EditForm>
+                                <RadzenLabel Text="Nom" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenTextBox Style="width: 100%;" Name="Nom" @bind-Value="graphe.Nom" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Status" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenDropDown @bind-Value="Status" Placeholder="ACTIVER" Data="status" Style="width: 100%;" Name="Status"></RadzenDropDown>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Groupe associé" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenDropDown @bind-Value="graphe.GroupeId" AllowClear="true" Placeholder="Sélectionné un groupe" Data="@listGroupe" Style="width: 100%;" TextProperty="Nom" ValueProperty="GroupeId" Name="Nom"></RadzenDropDown>
+                            </RadzenColumn>
+                        </RadzenRow>                           
+                    </RadzenStack>
+                </RadzenFieldset>                    
+            </RadzenStack>
+        </RadzenColumn>            
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
+        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
+    </RadzenStack>
+</EditForm>
 
 @code {
     public string NomGraphe { get; set; }
@@ -63,7 +64,6 @@
     public List<STIMULUS_V2.Shared.Models.Entities.Groupe> listGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Groupe>();
     public STIMULUS_V2.Shared.Models.Entities.Graphe graphe = new();
     public STIMULUS_V2.Shared.Models.Entities.Noeud nouveauNoeud = new();
-
 
     List<string> status = new List<string>() //Permet un affichage correct du Status
     {
@@ -88,7 +88,6 @@
         {
             graphe.Status = GrapheStatus.DESACTIVER;
         }
-
 
         var nouveauGraphe = await GrapheService.Create(graphe);
         var newgraphe = nouveauGraphe.Data;
@@ -116,6 +115,7 @@
     {
         NavigationManager.NavigateTo("/");
     }
+
     private void ReRender()
     {
         StateHasChanged();

@@ -72,6 +72,7 @@
 .custom-footer-icon {
     font-size: 12px;
 }
+
 /*POUR LE LOGO ANNIMÉ*/
 #logo-container {
     width: 150px;
@@ -82,7 +83,8 @@
 }
 
 #animated-text {
-    animation: stroke 5s infinite alternate; /* ajustez la durée de l'animation */
+    /* ajustez la durée de l'animation */
+    animation: stroke 5s infinite alternate;
     stroke-width: 2;
     font-size: 20px;
 }

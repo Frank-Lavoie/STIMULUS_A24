@@ -2,6 +2,7 @@
 @using STIMULUS_V2.Client.Shared.TheoryComponent
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRunTime
 @inject IPageService PageService
@@ -19,27 +20,25 @@
 
 @page "/ModifierPage"
 
-    <RadzenBody>
-        <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1500px; margin : 30px">
+<RadzenBody>
+    <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1500px; margin : 30px">
         <div style="text-align: center;">
             <RadzenButton Click=@DeletePage Text="Supprimer la page" Icon="report" ButtonStyle="ButtonStyle.Danger" />
         </div>
-            <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Édition</strong></RadzenText>
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
-                <RadzenImage Path="/RessourceVisuel/editpencil.png" Style="width: 100px; height: 100px; border-radius: 50%;" />
-                <RadzenStack Gap="2">
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Noeud</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@((noeud.Nom != null) ? noeud.Nom : "")</b></RadzenText>
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Page</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@((page.Ordre != null) ? "#" + page.Ordre : "")</b></RadzenText>
-                </RadzenStack>
+        <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Édition</strong></RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
+            <RadzenImage Path="/RessourceVisuel/editpencil.png" Style="width: 100px; height: 100px; border-radius: 50%;" />
+            <RadzenStack Gap="2">
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Noeud</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@((noeud.Nom != null) ? noeud.Nom : "")</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Page</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@((page.Ordre != null) ? "#" + page.Ordre : "")</b></RadzenText>
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
             <RadzenButton @ref=button ButtonStyle="ButtonStyle.Primary" Icon="add_circle_outline" class="mt-2 mb-4" Text="Ajouter un composant" Click="@(args => popup.ToggleAsync(button.Element))" />
-            <Popup @ref=popup Lazy=true Open="@OnOpen"
-                   Style="display:none;position:absolute;height:400px;width:400px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color); text-align: center;">
+                <Popup @ref=popup Lazy=true Open="@OnOpen" Style="display:none;position:absolute;height:400px;width:400px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color); text-align: center;">
                 <!-- Reste du code inchangé -->
-
                 <EditForm Model="composant" OnSubmit="@AddComposant">
                     <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
                         <RadzenColumn Class="mx-auto">
@@ -56,9 +55,6 @@
                                                 </RadzenDropDown>
                                             </RadzenColumn>
                                         </RadzenRow>
-
-
-
 
                                         @if (typeComposant == "Video")
                                         {
@@ -79,8 +75,6 @@
                                                 </RadzenColumn>
                                             </RadzenRow>
                                         }
-
-
                                         @if (typeComposant == "Texte")
                                         {
                                             <RadzenRow AlignItems="AlignItems.Center">
@@ -91,10 +85,7 @@
                                                     <RadzenTextBox @bind-Value="contenuTexte" Style="width: 200px; height : 160px" />
                                                 </RadzenColumn>
                                             </RadzenRow>
-   
                                         }
-
-
                                         @if (typeComposant == "Reference")
                                         {
                                             <RadzenRow AlignItems="AlignItems.Center">
@@ -113,7 +104,6 @@
                                                     <RadzenTextBox @bind-Value="descriptionReference" Style="width: 200px;" />
                                                 </RadzenColumn>
                                             </RadzenRow>
-
                                         }
                                         @if (typeComposant == "Image")
                                         {
@@ -133,10 +123,7 @@
                                                     <RadzenTextBox @bind-Value="descriptionImage" Style="width: 200px;" />
                                                 </RadzenColumn>
                                             </RadzenRow>
-
                                         }
-
-
                                         @if (typeComposant == "Exercice")
                                         {
                                             <RadzenRow AlignItems="AlignItems.Center">
@@ -147,9 +134,7 @@
                                                     <RadzenTextBox @bind-Value="solutionExercice" Style="width: 200px;" /> @* TEMPORAIRE *@
                                                 </RadzenColumn>
                                             </RadzenRow>
-
                                         }
-
                                         @if (typeComposant == "Code")
                                         {
                                             <RadzenRow AlignItems="AlignItems.Center">
@@ -168,7 +153,6 @@
                                                     <RadzenTextBox @bind-Value="contenuCode" Style="width: 200px;" />@* TEMPORAIRE *@
                                                 </RadzenColumn>
                                             </RadzenRow>
-
                                         }
                                     </RadzenStack>
                                 </RadzenFieldset>
@@ -180,7 +164,7 @@
                     </RadzenStack>
                 </EditForm>
             </Popup>
-            </RadzenStack>
+        </RadzenStack>
         <RadzenRow RowGap="2" Class="justify-content-center">
             @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
             {
@@ -188,6 +172,7 @@
                     <!-- Conteneur du bouton -->
                     <div style="text-align: right; margin-bottom: 10px;">
                         <div style="text-align: center;">
+
                             <!-- Bouton pour la flèche vers le haut -->
                             <RadzenButton Style="position: relative; margin-bottom: -20px;" Icon="arrow_upward" Click="@(args => ChangeComposantOrdreUp(composant.ComposantId))" />
 
@@ -227,18 +212,14 @@
                 </div>
             }
         </RadzenRow>
-        </RadzenCard>
-    </RadzenBody>
-
-
-
+    </RadzenCard>
+</RadzenBody>
 
 @code {
     bool sidebar1Expanded = true;
     Popup popup;
     RadzenButton button;
     private List<Composant> listComposant { get; set; } = new List<Composant>();
-
     private Page page { get; set; } = new();    
     private Composant composant { get; set; } = new();
     private Noeud noeud { get; set; } = new();
@@ -291,7 +272,6 @@
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
 
-
         listComposant.AddRange(composants);
 
         var pageActuelle = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
@@ -305,10 +285,8 @@
     {
         var ordreComposant = await ComposantService.Get(id);
         var composantDelete = ordreComposant.Data;
-
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
-
         var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer ce composant?", "Supprimer");
 
         if (result.HasValue && result.Value)
@@ -338,11 +316,14 @@
         }
 
     }
+
     private async void AddComposant()
     {
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
+
         Console.WriteLine("Ajout nouveau composant");
+
         if (typeComposant == "Code")
         {
             code.Titre = titreCode;
@@ -378,6 +359,7 @@
 
             var referenceNew = await ReferenceService.Create(reference);
             var newReference = referenceNew.Data;
+
             composant.Reference = newReference.ReferenceId;
         }
         if (typeComposant == "Texte")
@@ -386,6 +368,7 @@
 
             var texteNew = await TexteService.Create(texte);
             var newTexte = texteNew.Data;
+
             composant.Reference = newTexte.TexteFormaterId;
         }
         if (typeComposant == "Video")
@@ -397,6 +380,7 @@
 
             var videoNew = await VideoService.Create(video);
             var newVideo = videoNew.Data;
+
             composant.Reference = newVideo.VideoId;
         }
 
@@ -419,6 +403,7 @@
         StateHasChanged();
         await popup.CloseAsync();
     }
+
     private async void ChangeComposantOrdreUp(int id)
     {
         // 1. Obtenir le composant que vous souhaitez déplacer vers le haut
@@ -518,6 +503,7 @@
         StateHasChanged();
 
     }
+
     private async void DeletePage()
     {
         var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer cette page?", "Supprimer");
@@ -553,6 +539,4 @@
     {
         await JSRuntime.InvokeVoidAsync("eval", "setTimeout(function(){ document.getElementById('search').focus(); }, 200)");
     }   
-
-
 }

@@ -50,6 +50,7 @@ namespace STIMULUS_V2.Server.Controllers
             var response = await composantService.GetAllById(id);
             return StatusCode(response.StatusCode, response);
         }
+
 		[HttpGet("Fetch/AllVideo/{id}")]
 		public async Task<IActionResult> GetAllVideo(int id)
 		{
