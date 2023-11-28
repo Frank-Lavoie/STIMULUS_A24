@@ -430,6 +430,8 @@
     private async Task ChangePageWithNavBar(int id)
     {
         await sessionStorage.SetItemAsync<int>("idPage", id);
+        var obj = await PageService.Get(id);
+        page = obj.Data;
         CurrentPage = id;
         listComposant.Clear();
         StateHasChanged();
