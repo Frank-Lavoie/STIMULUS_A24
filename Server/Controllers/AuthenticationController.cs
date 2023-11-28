@@ -41,7 +41,6 @@ namespace STIMULUS_V2.Server.Controllers
                 {
                     return new APIResponse<SessionUtilisateur>(null, 400, "L'utilisateur n'existe pas.");
                 }
-
                 if (BCrypt.Net.BCrypt.Verify(connexionVerification.Password, existingUser.MotDePasse))
                 {
                     var userRole = existingUser.Role;
@@ -51,10 +50,9 @@ namespace STIMULUS_V2.Server.Controllers
                     }
 
                     var token = GenerateToken(connexionVerification.Identifiant, userRole);
-
                     var refreshToken = GenerateRefreshToken();
-
                     var existingUserToken = await sTIMULUSContext.TokenInfo.FirstOrDefaultAsync(token => token.UserId == existingUser.Identifiant);
+
                     if (existingUserToken is null)
                     {
                         sTIMULUSContext.TokenInfo.Add(new TokenInfo()
@@ -76,6 +74,7 @@ namespace STIMULUS_V2.Server.Controllers
                 return StatusCode(500, "Une erreur interne s'est produite.");
             }
         }
+
         private static string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
@@ -85,6 +84,7 @@ namespace STIMULUS_V2.Server.Controllers
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
             var userClaims = new[]
             {
                 new Claim(ClaimTypes.Name,email!),
@@ -105,7 +105,6 @@ namespace STIMULUS_V2.Server.Controllers
 
         // Account Registration
         [HttpPost("Inscription")]
-
         public async Task<IActionResult> UtilisateurInscription(InscriptionVerification inscriptionVerification)
         {
             var result = await utilisateurFactory.CreerUtilisateur(inscriptionVerification.Nom, inscriptionVerification.Prenom, inscriptionVerification.Email, inscriptionVerification.Password);

@@ -1,5 +1,6 @@
 ﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject IVideoService VideoService
 @inject IComposantService ComposantService
 
@@ -18,15 +19,15 @@
 </div>
 
 @code {
-    [Parameter] public int Reference { get; set; }
+    [Parameter] 
+    public int Reference { get; set; }
+
     public Video video { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         var Video = await VideoService.Get(Reference);
         video = Video.Data;
-
-
 
         await base.OnInitializedAsync();
         await TransformerVideoEmbed();
@@ -84,9 +85,7 @@
             {
                 throw new ArgumentException("L'URL YouTube ne contient pas de paramètre 'v'.");
             }
-
             return videoId;
         }
 	}
-
 }

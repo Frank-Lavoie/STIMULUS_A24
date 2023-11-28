@@ -13,6 +13,7 @@ namespace STIMULUS_V2.Client.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<APIResponse<Reference>> Create(Reference item)
         {
             var result = await _httpClient.PostAsJsonAsync<Reference>("api/Reference/Create", item);

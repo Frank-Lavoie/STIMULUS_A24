@@ -1,4 +1,5 @@
 ﻿@using STIMULUS_V2.Shared.Models.Authentication;
+
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
 @inject AuthenticationStateProvider authStateProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -17,7 +18,6 @@
             </div>
         </div>
         <div style="display: flex; align-items: center;">
-
             <RadzenProfileMenu Style="background-color: darkblue">
                 <Template>
                     <div style="display: flex; flex-direction:row; ">
@@ -26,7 +26,7 @@
                             <Authorized>
                                 @{
                                     sessionStorage.SetItemAsync<string>("idConnexion", context.User.Identity!.Name);
-                                }
+                                 }
                                 <span>@context.User.Identity!.Name</span>
                             </Authorized>
                             <NotAuthorized>
@@ -46,7 +46,6 @@
                     <Button style="width:100%; border:none; background-color: #FFFFFF" @onclick="Logout"><RadzenIcon Icon="exit_to_app" /><span>Déconnexion</span></Button>
                 </ChildContent>
             </RadzenProfileMenu>
-
         </div>
     </div>
 </RadzenHeader>

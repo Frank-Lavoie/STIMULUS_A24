@@ -1,5 +1,5 @@
-﻿@page "/CreerGroupe"
-@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
 @inject AuthenticationStateProvider authStateProvider
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -13,6 +13,8 @@
 @inject IJSRuntime js
 @inject NavigationManager NavigationManager
 @inject AppState State;
+
+@page "/CreerGroupe"
 
 <EditForm Model="groupe" OnSubmit="AjoutGroupe">
     <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
@@ -47,10 +49,9 @@
                                 <RadzenLabel Text="Liste des étudiants à ajouter" />
                             </RadzenColumn>
                             <RadzenColumn>
-                                <RadzenCheckBoxList @bind-Value="selectedStudents" Data="@listEtudiant" TextProperty="Identifiant" ValueProperty="Identifiant" Style="width: 100%;">
-                                </RadzenCheckBoxList>
+                                <RadzenCheckBoxList @bind-Value="selectedStudents" Data="@listEtudiant" TextProperty="Identifiant" ValueProperty="Identifiant" Style="width: 100%;" />
                             </RadzenColumn>
-                            </RadzenRow>
+                        </RadzenRow>
                     </RadzenStack>
                 </RadzenFieldset>
             </RadzenStack>
@@ -69,7 +70,6 @@
     public List<STIMULUS_V2.Shared.Models.Entities.Etudiant> listEtudiant { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Etudiant>();
     public List<STIMULUS_V2.Shared.Models.Entities.Cours> listCours{ get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Cours>();
     IEnumerable<string> selectedStudents = new List<string>();
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,7 +102,6 @@
                 NavigationManager.NavigateTo("/Groupe");              
             }
         }
-
         catch
         {
             await js.InvokeVoidAsync("alert", "Erreur lors de la création du groupe");
@@ -114,9 +113,9 @@
     {
         NavigationManager.NavigateTo("/");
     }
+
     private void ReRender()
     {
         StateHasChanged();
     }
 }
-

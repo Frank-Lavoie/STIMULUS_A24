@@ -12,7 +12,5 @@ namespace STIMULUS_V2.Shared.Models.Entities
     public class Etudiant : Utilisateur
     {
        
-
-       
     }
 }
