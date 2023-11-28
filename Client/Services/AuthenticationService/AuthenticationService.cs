@@ -22,11 +22,8 @@ namespace STIMULUS_V2.Client.Services.AuthenticationService
         {
             try
             {
-                var result = await httpClient.PostAsJsonAsync("api/Authentication/Connexion", model);
-                              
-
+                var result = await httpClient.PostAsJsonAsync("api/Authentication/Connexion", model);               
                return await result.Content.ReadFromJsonAsync<APIResponse<SessionUtilisateur>>();
-
             }
             catch (Exception ex)
             {

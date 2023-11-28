@@ -26,7 +26,7 @@
                             <Authorized>
                                 @{
                                     sessionStorage.SetItemAsync<string>("idConnexion", context.User.Identity!.Name);
-                                }
+                                 }
                                 <span>@context.User.Identity!.Name</span>
                             </Authorized>
                             <NotAuthorized>

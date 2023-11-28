@@ -220,7 +220,6 @@
     Popup popup;
     RadzenButton button;
     private List<Composant> listComposant { get; set; } = new List<Composant>();
-
     private Page page { get; set; } = new();    
     private Composant composant { get; set; } = new();
     private Noeud noeud { get; set; } = new();
@@ -286,10 +285,8 @@
     {
         var ordreComposant = await ComposantService.Get(id);
         var composantDelete = ordreComposant.Data;
-
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
-
         var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer ce composant?", "Supprimer");
 
         if (result.HasValue && result.Value)
@@ -324,7 +321,9 @@
     {
         var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         var composants = allComposant.Data;
+
         Console.WriteLine("Ajout nouveau composant");
+
         if (typeComposant == "Code")
         {
             code.Titre = titreCode;
@@ -360,6 +359,7 @@
 
             var referenceNew = await ReferenceService.Create(reference);
             var newReference = referenceNew.Data;
+
             composant.Reference = newReference.ReferenceId;
         }
         if (typeComposant == "Texte")
@@ -368,6 +368,7 @@
 
             var texteNew = await TexteService.Create(texte);
             var newTexte = texteNew.Data;
+
             composant.Reference = newTexte.TexteFormaterId;
         }
         if (typeComposant == "Video")
@@ -379,6 +380,7 @@
 
             var videoNew = await VideoService.Create(video);
             var newVideo = videoNew.Data;
+
             composant.Reference = newVideo.VideoId;
         }
 

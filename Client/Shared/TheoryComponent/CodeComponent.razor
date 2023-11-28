@@ -6,16 +6,18 @@
 
     @if (code != null)
     {
-    <div class="codeSample component">
-        <div class="headCode">
-            <p class="titleCode">
-                @((code.Titre != null) ? code.Titre : "")
-            </p>
+        <div class="codeSample component">
+            <div class="headCode">
+                <p class="titleCode">
+                    @((code.Titre != null) ? code.Titre : "")
+                </p>
+            </div>
+            <pre class="code">
+                <code class="python">
+                    @((code.Contenue != null) ? code.Contenue : "")
+                </code>
+            </pre>
         </div>
-        <pre class="code"><code class="python">
-                @((code.Contenue != null) ? code.Contenue : "")
-        </code></pre>
-    </div>
     }
     else
     {
@@ -23,8 +25,10 @@
     }
 
 @code {
-    [Parameter] public int Reference { get; set; }
-    [Inject] private IJSRuntime js { get; set; }
+    [Parameter]
+    public int Reference { get; set; }
+    [Inject] 
+    private IJSRuntime js { get; set; }
 
     public Code code { get; set; }
 
@@ -36,6 +40,7 @@
         await base.OnInitializedAsync();
         StateHasChanged();
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await js.InvokeVoidAsync("HighlightFunctions.highlightSnippets");

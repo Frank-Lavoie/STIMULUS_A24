@@ -42,7 +42,6 @@ namespace STIMULUS_V2.Client.Services
         {
             var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Groupe>>>($"api/Groupe/Fetch/All/{id}");
             return result;
-
         }
 
         public async Task<APIResponse<IEnumerable<Groupe>>> GetAllForTeacher(string id)

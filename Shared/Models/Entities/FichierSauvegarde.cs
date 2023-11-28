@@ -16,10 +16,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [Column(TypeName = "varchar(8000)")]
         public string? Contenue { get; set; }
+
         public DateTime Version { get; set; } = DateTime.Now;
 
         [ForeignKey("Etudiant")]
         public string? CodeDA { get; set; }
+
         public Etudiant? Etudiant { get; set; }        
     }
 }

@@ -13,7 +13,9 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [Column(TypeName = "nvarchar(max)")]
         public string Url { get; set; }
+
         public int Longueur { get; set; }
+
         public int Largeur { get; set; }
 
         [Column(TypeName = "nvarchar(max)")]

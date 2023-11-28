@@ -69,7 +69,6 @@
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
-
         var isProfesseur = user.IsInRole("PROFESSEUR");
         var isEtudiant = user.IsInRole("ETUDIANT");
 
@@ -102,6 +101,7 @@
 
                 ListeGraphesEtudiant.AddRange(graphesDuGroupe);
             }
+
             foreach (var cours in groupes)
             {
                 var responseCours = await CoursService.GetAllById((int)cours.GroupeId);
