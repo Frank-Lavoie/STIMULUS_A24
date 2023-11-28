@@ -288,57 +288,7 @@
 
         isOpen = false;
     }
-    private async Task AjoutPage(int id)
-    {
-        // Récupère toutes les pages du nœud avant l'ajout
-        var pageNoeudBefore = await PageService.GetAllFromNoeud(id);
-        var createBefore = pageNoeudBefore.Data;
-
-        // Initialise une nouvelle page
-        var newPage = new Page();
-        newPage.NoeudId = id;
-        newPage.ImportanceId = 1;
-
-        if (createBefore != null)
-        {
-            // Si des pages existent déjà, organise la valeur de la propriété Ordre de manière séquentielle
-            newPage.Ordre = createBefore.Count() + 1;
-        }
-        else
-        {
-            // Si aucune page n'existe, initialise la valeur de la propriété Ordre à 1
-            newPage.Ordre = 1;
-        }
-
-        // Crée la nouvelle page
-        await PageService.Create(newPage);
-
-        // Récupère toutes les pages du nœud après l'ajout
-        var pageNoeudAfter = await PageService.GetAllFromNoeud(id);
-        var affichPage = pageNoeudAfter.Data.ToList();
-
-        // Trie les pages en fonction de la propriété Ordre
-        affichPage = affichPage.OrderBy(p => p.Ordre).ToList();
-
-        // Met à jour les valeurs de la propriété Ordre de manière séquentielle
-        for (int i = 0; i < affichPage.Count(); i++)
-        {
-            affichPage[i].Ordre = i + 1;
-            PageService.Update(affichPage[i].PageId, affichPage[i]);
-
-        }
-
-        // Met à jour la liste des pages
-        listePage.Clear();
-        listePage.AddRange(affichPage);
-
-        // Active l'affichage des pages
-        viewPage = true;
-
-        // Met à jour l'affichage
-        StateHasChanged();
-    }
-
+    
     /// <summary>
     /// Appel la fonction en delegate de suppression de noeud
     /// </summary>
@@ -367,7 +317,59 @@
         displayNouveauNoeud = "hidden";
         isOpen = false;
     }
+    private async Task AjoutPage(int id)
+    {
+        // Récupère toutes les pages du nœud avant l'ajout
+        var pageNoeudBefore = await PageService.GetAllFromNoeud(id);
+        var createBefore = pageNoeudBefore.Data;
 
+
+
+        // Initialise une nouvelle page
+        newPage.NoeudId = id;
+        newPage.ImportanceId = 1;
+
+        if (createBefore != null)
+        {
+            // Si des pages existent déjà, organise la valeur de la propriété Ordre de manière séquentielle
+            newPage.Ordre = createBefore.Count() + 1;
+        }
+        else
+        {
+            // Si aucune page n'existe, initialise la valeur de la propriété Ordre à 1
+            newPage.Ordre = 1;
+        }
+
+        // Crée la nouvelle page
+        var nouvPage = await PageService.Create(newPage);
+        var nouvellePage = nouvPage.Data;
+        await sessionStorage.SetItemAsync<int>("idPage", nouvellePage.PageId);
+
+        // Récupère toutes les pages du nœud après l'ajout
+        var pageNoeudAfter = await PageService.GetAllFromNoeud(id);
+        var affichPage = pageNoeudAfter.Data.ToList();
+
+        // Trie les pages en fonction de la propriété Ordre
+        affichPage = affichPage.OrderBy(p => p.Ordre).ToList();
+
+        // Met à jour les valeurs de la propriété Ordre de manière séquentielle
+        for (int i = 0; i < affichPage.Count(); i++)
+        {
+            affichPage[i].Ordre = i + 1;
+            PageService.Update(affichPage[i].PageId, affichPage[i]);
+
+        }
+
+        // Met à jour la liste des pages
+        listePage.Clear();
+        listePage.AddRange(affichPage);
+
+        // Active l'affichage des pages
+        viewPage = true;
+
+        // Met à jour l'affichage
+        StateHasChanged();
+    }
     private async void SupprimerPage(int id)
     {
         await PageService.Delete(id);
@@ -410,7 +412,6 @@
         if (listePage.Count() == 0)
         {
             await AjoutPage(await sessionStorage.GetItemAsync<int>("idNoeud"));
-            await sessionStorage.SetItemAsync<int>("idPage", newPage.PageId);
         }
         else
         {
