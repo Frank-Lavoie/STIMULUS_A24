@@ -11,14 +11,13 @@ using STIMULUS_V2.Client.Services.AuthenticationService;
 using STIMULUS_V2.Shared.Interface.ChildInterface;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddBlazoredLocalStorage();
-
 builder.Services.AddScoped<ICodeService, CodeService>();
 builder.Services.AddScoped<IComposantService, ComposantService>();
 builder.Services.AddScoped<ICoursService, CoursService>();
@@ -43,14 +42,11 @@ builder.Services.AddSingleton<IUpdateService, UpdateService>();
 builder.Services
             .AddSingleton<MouseService>()
             .AddSingleton<IMouseService>(ff => ff.GetRequiredService<MouseService>());
-
 builder.Services.AddSingleton<AppState>();
-
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ICoursService, CoursService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddAuthorizationCore();
-
 builder.Services.AddRadzenComponents();
 
 await builder.Build().RunAsync();

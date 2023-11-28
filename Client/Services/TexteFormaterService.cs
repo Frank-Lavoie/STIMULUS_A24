@@ -13,6 +13,7 @@ namespace STIMULUS_V2.Client.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<APIResponse<TexteFormater>> Create(TexteFormater item)
         {
             var result = await _httpClient.PostAsJsonAsync<TexteFormater>("api/TexteFormater/Create", item);

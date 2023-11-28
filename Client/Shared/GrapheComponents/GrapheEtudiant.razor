@@ -26,7 +26,7 @@
                 <RadzenText class="custom-graphe-zoom-text" TextStyle="TextStyle.DisplayH3">Zoom: @AfficheZoom()</RadzenText>
             </RadzenStack>
         </foreignObject>
-            <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
+        <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
             @*<rect width="180" height="180" x="0" y="5" fill="#32587a"></rect>*@
             <foreignObject class="bg-transparent" x="0" y="5" width="160" height="205">
                 <RadzenPanel class="custom-graphe-legend-panel">
@@ -38,21 +38,18 @@
                                 <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/140-140-140.png"></RadzenImage>
                             </div>
                         </div>
-
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <RadzenLabel>Disponible</RadzenLabel>
                                 <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/228-231-245.png"></RadzenImage>
                             </div>
                         </div>
-
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <RadzenLabel>Consulté</RadzenLabel>
                                 <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/199-160-53.png"></RadzenImage>
                             </div>
                         </div>
-
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <RadzenLabel>Complété</RadzenLabel>
@@ -62,8 +59,7 @@
                     </RadzenStack>
                 </RadzenPanel>
             </foreignObject>
-            <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth" @onmousewheel="Zoom" @onmousemove=@(e => mouseSrv.FireMove(this, e))
-                @onmouseup=@(e => mouseSrv.FireUp(this, e))>
+            <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth" @onmousewheel="Zoom" @onmousemove=@(e => mouseSrv.FireMove(this, e)) @onmouseup=@(e => mouseSrv.FireUp(this, e))>
                 <Draggable GetModeDeVue="GetModeFond" X="@((viewBoxWidth - 1800) / 2)" Y="@((viewBoxWidth - 1500) / 2)">
                     <rect x="-1000" y="-1000" width="4000" height="4000" style="fill:rgb(0,0,0,0);stroke-width:1;stroke:rgb(0,0,0,0)" />
                     @foreach (var noeud in Nodes)
@@ -99,7 +95,6 @@
     /// </summary>
     private async Task UpdateGraphe()
     {
-
         Nodes = new();
         int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
 
@@ -116,7 +111,8 @@
         StateHasChanged();
         // NavigationManager.NavigateTo("/graphe");
     }
-    private int GetModeFond() => 2; //Hardcode
+    //Hardcode
+    private int GetModeFond() => 2; 
 
     private void OnMouseHover() => displayHover = "show";
     private void OnMouseLeave() => displayHover = "hidden";
@@ -130,6 +126,7 @@
         zoomIncrement = 100;
         AfficheZoom();
     }
+
     /// <summary>
     /// Augmenter le zoom
     /// </summary>
@@ -151,6 +148,7 @@
             AfficheZoom();
         }
     }
+
     /// <summary>
     /// Reduit le zoom
     /// </summary>
@@ -172,6 +170,7 @@
             AfficheZoom();
         }
     }
+
     /// <summary>
     /// Zoom scroll molette
     /// </summary>
@@ -184,7 +183,6 @@
             if (mouse.DeltaY < 0)
             {
                 // Faire zoom vers le haut
-
                 if (zoomIncrement != 150)
                 {
                     viewBoxX = viewBoxX + 10;
@@ -204,7 +202,6 @@
             else if (mouse.DeltaY > 0)
             {
                 // Faire zoom vers le bas
-
                 if (zoomIncrement != 0)
                 {
                     viewBoxX = viewBoxX - 10;
@@ -223,6 +220,7 @@
             }
         }
     }
+
     public string AfficheZoom()
     {
         if (zoomIncrement <= 0)

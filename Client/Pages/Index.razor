@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
+
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject AppState State;
 @inject AuthenticationStateProvider authStateProvider
@@ -13,12 +14,14 @@
             State.Identifiant = context.User.Identity!.Name;           
         }
     </AuthorizeView>
+
     <AuthorizeView Roles="ETUDIANT">
         <p class="lead">Vous êtes un Étudiant</p>
         @{
             State.Identifiant = context.User.Identity!.Name;
         }
     </AuthorizeView>
+
     <AuthorizeView Roles="ADMIN">
         <p class="lead">Vous êtes un Administrateur</p>
         @{

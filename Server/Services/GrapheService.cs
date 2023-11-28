@@ -117,6 +117,7 @@ namespace STIMULUS_V2.Server.Services
         {
             throw new NotImplementedException();
         }
+
         public async Task<APIResponse<IEnumerable<Graphe>>> GetAllFromGroup(int id)
         {
             try

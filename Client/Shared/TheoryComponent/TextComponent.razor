@@ -16,9 +16,10 @@ else
     <p>Chargement...</p>
 }
 
-
 @code {
-    [Parameter] public int Reference { get; set; }
+    [Parameter] 
+    public int Reference { get; set; }
+
     public TexteFormater texte { get; set; }
 
     protected async override Task OnInitializedAsync()
@@ -26,11 +27,7 @@ else
         var Texte = await TextFormaterService.Get(Reference);
         texte = Texte.Data;
 
-
-
         await base.OnInitializedAsync();
         StateHasChanged();
     }
-
-
 } 

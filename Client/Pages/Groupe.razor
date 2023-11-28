@@ -1,6 +1,6 @@
-﻿@page "/Groupe"
-@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IGroupeService GroupeService
 @inject IEtudiantService EtudiantService
@@ -10,7 +10,7 @@
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject AppState State;
 
-
+@page "/Groupe"
 
 <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
@@ -54,7 +54,6 @@
     public string imageActif;
     public string siActif;
 
-
     protected override async Task OnInitializedAsync()
     {
         await GetDataGroupe();
@@ -76,12 +75,8 @@
             siActif = "Inactif";
         }
 
-
-
-
         var cours = await CoursService.Get((int)groupeProf.CoursId);
         groupeCours = cours.Data;
-
 
         var graphe = await GrapheService.GetAllFromGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
         var graphes = graphe.Data;
@@ -92,7 +87,6 @@
                 listGrapheGroupe.Add(grapheGroupe);
             }
         }
-
 
         var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
         var etudiants = eleve.Data;

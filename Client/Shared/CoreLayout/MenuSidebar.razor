@@ -2,6 +2,7 @@
 @using STIMULUS_V2.Shared.Models.Authentication;
 @using Blazored.LocalStorage;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject TooltipService tooltipService
@@ -68,17 +69,13 @@
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
-
         var isProfesseur = user.IsInRole("PROFESSEUR");
         var isEtudiant = user.IsInRole("ETUDIANT");
 
-
         if (isProfesseur)
         {
-
             var responseGroupeActif = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
             var groupesActif = responseGroupeActif.Data;
-
 
             groupesProf.AddRange(groupesActif);
 
@@ -104,6 +101,7 @@
 
                 ListeGraphesEtudiant.AddRange(graphesDuGroupe);
             }
+
             foreach (var cours in groupes)
             {
                 var responseCours = await CoursService.GetAllById((int)cours.GroupeId);
@@ -111,21 +109,21 @@
 
                 ListeCours.AddRange(nomDesCours);
             }
-
             StateHasChanged();
         }
     }
+
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Graphe");
     }
+
     public async Task ChargerGroupe(int idGroupe)
     {
         await sessionStorage.SetItemAsync<int>("idGroupe", idGroupe);
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Groupe");
     }
-
 }

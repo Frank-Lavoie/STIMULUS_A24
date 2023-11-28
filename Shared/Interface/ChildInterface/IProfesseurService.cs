@@ -10,5 +10,6 @@ namespace STIMULUS_V2.Shared.Interface.ChildInterface
 {
     public interface IProfesseurService : IModelService<Professeur, string>
     {
+
     }
 }

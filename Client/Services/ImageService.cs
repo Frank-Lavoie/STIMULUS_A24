@@ -13,6 +13,7 @@ namespace STIMULUS_V2.Client.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<APIResponse<Image>> Create(Image item)
         {
             var result = await _httpClient.PostAsJsonAsync<Image>("api/Image/Create", item);
