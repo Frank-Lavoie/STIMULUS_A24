@@ -184,16 +184,16 @@
         <RadzenRow RowGap="2" Class="justify-content-center">
             @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
             {
-                <div style="margin: 0 auto; width: 50%; padding: 10px; text-align: center;">
+                <div style="margin: 0 auto; width: 100%;max-width: 1200px; padding: 10px; text-align: center; box-sizing: content-box;">
                     <!-- Conteneur du bouton -->
                     <div style="text-align: right; margin-bottom: 10px;">
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Style="height:35px;" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteComposant(composant.ComposantId))" />
                         <div style="text-align: center;">
                             <!-- Bouton pour la flèche vers le haut -->
                             <RadzenButton Style="position: relative; margin-bottom: -20px;" Icon="arrow_upward" Click="@(args => ChangeComposantOrdreUp(composant.ComposantId))" />
 
                             <!-- Bouton pour la flèche vers le bas -->
                             <RadzenButton Icon="arrow_downward" Click="@(args => ChangeComposantOrdreDown(composant.ComposantId))" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Style="height:35px;" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteComposant(composant.ComposantId))" />
                         </div>
                     </div>
 

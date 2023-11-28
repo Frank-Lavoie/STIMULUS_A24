@@ -1,12 +1,6 @@
 ﻿/*Cette section concerne l'ensemble du header*/
 .custom-header-background {
-    /*background-color: darkblue; */
-}
-
-.custom-header-image {
-    width: 75px;
-    height: 25px;
-    vertical-align: baseline;
+    background-color: darkblue; 
 }
 
 .custom-header-radzen-breadcrumb {
@@ -77,4 +71,47 @@
 
 .custom-footer-icon {
     font-size: 12px;
+}
+/*POUR LE LOGO ANNIMÉ*/
+#logo-container {
+    width: 150px;
+    height: 50px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#animated-text {
+    animation: stroke 5s infinite alternate; /* ajustez la durée de l'animation */
+    stroke-width: 2;
+    font-size: 20px;
+}
+
+@keyframes stroke {
+    0% {
+        fill: white;
+        stroke: darkblue;
+        stroke-dashoffset: 25%;
+        stroke-dasharray: 0 50%;
+        stroke-width: 2;
+    }
+
+    70% {
+        fill: white;
+        stroke: darkblue;
+    }
+
+    80% {
+        fill: white;
+        stroke: darkblue;
+        stroke-width: 3;
+    }
+
+    100% {
+        fill: white;
+        stroke: darkblue;
+        stroke-dashoffset: -25%;
+        stroke-dasharray: 50% 0;
+        stroke-width: 0;
+    }
 }

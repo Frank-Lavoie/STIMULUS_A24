@@ -7,9 +7,9 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject ITexteFormaterService TextFormaterService; 
 
-@if(texte != null)
+@if (texte != null)
 {
-    <h3 class="custom-theory-texte-letter">@((texte.Contenue != null) ? texte.Contenue : "")</h3>
+    <p class="custom-theory-texte-paragraph">@((texte.Contenue != null) ? texte.Contenue : "")</p>
 }
 else
 {

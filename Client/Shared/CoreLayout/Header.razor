@@ -4,22 +4,21 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 <RadzenHeader class="custom-header-background">
-    <div style="display:flex; flex-direction:row; justify-content:space-between; ">
-        <div>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <!-- SidebarToggle et Logo dans le même conteneur flex -->
+        <div style="display: flex; align-items: center;">
             <RadzenSidebarToggle Click="@ToggleSidebar" />
-            <img src="/RessourceVisuel/LogoCEPI.png" class="custom-header-image" />
-            @* <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2rem">
-            <RadzenLabel Text=@config["Title"] />
-            <div>
-            <RadzenBreadCrumb class="custom-header-radzen-breadcrumb">
-            <RadzenBreadCrumbItem Path="/" style="white-space: nowrap;" Text="Tableau de bord" />
-            </RadzenBreadCrumb>
+            <div id="logo-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="150" height="50">
+                    <text x="50%" y="50%" font-size="20" stroke-width="2" stroke="#365FA0" fill="lightyellow" id="animated-text" text-anchor="middle" dy="0.3em">
+                        C E P I
+                    </text>
+                </svg>
             </div>
-            </RadzenStack> *@
         </div>
-        <div style="display:flex; align-items: center;">
+        <div style="display: flex; align-items: center;">
 
-            <RadzenProfileMenu>
+            <RadzenProfileMenu Style="background-color: darkblue">
                 <Template>
                     <div style="display: flex; flex-direction:row; ">
                         <RadzenIcon Icon="account_circle"></RadzenIcon>
