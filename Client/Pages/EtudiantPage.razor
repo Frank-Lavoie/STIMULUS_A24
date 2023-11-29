@@ -175,8 +175,13 @@
         }
 
         // Naviguer vers la page correspondante
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/Pages");
+        var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 
     private async void PreviousPage()
@@ -201,7 +206,12 @@
         }
 
         // Naviguer vers la page correspondante
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/Pages");
+        var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 }

@@ -548,7 +548,6 @@
 
         var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
         page = obj.Data;
-        CurrentPage = await sessionStorage.GetItemAsync<int>("idPage");
         listComposant.Clear();
         StateHasChanged();
         var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
@@ -579,7 +578,6 @@
 
         var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
         page = obj.Data;
-        CurrentPage = await sessionStorage.GetItemAsync<int>("idPage");
         listComposant.Clear();
         StateHasChanged();
         var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
