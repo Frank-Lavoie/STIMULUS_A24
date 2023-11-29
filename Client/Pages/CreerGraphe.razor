@@ -1,4 +1,5 @@
 ﻿@using Blazored.LocalStorage;
+@using STIMULUS_V2.Client.Services;
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
 
@@ -12,6 +13,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AppState State;
 @inject NavigationManager NavigationManager
+@inject RerenderService Rerender
 
 @page "/CreerGraphe"
 
@@ -57,6 +59,8 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public EventCallback OnGrapheCreated { get; set; }
     public string NomGraphe { get; set; }
     public string Status { get; set; }
     public int IdGroupe { get; set; }
@@ -106,9 +110,9 @@
         await NoeudService.Create(nouveauNoeud);
 
         await sessionStorage.SetItemAsync<int>("idGraphe", newgraphe.GrapheId);
+        await OnGrapheCreated.InvokeAsync();
+        Rerender.TriggerGrapheCreated();
         NavigationManager.NavigateTo("/Graphe");
-
-        ReRender();
     }
 
     void Cancel()
@@ -116,8 +120,4 @@
         NavigationManager.NavigateTo("/");
     }
 
-    private void ReRender()
-    {
-        StateHasChanged();
-    }
 }

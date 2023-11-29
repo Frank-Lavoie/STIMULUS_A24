@@ -1,4 +1,5 @@
-﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Authentication;
 @using Blazored.LocalStorage;
 @using STIMULUS_V2.Shared.Models.Entities;
@@ -14,6 +15,7 @@
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject AppState State;
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject RerenderService Rerender
 
 <RadzenSidebar Responsive="true" Style="width: max-content">
     <RadzenPanelMenu DisplayStyle="@(sidebarExpanded ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon)" ShowArrow="@sidebarExpanded">
@@ -55,17 +57,26 @@
 @code {
     [Parameter]
     public bool sidebarExpanded { get; set; } = false;
-    public List<Graphe> ListeGraphesProf { get; set; } = new List<Graphe>();
-    public List<Graphe> ListeGraphesEtudiant { get; set; } = new List<Graphe>();
-    public List<Cours> ListeCours { get; set; } = new List<Cours>();
-    public List<Groupe> groupesProf { get; set; } = new List<Groupe>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Graphe> ListeGraphesProf { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Graphe> ListeGraphesEtudiant { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Cours> ListeCours { get; set; } = new List<Cours>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Groupe> groupesProf { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Groupe>();
 
-    protected async Task OnInitializedAsync()
+    protected async override void OnInitialized()
+    {
+        await SideBarData();
+        Rerender.OnGroupeCreated += HandleGroupeCreated;
+        Rerender.OnGrapheCreated += HandleGrapheCreated;
+    }
+
+    public async Task SideBarData()
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
         var isProfesseur = user.IsInRole("PROFESSEUR");
         var isEtudiant = user.IsInRole("ETUDIANT");
+        groupesProf.Clear();
+        ListeGraphesProf.Clear();
 
         if (isProfesseur)
         {
@@ -74,23 +85,16 @@
 
             groupesProf.AddRange(groupesActif);
 
-            var UpdateGroupe = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
-            groupesProf = UpdateGroupe.Data.ToList();
-            StateHasChanged();
-
             foreach (var graphe in groupesActif)
             {
                 var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
                 var graphesDuGroupe = responseGraphe.Data;
 
                 ListeGraphesProf.AddRange(graphesDuGroupe);
-
-                var UpdateGraph = await GrapheService.GetAllFromGroup(graphe.GroupeId);
-                ListeGraphesProf = UpdateGraph.Data.ToList();
-                StateHasChanged();
             }
-
+            StateHasChanged();
         }
+
         if (isEtudiant)
         {
             var responseGroupeEtudiant = await GroupeEtudiantService.GetAllGroupForStudent(await sessionStorage.GetItemAsync<string>("idConnexion"));
@@ -114,8 +118,17 @@
             StateHasChanged();
         }
     }
+    private async void HandleGroupeCreated()
+    {
+        await SideBarData();
+        StateHasChanged();
+    }
+    private async void HandleGrapheCreated()
+    {
+        await SideBarData();
+        StateHasChanged();
+    }
 
-   
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);

@@ -13,6 +13,7 @@
 @inject IPageService PageService
 @inject IComposantService ComposantService
 @inject AppState State;
+@inject Radzen.DialogService DialogService
 
 @for (int i = 0; i < Nodes.Count; i++)
 {
@@ -383,20 +384,58 @@
 
     private async void SupprimerPage(int id)
     {
-        await PageService.Delete(id);
-        var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
-        var affichPage = pageNoeud.Data.ToList();
-        affichPage = affichPage.OrderBy(p => p.Ordre).ToList();
-        // Met à jour la propriété Ordre de manière séquentielle
-        for (int i = 0; i < affichPage.Count(); i++)
-        {
-            affichPage[i].Ordre = i + 1;
-            PageService.Update(affichPage[i].PageId, affichPage[i]);
-        }
+        var allComposant = await ComposantService.GetAllById(id);
+        var composants = allComposant.Data;
 
-        listePage.Clear();
-        listePage.AddRange(affichPage);
-        StateHasChanged();
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer cette page ? elle contient : "+ composants.Count()+ " composants", "Supprimer");
+
+        if (result.HasValue && result.Value)
+        {
+            //Delete tous les composants
+
+            foreach (var deleteComposant in composants)
+            {
+                await ComposantService.Delete(deleteComposant.ComposantId);
+            }
+
+            //ReOrderPage
+            var AllPage = await PageService.Get(id);
+            var livePage = AllPage.Data;
+
+            foreach (var reOrdered in listePage)
+            {
+                if (livePage.Ordre < reOrdered.Ordre)
+                {
+                    reOrdered.Ordre = reOrdered.Ordre - 1;
+                    await PageService.Update(reOrdered.PageId, reOrdered);
+                }
+            }
+
+            await PageService.Delete(id);
+            listePage.Clear();
+            var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
+            var affichPage = pageNoeud.Data.ToList();
+            listePage.AddRange(affichPage);
+            StateHasChanged();
+        }
+        else
+        {
+            
+        }
+        // await PageService.Delete(id);
+        // var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
+        // var affichPage = pageNoeud.Data.ToList();
+        // affichPage = affichPage.OrderBy(p => p.Ordre).ToList();
+        // // Met à jour la propriété Ordre de manière séquentielle
+        // for (int i = 0; i < affichPage.Count(); i++)
+        // {
+        //     affichPage[i].Ordre = i + 1;
+        //     PageService.Update(affichPage[i].PageId, affichPage[i]);
+        // }
+
+        // listePage.Clear();
+        // listePage.AddRange(affichPage);
+        // StateHasChanged();
     }
 
     /// <summary>

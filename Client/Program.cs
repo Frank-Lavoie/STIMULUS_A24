@@ -44,6 +44,7 @@ builder.Services.AddSingleton<AppState>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ICoursService, CoursService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<RerenderService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddRadzenComponents();
 
