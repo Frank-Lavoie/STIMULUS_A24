@@ -3,6 +3,7 @@
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
 
+@inject IJSRuntime JSRuntime
 @inject IGrapheService GrapheService
 @inject INoeudService NoeudService
 @inject ILocalStorageService localStorageService
@@ -93,26 +94,37 @@
             graphe.Status = GrapheStatus.DESACTIVER;
         }
 
-        var nouveauGraphe = await GrapheService.Create(graphe);
-        var newgraphe = nouveauGraphe.Data;
 
-        nouveauNoeud.GrapheId = newgraphe.GrapheId;
-        nouveauNoeud.Nom = newgraphe.Nom;
-        nouveauNoeud.Description = "Structure";
-        nouveauNoeud.Disponibilite = DateTime.Now;
-        nouveauNoeud.Obligatoire = false;             //Ajout du noeud de départ
-        nouveauNoeud.Status = 4;
-        nouveauNoeud.PosX = 0.0;
-        nouveauNoeud.PosY = 0.0;
-        nouveauNoeud.Rayon = 50;
-        nouveauNoeud.Type = NoeudType.STRUCTURE;
+        string nomSansEspaces = graphe.Nom.Replace(" ", "");
 
-        await NoeudService.Create(nouveauNoeud);
+        if (nomSansEspaces.Length > 10)
+        {
+            // Le nom est trop long, afficher une alerte
+            await JSRuntime.InvokeVoidAsync("alert", "Le nom du graphe est trop long.");
+        }
+        else
+        {
+            var nouveauGraphe = await GrapheService.Create(graphe);
+            var newgraphe = nouveauGraphe.Data;
 
-        await sessionStorage.SetItemAsync<int>("idGraphe", newgraphe.GrapheId);
-        await OnGrapheCreated.InvokeAsync();
-        Rerender.TriggerGrapheCreated();
-        NavigationManager.NavigateTo("/Graphe");
+            nouveauNoeud.GrapheId = newgraphe.GrapheId;
+            nouveauNoeud.Nom = nomSansEspaces;
+            nouveauNoeud.Description = "Structure";
+            nouveauNoeud.Disponibilite = DateTime.Now;
+            nouveauNoeud.Obligatoire = false;
+            nouveauNoeud.Status = 4;
+            nouveauNoeud.PosX = 0.0;
+            nouveauNoeud.PosY = 0.0;
+            nouveauNoeud.Rayon = 50;
+            nouveauNoeud.Type = NoeudType.STRUCTURE;
+
+            await NoeudService.Create(nouveauNoeud);
+
+            await sessionStorage.SetItemAsync<int>("idGraphe", newgraphe.GrapheId);
+            await OnGrapheCreated.InvokeAsync();
+            Rerender.TriggerGrapheCreated();
+            NavigationManager.NavigateTo("/Graphe");
+        }
     }
 
     void Cancel()
