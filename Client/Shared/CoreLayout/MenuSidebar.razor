@@ -65,8 +65,9 @@
     protected async override void OnInitialized()
     {
         await SideBarData();
-        Rerender.OnGroupeCreated += HandleGroupeCreated;
-        Rerender.OnGrapheCreated += HandleGrapheCreated;
+        Rerender.OnGroupeCreated += HandleUpdateSideBar;
+        Rerender.OnGrapheCreated += HandleUpdateSideBar;
+        Rerender.OnGrapheDelete += HandleUpdateSideBar;
     }
 
     public async Task SideBarData()
@@ -118,12 +119,7 @@
             StateHasChanged();
         }
     }
-    private async void HandleGroupeCreated()
-    {
-        await SideBarData();
-        StateHasChanged();
-    }
-    private async void HandleGrapheCreated()
+    private async void HandleUpdateSideBar()
     {
         await SideBarData();
         StateHasChanged();
