@@ -20,7 +20,7 @@
 
 @page "/Pages"
 
-<RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'">
+<RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'; height: 3200px;">   ­
     <RadzenSidebar>
         <RadzenPanelMenu>
             @foreach (var page in listePage.OrderBy(c => c.Ordre))
@@ -42,32 +42,37 @@
             <RadzenRow RowGap="2" Class="justify-content-center">
                 @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
                 {
-                    <!-- Conteneur du composant spécifique -->
-                    @if (composant.Type == "Code")
-                    {
-                        <CodeComponent Reference="composant.Reference" />
-                    }   
-                    @if (composant.Type == "Exercice")
-                    {   
-                        <ExerciceComponent Reference="composant.Reference" />
-                    }    
-                    @if (composant.Type == "Image")
-                    {
-                        <ImageComponent Reference="composant.Reference" />
-                    }
-                    @if (composant.Type == "Reference")
-                    {
-                        <ReferenceComponent Reference="composant.Reference" />
-                    }
-                    @if (composant.Type == "Texte")
-                    {   
-                    <TextComponent Reference="composant.Reference" />
-                    }
-                    @if (composant.Type == "Video")
-                    {
-                        <VideoComponent Reference="composant.Reference" />
-                    }
-                }                 
+                    <div style="margin: 0 auto; width: 100%;max-width: 1200px; padding: 10px; text-align: center; box-sizing: content-box;">
+
+                        <!-- Conteneur du composant spécifique -->
+                        <div style="text-align: center;">
+                            @if (composant.Type == "Code")
+                            {
+                                <CodeComponent Reference="composant.Reference" />
+                            }
+                            @if (composant.Type == "Exercice")
+                            {
+                                <ExerciceComponent Reference="composant.Reference" />
+                            }
+                            @if (composant.Type == "Image")
+                            {
+                                <ImageComponent Reference="composant.Reference" />
+                            }
+                            @if (composant.Type == "Reference")
+                            {
+                                <ReferenceComponent Reference="composant.Reference" />
+                            }
+                            @if (composant.Type == "Texte")
+                            {
+                                <TextComponent Reference="composant.Reference" />
+                            }
+                            @if (composant.Type == "Video")
+                            {
+                                <VideoComponent Reference="composant.Reference" />
+                            }
+                        </div>
+                    </div>
+                }
             </RadzenRow>
         </RadzenCard>
     </RadzenBody>
@@ -149,8 +154,13 @@
     private async Task ChangePage(int id)
     {
         await sessionStorage.SetItemAsync<int>("idPage", id);
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/Pages");
+        var obj = await PageService.Get(id);
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }  
     
     private async void NextPage()
@@ -175,8 +185,13 @@
         }
 
         // Naviguer vers la page correspondante
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/Pages");
+        var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 
     private async void PreviousPage()
@@ -201,7 +216,12 @@
         }
 
         // Naviguer vers la page correspondante
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/Pages");
+        var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }
 }
