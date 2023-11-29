@@ -154,8 +154,13 @@
     private async Task ChangePage(int id)
     {
         await sessionStorage.SetItemAsync<int>("idPage", id);
-        NavigationManager.NavigateTo("/");
-        NavigationManager.NavigateTo("/Pages");
+        var obj = await PageService.Get(id);
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
+        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+        listComposant = composantsRefresh.Data.ToList();
+        StateHasChanged();
     }  
     
     private async void NextPage()
