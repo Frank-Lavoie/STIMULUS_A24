@@ -39,12 +39,15 @@
     }
     @if (GetModeDeVue() == 2)
     {
-        @if (Nodes.Where(c => c.NoeudParentId == Node.NoeudId).ToList().Count == 0 || Node.NoeudId == Node.NoeudParentId)
+        @if(Nodes.Count > 1){
+@if (Nodes.Where(c => c.NoeudParentId == Node.NoeudId).ToList().Count == 0 || Node.NoeudId == Node.NoeudParentId)
         {
             <foreignObject x="@(-Node.Rayon )" y="@(-Node.Rayon )" width="20" height="20">
                 <span id="deleteNoeud" title="Supprimer le noeud @Node.Status" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"></span>
             </foreignObject>
         }
+        }
+        
         @if (Node.NoeudParentId == null || Node.NoeudId == Node.NoeudParentId)
         {
             <foreignObject x="@((-Node.Rayon) )" y="@((Node.Rayon)/2 )" width="20" height="20">
@@ -224,7 +227,6 @@
         var affichPage = pageNoeud.Data;
 
         listePage.AddRange(affichPage);
-
         StateHasChanged();
     }
     private async void ViewPageTemplate()
