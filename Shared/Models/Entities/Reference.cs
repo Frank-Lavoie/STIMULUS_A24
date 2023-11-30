@@ -15,6 +15,5 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public string Url { get; set; }
 
         public string? Description { get; set; }
-
     }
 }

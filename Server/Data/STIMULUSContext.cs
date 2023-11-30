@@ -11,7 +11,8 @@ namespace STIMULUS_V2.Server.Data
         public STIMULUSContext(DbContextOptions<STIMULUSContext> options) : base(options)
         {
 
-        }       
+        }    
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Etudiant>().ToTable("Etudiant");

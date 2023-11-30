@@ -11,5 +11,6 @@ namespace STIMULUS_V2.Shared.Interface.ChildInterface
 {
     public interface IVideoService : IModelService<Video, int>
     {
+
     }
 }

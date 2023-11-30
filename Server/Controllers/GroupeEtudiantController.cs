@@ -14,6 +14,7 @@ namespace STIMULUS_V2.Server.Controllers
         {
             this.groupeEtudiantService = groupeEtudiantService;
         }
+
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] Groupe_Etudiant groupeEtudiant)
         {
@@ -62,6 +63,7 @@ namespace STIMULUS_V2.Server.Controllers
             var response = await groupeEtudiantService.GetAllStudentForGroup(id);
             return StatusCode(response.StatusCode, response);
         }
+
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Groupe_Etudiant groupeEtudiant)
         {

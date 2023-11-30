@@ -10,7 +10,6 @@
 
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject AppState State;
-
 @inject ICoursService coursService
 
 @page "/"
@@ -22,13 +21,15 @@
 
 <div>
     <AuthorizeView Roles="ADMIN">
-            <HomeAdminComponent />
+        <HomeAdminComponent />
     </AuthorizeView>
+
     <AuthorizeView Roles="PROFESSEUR">
-            <HomeTeacherComponent />
+        <HomeTeacherComponent />
     </AuthorizeView>
+
     <AuthorizeView Roles="ETUDIANT">
-            <HomeStudentComponent />
+        <HomeStudentComponent />
     </AuthorizeView>
 </div>
 

@@ -19,6 +19,7 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [ForeignKey("Groupe")]
         public int? GroupeId { get; set; }
+
         public Groupe? Groupe { get; set; }
     }
 

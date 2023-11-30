@@ -11,7 +11,6 @@ namespace STIMULUS_V2.Shared.Models.Authentication
 {
     public class Utilisateur
     {
-
         [Key]
         [Column(TypeName = "nvarchar(255)")]
         public string Identifiant { get; set; }
@@ -25,6 +24,5 @@ namespace STIMULUS_V2.Shared.Models.Authentication
         public string? MotDePasse { get; set; }
 
         public string Role { get; set; }
-
     } 
 }

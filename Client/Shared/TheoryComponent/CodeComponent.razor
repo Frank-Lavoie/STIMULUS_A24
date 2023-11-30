@@ -1,20 +1,23 @@
-﻿@inject NavigationManager NavigationManager
-@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject ICodeService CodeService
+@inject NavigationManager NavigationManager
 
     @if (code != null)
     {
-    <div class="codeSample component">
-        <div class="headCode">
-            <p class="titleCode">
-                @((code.Titre != null) ? code.Titre : "")
-            </p>
+        <div class="codeSample component">
+            <div class="headCode">
+                <p class="titleCode">
+                    @((code.Titre != null) ? code.Titre : "")
+                </p>
+            </div>
+            <pre class="code">
+                <code class="python">
+                    @((code.Contenue != null) ? code.Contenue : "")
+                </code>
+            </pre>
         </div>
-        <pre class="code"><code class="python">
-                @((code.Contenue != null) ? code.Contenue : "")
-        </code></pre>
-    </div>
     }
     else
     {
@@ -22,8 +25,11 @@
     }
 
 @code {
-    [Parameter] public int Reference { get; set; }
-    [Inject] private IJSRuntime js { get; set; }
+    [Parameter]
+    public int Reference { get; set; }
+
+    [Inject] 
+    private IJSRuntime js { get; set; }
 
     public Code code { get; set; }
 
@@ -32,11 +38,10 @@
         var Code = await CodeService.Get(Reference);
         code = Code.Data;
 
-
-
         await base.OnInitializedAsync();
         StateHasChanged();
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await js.InvokeVoidAsync("HighlightFunctions.highlightSnippets");

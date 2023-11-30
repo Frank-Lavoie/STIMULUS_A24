@@ -1,5 +1,5 @@
-﻿@page "/CreerCours"
-@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
 @inject AuthenticationStateProvider authStateProvider
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -12,6 +12,8 @@
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject IJSRuntime js
 @inject NavigationManager NavigationManager
+
+@page "/CreerCours"
 
 <EditForm Model="cours" OnSubmit="AjoutCours">
     <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
@@ -46,7 +48,6 @@
     </RadzenStack>
 </EditForm>
 
-
 @code {
     public STIMULUS_V2.Shared.Models.Entities.Cours cours = new();
     public List<STIMULUS_V2.Shared.Models.Entities.Etudiant> listEtudiant { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Etudiant>();
@@ -64,9 +65,9 @@
     {
         NavigationManager.NavigateTo("/");
     }
+
     private void ReRender()
     {
         StateHasChanged();
     }
 }
-

@@ -1,7 +1,9 @@
-﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Authentication;
 @using Blazored.LocalStorage;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject TooltipService tooltipService
@@ -13,6 +15,7 @@
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject AppState State;
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject RerenderService Rerender
 
 <RadzenSidebar Responsive="true" Style="width: max-content">
     <RadzenPanelMenu DisplayStyle="@(sidebarExpanded ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon)" ShowArrow="@sidebarExpanded">
@@ -54,31 +57,32 @@
 @code {
     [Parameter]
     public bool sidebarExpanded { get; set; } = false;
-    public List<Graphe> ListeGraphesProf { get; set; } = new List<Graphe>();
-    public List<Graphe> ListeGraphesEtudiant { get; set; } = new List<Graphe>();
-    public List<Cours> ListeCours { get; set; } = new List<Cours>();
-    public List<Groupe> groupesProf { get; set; } = new List<Groupe>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Graphe> ListeGraphesProf { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Graphe> ListeGraphesEtudiant { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Cours> ListeCours { get; set; } = new List<Cours>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Groupe> groupesProf { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Groupe>();
 
     protected async override void OnInitialized()
     {
         await SideBarData();
+        Rerender.OnGroupeCreated += HandleUpdateSideBar;
+        Rerender.OnGrapheCreated += HandleUpdateSideBar;
+        Rerender.OnGrapheDelete += HandleUpdateSideBar;
     }
 
     public async Task SideBarData()
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authenticationState.User;
-
         var isProfesseur = user.IsInRole("PROFESSEUR");
         var isEtudiant = user.IsInRole("ETUDIANT");
-
+        groupesProf.Clear();
+        ListeGraphesProf.Clear();
 
         if (isProfesseur)
         {
-
             var responseGroupeActif = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
             var groupesActif = responseGroupeActif.Data;
-
 
             groupesProf.AddRange(groupesActif);
 
@@ -104,6 +108,7 @@
 
                 ListeGraphesEtudiant.AddRange(graphesDuGroupe);
             }
+
             foreach (var cours in groupes)
             {
                 var responseCours = await CoursService.GetAllById((int)cours.GroupeId);
@@ -111,21 +116,26 @@
 
                 ListeCours.AddRange(nomDesCours);
             }
-
             StateHasChanged();
         }
     }
+    private async void HandleUpdateSideBar()
+    {
+        await SideBarData();
+        StateHasChanged();
+    }
+
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Graphe");
     }
+
     public async Task ChargerGroupe(int idGroupe)
     {
         await sessionStorage.SetItemAsync<int>("idGroupe", idGroupe);
         NavigationManager.NavigateTo("/");
         NavigationManager.NavigateTo("/Groupe");
     }
-
 }
