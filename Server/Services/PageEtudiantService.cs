@@ -16,12 +16,12 @@ namespace STIMULUS_V2.Server.Services
             this.sTIMULUSContext = sTIMULUSContext;
         }
 
-        public async Task<APIResponse<double>> CalculerPourcentage(int groupeId, string codeDa)
+        public async Task<APIResponse<double>> CalculerPourcentage(int groupeId, string codeDa, string professeurIdentifiant)
         {
             try
             {
                 var sommePts = await CalculerSommePtsEtudiant(codeDa, groupeId);
-                var sommeImportance = await CalculerSommePtsGroupe(groupeId);
+                var sommeImportance = await CalculerSommePtsGroupe(professeurIdentifiant, groupeId);
 
                 if (sommePts != null && sommeImportance.Data != 0)
                 {
@@ -46,13 +46,15 @@ namespace STIMULUS_V2.Server.Services
         {
             try
             {
-                var sommePts = sTIMULUSContext.Importance
-                    .Join(sTIMULUSContext.Page, imp => imp.Code, page => page.ImportanceId, (imp, page) => new { imp, page })
-                    .Join(sTIMULUSContext.Page_Etudiant, join1 => join1.page.PageId, pe => pe.PageId, (join1, pe) => new { join1.imp, join1.page, pe })
-                    .Join(sTIMULUSContext.Etudiant, join2 => join2.pe.CodeDA, etudiant => etudiant.Identifiant, (join2, etudiant) => new { join2.imp, join2.page, join2.pe, etudiant })
-                    .Join(sTIMULUSContext.Groupe_Etudiant, join3 => join3.etudiant.Identifiant, ge => ge.CodeDA, (join3, ge) => new { join3.imp, join3.page, join3.pe, join3.etudiant, ge })
-                    .Where(result => result.ge.CodeDA == codeDA && result.ge.GroupeId == groupeId)
-                    .Sum(result => result.imp.Pts);
+                var sommePts = await (
+                    from imp in sTIMULUSContext.Importance
+                    join page in sTIMULUSContext.Page on imp.Code equals page.ImportanceId
+                    join pageEtudiant in sTIMULUSContext.Page_Etudiant on page.PageId equals pageEtudiant.PageId
+                    join etudiant in sTIMULUSContext.Etudiant on pageEtudiant.CodeDA equals etudiant.Identifiant
+                    join groupeEtudiant in sTIMULUSContext.Groupe_Etudiant on etudiant.Identifiant equals groupeEtudiant.CodeDA
+                    where groupeEtudiant.CodeDA == codeDA && groupeEtudiant.GroupeId == groupeId
+                    select imp.Pts
+                ).SumAsync();
 
                 return new APIResponse<double>(sommePts, 200, "Succès");
             }
@@ -62,23 +64,26 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
-        public async Task<APIResponse<double>> CalculerSommePtsGroupe(int groupeId)
+        public async Task<APIResponse<double>> CalculerSommePtsGroupe(string professeurIdentifiant, int groupeId)
         {
             try
             {
-                var sommeImportance = sTIMULUSContext.Importance
-                    .Join(sTIMULUSContext.Page, imp => imp.Code, page => page.ImportanceId, (imp, page) => new { imp, page })
-                    .Join(sTIMULUSContext.Noeud, join1 => join1.page.NoeudId, noeud => noeud.NoeudId, (join1, noeud) => new { join1.imp, join1.page, noeud })
-                    .Join(sTIMULUSContext.Graphe, join2 => join2.noeud.GrapheId, graphe => graphe.GrapheId, (join2, graphe) => new { join2.imp, join2.page, join2.noeud, graphe })
-                    .Join(sTIMULUSContext.Groupe, join3 => join3.graphe.GroupeId, groupe => groupe.GroupeId, (join3, groupe) => new { join3.imp, join3.page, join3.noeud, join3.graphe, groupe })
-                    .Where(result => result.groupe.GroupeId == groupeId)
-                    .Sum(result => result.imp.Pts);
+                var sommeImportance = await (
+                    from imp in sTIMULUSContext.Importance
+                    join page in sTIMULUSContext.Page on imp.Code equals page.ImportanceId
+                    join noeud in sTIMULUSContext.Noeud on page.NoeudId equals noeud.NoeudId
+                    join graphe in sTIMULUSContext.Graphe on noeud.GrapheId equals graphe.GrapheId
+                    join groupe in sTIMULUSContext.Groupe on graphe.GroupeId equals groupe.GroupeId
+                    join professeur in sTIMULUSContext.Professeur on groupe.ProfesseurId equals professeur.Identifiant
+                    where groupe.GroupeId == groupeId && professeur.Identifiant == professeurIdentifiant
+                    select imp.Pts
+                ).SumAsync();
 
                 return new APIResponse<double>(sommeImportance, 200, "Succès");
             }
             catch (Exception ex)
             {
-                return new APIResponse<double>(0, 500, $"Erreur lors du calcul de la somme des points. Message : {ex.Message}");
+                return new APIResponse<double>(0, 500, $"Erreur lors du calcul de la somme d'importance. Message : {ex.Message}");
             }
         }
     }

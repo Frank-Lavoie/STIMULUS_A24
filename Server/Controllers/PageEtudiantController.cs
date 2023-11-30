@@ -17,10 +17,10 @@ namespace STIMULUS_V2.Server.Controllers
             this.pageEtudiantService = pageEtudiantService;
         }
 
-        [HttpGet("Calcule/{groupeId}/{codeDa}")]
-        public async Task<IActionResult> CalculerPourcentage(int groupeId, string codeDa)
+        [HttpGet("Calcule/{groupeId}/{codeDa}/{professeurIdentifiant}")]
+        public async Task<IActionResult> CalculerPourcentage(int groupeId, string codeDa, string professeurIdentifiant)
         {
-            var response = await pageEtudiantService.CalculerPourcentage(groupeId, codeDa);
+            var response = await pageEtudiantService.CalculerPourcentage(groupeId, codeDa, professeurIdentifiant);
             return StatusCode(response.StatusCode, response);
         }
     }

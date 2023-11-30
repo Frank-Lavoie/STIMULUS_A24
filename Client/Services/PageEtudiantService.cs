@@ -14,9 +14,9 @@ namespace STIMULUS_V2.Client.Services
             _httpClient = httpClient;
         }
 
-        public async Task<APIResponse<double>> CalculerPourcentage(int groupeId, string codeDa)
+        public async Task<APIResponse<double>> CalculerPourcentage(int groupeId, string codeDa, string professeurIdentifiant)
         {
-            var result = await _httpClient.GetFromJsonAsync<APIResponse<double>>($"api/PageEtudiant/Calcule/{groupeId}/{codeDa}");
+            var result = await _httpClient.GetFromJsonAsync<APIResponse<double>>($"api/PageEtudiant/Calcule/{groupeId}/{codeDa}/{professeurIdentifiant}");
             return result;
         }
     }

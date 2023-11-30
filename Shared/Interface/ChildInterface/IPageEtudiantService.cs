@@ -9,6 +9,6 @@ namespace STIMULUS_V2.Shared.Interface.ChildInterface
 {
     public interface IPageEtudiantService
     {
-        Task<APIResponse<double>> CalculerPourcentage(int groupeId, string codeDa);
+        Task<APIResponse<double>> CalculerPourcentage(int groupeId, string codeDa, string professeurIdentifiant);
     }
 }
