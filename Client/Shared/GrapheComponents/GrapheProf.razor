@@ -257,7 +257,6 @@
                 //Plus chill qu'une boucle industrielle
                 await Task.Delay(100);
             }
-
             Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
 
             var response = await NoeudService.GetAllFromGraph(idGraphe);
