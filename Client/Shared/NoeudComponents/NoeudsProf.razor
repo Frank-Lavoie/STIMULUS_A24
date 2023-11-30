@@ -40,12 +40,15 @@
     }
     @if (GetModeDeVue() == 2)
     {
-        @if (Nodes.Where(c => c.NoeudParentId == Node.NoeudId).ToList().Count == 0 || Node.NoeudId == Node.NoeudParentId)
-        {
-            <foreignObject x="@(-Node.Rayon )" y="@(-Node.Rayon )" width="20" height="20">
-                <span id="deleteNoeud" title="Supprimer le noeud @Node.Status" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"></span>
-            </foreignObject>
+        @if(Nodes.Count > 1){
+            @if (Nodes.Where(c => c.NoeudParentId == Node.NoeudId).ToList().Count == 0 || Node.NoeudId == Node.NoeudParentId)
+            {
+                <foreignObject x="@(-Node.Rayon )" y="@(-Node.Rayon )" width="20" height="20">
+                    <span id="deleteNoeud" title="Supprimer le noeud @Node.Status" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"></span>
+                </foreignObject>
+            }
         }
+        
         @if (Node.NoeudParentId == null || Node.NoeudId == Node.NoeudParentId)
         {
             <foreignObject x="@((-Node.Rayon) )" y="@((Node.Rayon)/2 )" width="20" height="20">
@@ -89,8 +92,8 @@
                 <div class="form-group">
                     <label for="modelNoeud"><h5>Modèle de Noeud :</h5></label>
                     <select class="form-control" id="modelNoeud" @bind="modelNoeud">
-                        <option value="Noeud_Contenu" selected="@(modelNoeud == "CONTENU")">Noeud Contenu</option>
-                        <option value="Noeud_Structure" selected="@(modelNoeud == "STRUCTURE")">Noeud Structure</option>
+                        <option value="CONTENU">Noeud Contenu</option>
+                        <option value="STRUCTURE">Noeud Structure</option>
                     </select>
                 </div>
                 <div class="form-group" style="text-align: center;">
@@ -230,7 +233,6 @@
         var affichPage = pageNoeud.Data;
 
         listePage.AddRange(affichPage);
-
         StateHasChanged();
     }
 
@@ -283,6 +285,10 @@
         nouveauNoeud.NoeudParentId = Node.NoeudId;
         nouveauNoeud.Obligatoire = true;
         nouveauNoeud.Disponibilite = DateTime.Now;
+        if(modelNoeud == "STRUCTURE")
+            nouveauNoeud.Type = NoeudType.STRUCTURE;
+        else
+            nouveauNoeud.Type = NoeudType.CONTENU;
 
         if (nouveauNoeud.Nom != null && nouveauNoeud.Description != null && nouveauNoeud.Nom.Length >= 3 && nouveauNoeud.Nom.Length <= 10 && nouveauNoeud.Description.Length >= 3 && nouveauNoeud.Description.Length <= 100 && nouveauNoeud.Rayon != null)
         {
