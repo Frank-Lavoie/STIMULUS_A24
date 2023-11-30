@@ -15,8 +15,6 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public string Code { get; set; }
 
         [Column(TypeName = "nvarchar(255)")]
-        public string? Description { get; set; }
-
-       
+        public string? Description { get; set; }      
     }
 }

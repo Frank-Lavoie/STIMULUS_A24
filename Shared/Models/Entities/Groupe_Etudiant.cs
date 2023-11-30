@@ -13,10 +13,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [ForeignKey("Groupe")]
         public int? GroupeId { get; set; }
+
         public Groupe? Groupe { get; set; }
 
         [ForeignKey("Etudiant")]
         public string? CodeDA { get; set; }
+
         public Etudiant? Etudiant { get; set; }
     }
 }

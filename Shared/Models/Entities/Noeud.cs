@@ -18,7 +18,9 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public string Description { get; set; }
 
         public DateTime Disponibilite { get; set; } = DateTime.Now;
+
         public bool Obligatoire { get; set; } = false;
+
         public int Status { get; set; }
 
         [Column(TypeName = "decimal(8,2)")]
@@ -35,10 +37,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [ForeignKey("Graphe")]
         public int? GrapheId { get; set; }
+
         public Graphe? Graphe { get; set; }
 
         [ForeignKey("NoeudParent")]
         public int? NoeudParentId { get; set; }
+
         public Noeud? NoeudParent { get; set; }
     }
 

@@ -132,6 +132,7 @@ namespace STIMULUS_V2.Server.Services
                 return new APIResponse<IEnumerable<Noeud>>(null, 500, $"Erreur lors de la récupération du model par son parent {typeof(Noeud).Name}. Message : {ex.Message}.");
             }
         }
+
         public async Task<APIResponse<IEnumerable<Noeud>>> GetAllFromGraph(int id)
         {
             try

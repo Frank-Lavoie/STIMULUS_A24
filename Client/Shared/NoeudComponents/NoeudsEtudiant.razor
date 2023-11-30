@@ -3,6 +3,7 @@
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @* @using STIMULUS_V2.Client.Shared.TheorieComponents; *@
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
+
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject INoeudService NoeudService;
 @inject IPageService PageService;
@@ -17,7 +18,7 @@
     }
 }
 
-    <NonDraggable @bind-X=Node.PosX @bind-Y=Node.PosY>
+<NonDraggable @bind-X=Node.PosX @bind-Y=Node.PosY>
     <NavLink @onclick="DirectionPage" id="lien">
         <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
         <circle @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) r="@Node.Rayon" class="cercle" style="fill:@Couleur"/>
@@ -28,62 +29,9 @@
             <span> Desc : @Node.Description</span>       
         </foreignObject>
         <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
-        </NavLink>                                                
-    </NonDraggable>
+    </NavLink>                                                
+</NonDraggable>
 
-<style>
-    #lien:hover{
-        cursor:pointer;
-    }
-    #deleteNoeud {
-        color: darkred;
-    }
-
-    #deleteNoeud:hover {
-        color: red;
-        cursor: pointer;
-    }
-    #addNoeud {
-        color: black;
-    }
-
-    #addNoeud:hover {
-        color: yellow;
-        cursor: pointer;
-    }
-    a{
-        text-decoration: none;
-    }
-    text {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-weight:bolder;
-        fill: white;
-    }
-
-    text:hover {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-weight: bold;
-        fill: black;
-    }
-    .cercle-title {
-        fill: #fff;
-        pointer-events: none !important;
-    }
-
-    .cercle {
-        z-index: 1;
-        stroke: #fff;
-        stroke-width: 1;
-    }
-</style>
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
@@ -105,7 +53,6 @@
     private readonly string COULEUR_NON_CONSULTER = "rgb(228, 231, 245)";
     private readonly string COULEUR_CONSULTER = "rgb(199,160,53)";
     private readonly string COULEUR_COMPLETER = "rgb(28, 90, 47)";
-
 
     private int GetModeVue() => -1;
     protected override async Task OnInitializedAsync()
@@ -129,12 +76,15 @@
             Couleur = COULEUR_COMPLETER;
         }
     }
+
     private string TestParent() => (Node.NoeudParentId != null) ? Node.NoeudParentId.ToString() : "Aucun";
     private void OnMouseHover() => displayHover = "visible";
+
     private void OnMouseLeave()
     {
         displayHover = "hidden";
     }
+
     private async void DirectionPage()
     {
         await sessionStorage.SetItemAsync<int>("idNoeud", Node.NoeudId);
@@ -151,8 +101,6 @@
             // Stocker l'ID de la première page dans la session
             await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
         }
-
         NavigationManager.NavigateTo("/Pages");
     }
-
 }

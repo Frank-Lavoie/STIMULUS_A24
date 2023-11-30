@@ -13,6 +13,7 @@ namespace STIMULUS_V2.Client.Services
         {
             _httpClient = httpClient;
         }
+
         public async Task<APIResponse<Page>> Create(Page item)
         {
             var result = await _httpClient.PostAsJsonAsync<Page>("api/Page/Create", item);
@@ -42,6 +43,7 @@ namespace STIMULUS_V2.Client.Services
             var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Page>>>($"api/Page/Fetch/AllBy/{id}");
             return result;
         }
+
         public async Task<APIResponse<IEnumerable<Page>>> GetAllFromNoeud(int id)
         {
             var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Page>>>($"api/Page/Fetch/All/FromNoeud/{id}");

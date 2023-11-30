@@ -9,6 +9,7 @@ public interface IUpdateService
 public class UpdateService : IUpdateService
 {
     public event Action RefreshRequested;
+
     public void CallRequestRefresh()
     {
         RefreshRequested?.Invoke();

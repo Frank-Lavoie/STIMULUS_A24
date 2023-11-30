@@ -22,10 +22,12 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [ForeignKey("Cours")]
         public int? CoursId { get; set; }
+
         public Cours? Cours { get; set; }
 
         [ForeignKey("Professeur")]
         public string? ProfesseurId { get; set; }
+
         public Professeur? Professeur { get; set; }
     }
 }

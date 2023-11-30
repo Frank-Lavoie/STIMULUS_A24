@@ -1,4 +1,5 @@
 ﻿@using STIMULUS_V2.Shared.Models.Entities;
+
 <path d="M @X1 @Y1 C @c1x @c1y, @c2x @c2y, @X2 @Y2" stroke="rgb(108, 117, 125)" stroke-width="1.5" fill="transparent" style="pointer-events:none !important; position: absolute; z-index: -1;" />
     @if (GetModeDeVue() == 2)
 {
@@ -35,6 +36,7 @@
         SaveChangeNoeud(Noeud);
         ReRender();
     }
+
     protected override void OnParametersSet()
     {
         c1x = cx(Dir1, X1);
@@ -49,6 +51,7 @@
 
         base.OnParametersSet();
     }
+
     const int coef = 0;
 
     static double cx(Direction dir, double? x)

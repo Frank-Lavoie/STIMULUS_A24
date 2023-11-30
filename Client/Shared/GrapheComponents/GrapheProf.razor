@@ -19,6 +19,7 @@
 @inject IJSRuntime JSRuntim
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject Radzen.DialogService DialogService
+@inject RerenderService Rerender
 
 <div class="row mt-2">
     <foreignObject class="custom-graphe-foreignobject-bg" x="5" y="5" width="150" height="50">
@@ -66,10 +67,7 @@
                 </RadzenStack>
             </RadzenPanel>
         </foreignObject>
-        <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth"
-             @onmousemove=@(e => mouseSrv.FireMove(this, e))
-             @onmouseup=@(e => mouseSrv.FireUp(this, e))
-             @onmousewheel="Zoom">
+        <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth" @onmousemove=@(e => mouseSrv.FireMove(this, e)) @onmouseup=@(e => mouseSrv.FireUp(this, e)) @onmousewheel="Zoom">
             <Draggable X="@((viewBoxWidth - 1800) / 2)" Y="@((viewBoxWidth - 1500) / 2)" GetModeDeVue="GetModeFond">
                 <rect x="-1000" y="-1000" width="4000" height="4000" style="fill:rgb(0,0,0,0);stroke-width:0;stroke:rgb(0,0,0)" />
                 @foreach (var noeud in Nodes)
@@ -90,7 +88,10 @@
         </svg>
     </svg>
 </div>
+
 @code {
+    [Parameter]
+    public EventCallback OnGrapheDelete { get; set; }
     private string displayHover = "hidden";
     private double viewBoxX = 0;
     private double viewBoxY = 0;
@@ -114,11 +115,11 @@
     {
         await UpdateGraphe();
     }
+
     /// <summary>
     /// Permet de set le mode de vu. 1 => Page, 2 => Edit, 3 => Etudiant
     /// </summary>
     /// <param name="v">valeur de la vue</param>
-    ///
     private void ModeDeVue(int v)
     {
         if (v == 1)
@@ -142,18 +143,23 @@
         modeDeVue = v;
         Console.WriteLine($"Mode de vu : {v}");
     }
+
     /// <summary>
     /// Permet a tout les noeuds d'adapter leur mode (fonction delegate au noeud et connecteur)
     /// </summary>
     /// <returns></returns>
     private int GetModeDeVue() => modeDeVue;
+
     /// <summary>
     /// Pour conserver le fond dragable quand en mode "vue etudiant"
+    //Hardcode    /// 
     /// </summary>
     /// <returns></returns>
-    private int GetModeFond() => 2; //Hardcode
-                                    //Quand la souris survole
+    private int GetModeFond() => 2; 
+      
+    //Quand la souris survole
     private void OnMouseHover() => displayHover = "show";
+
     //Quand la souris ne survole plus
     private void OnMouseLeave() => displayHover = "hidden";
 
@@ -167,6 +173,7 @@
         pageRechercheNoeud = page;
         enRecherchePage = true;
     }
+
     private async Task<bool> ReLinkBindPage(Noeud noeud)
     {
         if (enRecherchePage)
@@ -186,6 +193,7 @@
             {
                 pageRechercheNoeud.Ordre = 1;
             }
+
             // Enregistre les changements
             SaveChange(pageRechercheNoeud);
             // Récupère toutes les pages du nœud après le relink
@@ -206,6 +214,7 @@
         }
         return false;
     }
+
     /// <summary>
     /// Permet de rattacher un noeud enfant a un parent clique
     /// </summary>
@@ -220,6 +229,7 @@
             SaveChange(enfantRechercheParent);
         }
     }
+
     /// <summary>
     /// Detache un noeud enfant de son parent
     /// </summary>
@@ -256,6 +266,7 @@
         }
         StateHasChanged();
     }
+
     /// <summary>
     /// Permet l'ajout de noveau noeud
     /// </summary>
@@ -264,6 +275,7 @@
         await SaveNouveauNoeud(nouveauNoeud);
         await UpdateGraphe();
     }
+
     /// <summary>
     /// Supprime le noeud avec l'id selectionner
     /// </summary>
@@ -370,6 +382,8 @@
             }
             // Supprimer le graphe
             await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
+            await OnGrapheDelete.InvokeAsync();
+            Rerender.TriggerGrapheDelete();
             NavigationManager.NavigateTo("/");
         }
         else
@@ -377,6 +391,7 @@
             NavigationManager.NavigateTo("/Graphe");
         }
     }
+
     /// <summary>
     /// Reset le zoom a 100%
     /// </summary>
@@ -446,7 +461,6 @@
             if (mouse.DeltaY < 0)
             {
                 // Faire zoom vers le haut
-
                 if (zoomIncrement != 150)
                 {
                     viewBoxX = viewBoxX + 10;
@@ -466,7 +480,6 @@
             else if (mouse.DeltaY > 0)
             {
                 // Faire zoom vers le bas
-
                 if (zoomIncrement != 0)
                 {
                     viewBoxX = viewBoxX - 10;
@@ -502,5 +515,4 @@
             return (zoomIncrement + "%");
         }
     }
-
 }

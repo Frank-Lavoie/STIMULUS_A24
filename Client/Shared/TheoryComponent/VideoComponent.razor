@@ -1,5 +1,6 @@
 ﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
+
 @inject IVideoService VideoService
 @inject IComposantService ComposantService
 
@@ -8,7 +9,7 @@
     {
         <div style="position: relative;">
             <iframe width="800" height="500" src="@video.Url" frameborder="0" allowfullscreen style="margin: 0 auto;"></iframe>
-            <h1 style="font-size: 1.5em; position: absolute; bottom: 0; width: 1200px; background-color: rgba(255, 255, 255, 0.8); padding: 10px;">@((video.Description != null) ? video.Description : "")</h1>
+            <p style="font-style: italic; margin-top: 10px;">@((video.Description != null) ? video.Description : "")</p>
         </div>
     }
     else
@@ -18,15 +19,15 @@
 </div>
 
 @code {
-    [Parameter] public int Reference { get; set; }
+    [Parameter] 
+    public int Reference { get; set; }
+
     public Video video { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         var Video = await VideoService.Get(Reference);
         video = Video.Data;
-
-
 
         await base.OnInitializedAsync();
         await TransformerVideoEmbed();
@@ -84,9 +85,7 @@
             {
                 throw new ArgumentException("L'URL YouTube ne contient pas de paramètre 'v'.");
             }
-
             return videoId;
         }
 	}
-
 }

@@ -22,6 +22,7 @@ namespace STIMULUS_V2.Shared.Models.Entities
 
         [ForeignKey("Exercice")]
         public int? ExerciceId { get; set; }
+
         public Exercice? Exercice { get; set; }
     }
 }
