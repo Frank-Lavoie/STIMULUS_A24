@@ -226,6 +226,7 @@
             </RadzenRow>
         </RadzenCard>
     </RadzenBody>
+
     </RadzenLayout>
 
 
@@ -545,10 +546,10 @@
             }
         }
 
-        // Naviguer vers la page correspondante
-        currentPageId = await sessionStorage.GetItemAsync<int>("idPage"); ;
-        pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
-        affichPage = pageNoeud.Data;
+        var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
         var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         listComposant = composantsRefresh.Data.ToList();
         StateHasChanged();
@@ -575,10 +576,10 @@
             }
         }
 
-        // Naviguer vers la page correspondante
-        currentPageId = await sessionStorage.GetItemAsync<int>("idPage"); ;
-        pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
-        affichPage = pageNoeud.Data;
+        var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+        page = obj.Data;
+        listComposant.Clear();
+        StateHasChanged();
         var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         listComposant = composantsRefresh.Data.ToList();
         StateHasChanged();

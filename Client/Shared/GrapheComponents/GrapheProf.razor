@@ -19,6 +19,7 @@
 @inject IJSRuntime JSRuntim
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject Radzen.DialogService DialogService
+@inject RerenderService Rerender
 
 <div class="row mt-2">
     <foreignObject class="custom-graphe-foreignobject-bg" x="5" y="5" width="150" height="50">
@@ -89,6 +90,8 @@
 </div>
 
 @code {
+    [Parameter]
+    public EventCallback OnGrapheDelete { get; set; }
     private string displayHover = "hidden";
     private double viewBoxX = 0;
     private double viewBoxY = 0;
@@ -376,6 +379,8 @@
             }
             // Supprimer le graphe
             await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
+            await OnGrapheDelete.InvokeAsync();
+            Rerender.TriggerGrapheDelete();
             NavigationManager.NavigateTo("/");
         }
         else
