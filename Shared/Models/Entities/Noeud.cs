@@ -30,7 +30,7 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public double PosY { get; set; }
 
         [Column(TypeName = "decimal(4,2)")]
-        public double Rayon { get; set; }
+        public double Rayon { get; set; } = 40;
 
         [Column(TypeName = "nvarchar(50)")]
         public NoeudType Type { get; set; }
