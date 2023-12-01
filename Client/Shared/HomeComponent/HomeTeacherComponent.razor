@@ -1,31 +1,71 @@
-﻿<div class="container text-center">
-    <p class="lead">Vous êtes un Professeur</p>
+﻿@using Radzen.Blazor.Rendering;
+@using STIMULUS_V2.Client.Shared.TheoryComponent
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+@using System.Globalization
+@inject  IPageEtudiantService PageEtudiantService
+
+<div class="teacher-info-container">
+    <div class="container text-center">
+        <p class="lead">Vous êtes un Professeur</p>
+    </div>
 </div>
 
-<RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
-<div class="">
+<div class="box-display">
+    <RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
     <div class="row">
         <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
             <RadzenCard class="w-100 mb-4">
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
                 <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+                <RadzenLabel Text="Smooth" For="smooth" Class="rz-mr-6" />
             </RadzenCard>
+        </div>
+
+        <div class="col-sm-11 col-lg-5 my-5">
             <RadzenChart>
                 <RadzenPieSeries Data="@progression" Title="Student" CategoryProperty="Progression" ValueProperty="Progression">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenPieSeries>
             </RadzenChart>
         </div>
+
+        <div class="col-sm-11 col-lg-5 my-5">
+            <RadzenChart>
+                <RadzenAreaSeries Smooth="@smooth" Data="@progression" CategoryProperty="Progression" Title="2019" ValueProperty="Progression" RenderingOrder="1">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenAreaSeries>
+                <RadzenAreaSeries Smooth="@smooth" Data="@progression" CategoryProperty="Progression" Title="2020" LineType="LineType.Dashed" ValueProperty="Progression">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenAreaSeries>
+               
+            </RadzenChart>
+        </div>
     </div>
 </div>
+<style>
+    .box-display {
+        text-align: center;
+        align-items: center;
+        background-color: lightgrey;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+</style>
 
 @code {
     bool showDataLabels = false;
+    bool smooth = true;
 
     class DataItem
     {
         public string Student { get; set; }
         public double Progression { get; set; }
+        public string Date { get; set; }
+        public double Revenue { get; set; }
     }
 
     DataItem[] progression = new DataItem[] {
@@ -49,5 +89,131 @@
             Student = "Q4",
             Progression = 80000
         },
+    };
+
+    DataItem[] revenue2019 = new DataItem[] {
+        new DataItem
+        {
+            Date = ("2019-01-01"),
+            Revenue = 234000
+        },
+        new DataItem
+        {
+            Date = ("2019-02-01"),
+            Revenue = 269000
+        },
+        new DataItem
+        {
+            Date = ("2019-03-01"),
+            Revenue = 233000
+        },
+        new DataItem
+        {
+            Date = ("2019-04-01"),
+            Revenue = 244000
+        },
+        new DataItem
+        {
+            Date = ("2019-05-01"),
+            Revenue = 214000
+        },
+        new DataItem
+        {
+            Date = ("2019-06-01"),
+            Revenue = 253000
+        },
+        new DataItem
+        {
+            Date = ("2019-07-01"),
+            Revenue = 274000
+        },
+        new DataItem
+        {
+            Date = ("2019-08-01"),
+            Revenue = 284000
+        },
+        new DataItem
+        {
+            Date = ("2019-09-01"),
+            Revenue = 273000
+        },
+        new DataItem
+        {
+            Date = ("2019-10-01"),
+            Revenue = 282000
+        },
+        new DataItem
+        {
+            Date = ("2019-11-01"),
+            Revenue = 289000
+        },
+        new DataItem
+        {
+            Date = ("2019-12-01"),
+            Revenue = 294000
+        }
+    };
+
+    DataItem[] revenue2020 = new DataItem[] {
+        new DataItem
+        {
+            Date = ("2019-01-01"),
+            Revenue = 334000
+        },
+        new DataItem
+        {
+            Date = ("2019-02-01"),
+            Revenue = 369000
+        },
+        new DataItem
+        {
+            Date = ("2019-03-01"),
+            Revenue = 333000
+        },
+        new DataItem
+        {
+            Date = ("2019-04-01"),
+            Revenue = 344000
+        },
+        new DataItem
+        {
+            Date = ("2019-05-01"),
+            Revenue = 314000
+        },
+        new DataItem
+        {
+            Date = ("2019-06-01"),
+            Revenue = 353000
+        },
+        new DataItem
+        {
+            Date = ("2019-07-01"),
+            Revenue = 374000
+        },
+        new DataItem
+        {
+            Date = ("2019-08-01"),
+            Revenue = 384000
+        },
+        new DataItem
+        {
+            Date = ("2019-09-01"),
+            Revenue = 373000
+        },
+        new DataItem
+        {
+            Date = ("2019-10-01"),
+            Revenue = 382000
+        },
+        new DataItem
+        {
+            Date = ("2019-11-01"),
+            Revenue = 389000
+        },
+        new DataItem
+        {
+            Date = ("2019-12-01"),
+            Revenue = 394000
+        }
     };
 }
