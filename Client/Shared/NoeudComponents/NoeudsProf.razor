@@ -65,7 +65,7 @@
                 <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-minus" aria-hidden="true" @onclick="@FermeForm"></span>
             }
         </foreignObject>
-        <rect x="@(Node.Rayon/2 + 20)" y="@(Node.Rayon/2 + 20)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="fill: rgba(0, 0, 0, 0.5); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
+        <rect x="@(Node.Rayon/2 + 20)" y="@(Node.Rayon/2 + 20)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="fill: rgba(0, 0, 0, 0.8); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
         <foreignObject x="@(Node.Rayon/2 +20 )" y="@(Node.Rayon/2 +20)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="padding:5px">
             <EditForm Model="nouveauNoeud" OnSubmit="AjoutNoeud" visibility="@displayNouveauNoeud" class="formLogin">
                 <div class="form-group">
@@ -231,7 +231,7 @@
 
         var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
         var affichPage = pageNoeud.Data;
-
+        nouveauNoeud.Rayon = 40;
         listePage.AddRange(affichPage);
         StateHasChanged();
     }
@@ -371,7 +371,7 @@
     {
         //Base du nouveau noeud
         formSizeW = 250;
-        formSizeH = 480;
+        formSizeH = 445;
         displayNouveauNoeud = "visible";
         isOpen = true;
     }
