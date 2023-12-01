@@ -36,6 +36,8 @@ builder.Services.AddScoped<IProfesseurService, ProfesseurService>();
 builder.Services.AddScoped<IReferenceService, ReferenceService>();
 builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<IPageEtudiantService, PageEtudiantService>();
+
 builder.Services.AddSingleton<IUpdateService, UpdateService>();
 builder.Services
             .AddSingleton<MouseService>()
