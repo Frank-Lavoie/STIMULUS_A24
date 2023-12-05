@@ -35,7 +35,8 @@
         <foreignObject x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
             <span> Nom :  @Node.Nom </span><br />
             <span>Parent : @TestParent()</span><br /> @*Pour ne pas avoir de champ vide*@
-            <span> Desc : @Node.Description</span>
+            <span> Desc : @Node.Description</span><br />
+            <span> Type : @Node.Type </span>
         </foreignObject>
     }
     @if (GetModeDeVue() == 2)
