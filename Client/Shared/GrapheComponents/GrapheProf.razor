@@ -411,11 +411,11 @@
     {
         if (zoomIncrement != 150)
         {
-            viewBoxX = viewBoxX + 10;
-            viewBoxY = viewBoxY + 10;
-            viewBoxWidth = viewBoxWidth - 20;
-            viewBoxHeight = viewBoxHeight - 20;
-            zoomIncrement = zoomIncrement + 1;
+            viewBoxX = viewBoxX + 50;
+            viewBoxY = viewBoxY + 50;
+            viewBoxWidth = viewBoxWidth - 100;
+            viewBoxHeight = viewBoxHeight - 100;
+            zoomIncrement = zoomIncrement + 5;
             AfficheZoom();
         }
         else
@@ -433,11 +433,11 @@
     {
         if (zoomIncrement != 0)
         {
-            viewBoxX = viewBoxX - 10;
-            viewBoxY = viewBoxY - 10;
-            viewBoxWidth = viewBoxWidth + 20;
-            viewBoxHeight = viewBoxHeight + 20;
-            zoomIncrement = zoomIncrement - 1;
+            viewBoxX = viewBoxX - 50;
+            viewBoxY = viewBoxY - 50;
+            viewBoxWidth = viewBoxWidth + 100;
+            viewBoxHeight = viewBoxHeight + 100;
+            zoomIncrement = zoomIncrement - 5;
             AfficheZoom();
         }
         else
