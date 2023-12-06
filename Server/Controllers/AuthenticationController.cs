@@ -34,19 +34,27 @@ namespace STIMULUS_V2.Server.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<APIResponse<SessionUtilisateur>>> ConnexionUtilisateur(ConnexionVerification connexionVerification)
         {
+            //Logging
+            var log = Log.ForContext<AuthenticationController>();
+            APIResponse<SessionUtilisateur> apiResponse;
+
             try
             {
                 var existingUser = await sTIMULUSContext.Utilisateur.SingleOrDefaultAsync(user => user.Identifiant == connexionVerification.Identifiant);
                 if (existingUser == null)
                 {
-                    return new APIResponse<SessionUtilisateur>(null, 400, "L'utilisateur n'existe pas.");
+                    apiResponse = new APIResponse<SessionUtilisateur>(null, 400, "L'utilisateur n'existe pas.");
+                    log.Warning($"NULL PARAMETER -> ConnexionUtilisateur(ConnexionVerification connexionVerification = {connexionVerification}) ApiResponse: {apiResponse}");
+                    return apiResponse;
                 }
                 if (BCrypt.Net.BCrypt.Verify(connexionVerification.Password, existingUser.MotDePasse))
                 {
                     var userRole = existingUser.Role;
                     if (string.IsNullOrEmpty(userRole))
                     {
-                        return new APIResponse<SessionUtilisateur>(null, 400, "Le rôle de l'utilisateur n'est pas défini.");
+                        apiResponse = new APIResponse<SessionUtilisateur>(null, 400, "Le rôle de l'utilisateur n'est pas défini.");
+                        log.Warning($"NOT FOUND -> ConnexionUtilisateur(ConnexionVerification connexionVerification = {connexionVerification}) ApiResponse: {apiResponse}");
+                        return apiResponse;
                     }
 
                     var token = GenerateToken(connexionVerification.Identifiant, userRole);
@@ -65,13 +73,19 @@ namespace STIMULUS_V2.Server.Controllers
                         existingUserToken.TokenExpiry = DateTime.Now.AddMinutes(1);
                         await sTIMULUSContext.SaveChangesAsync();
                     }
-                    return new APIResponse<SessionUtilisateur>(new SessionUtilisateur() { Token = token, RefreshToken = refreshToken }, 200, "Success");
+                    apiResponse = new APIResponse<SessionUtilisateur>(new SessionUtilisateur() { Token = token, RefreshToken = refreshToken }, 200, "Success");
+                    log.Information($"SUCCESS -> ConnexionUtilisateur(ConnexionVerification connexionVerification = {connexionVerification}) \n  Http Protocole: {apiResponse.StatusCode} \n  ApiResponse: {apiResponse.Message} ");
+                    return apiResponse; 
                 }
-                return new APIResponse<SessionUtilisateur>(null, 400, "Le mot de passe est incorrect.");
+                apiResponse = new APIResponse<SessionUtilisateur>(null, 400, "Le mot de passe est incorrect.");
+                log.Warning($"NULL PARAMETER -> ConnexionUtilisateur(ConnexionVerification connexionVerification = {connexionVerification}) \n  Http Protocole: {apiResponse.StatusCode} \n  ApiResponse: {apiResponse.Message} ");
+                return apiResponse;
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Une erreur interne s'est produite.");
+                var statusCode = StatusCode(500, "Une erreur interne s'est produite.");
+                log.Fatal($"ERROR -> ConnexionUtilisateur(ConnexionVerification connexionVerification = {connexionVerification}) \n  Http Protocole: {statusCode.StatusCode} \n  ApiResponse: {statusCode.Value}", ex);
+                return statusCode;
             }
         }
 
@@ -107,15 +121,23 @@ namespace STIMULUS_V2.Server.Controllers
         [HttpPost("Inscription")]
         public async Task<IActionResult> UtilisateurInscription(InscriptionVerification inscriptionVerification)
         {
+            var log = Log.ForContext<AuthenticationController>();
+
             var result = await utilisateurFactory.CreerUtilisateur(inscriptionVerification.Nom, inscriptionVerification.Prenom, inscriptionVerification.Email, inscriptionVerification.Password);
 
             if (result.Succeeded)
             {
-                return Ok("Utilisateur inscrit avec succès");
+                var apiResponse = Ok("Utilisateur inscrit avec succès");
+                log.Information($"SUCCESS -> UtilisateurInscription(InscriptionVerification inscriptionVerification = {inscriptionVerification}) \n  Response: {apiResponse}");
+
+                return apiResponse;
             }
             else
             {
-                return BadRequest(result.Errors);
+                var apiResponse = BadRequest(result.Errors);
+                log.Warning($"BAD REQUEST -> UtilisateurInscription(InscriptionVerification inscriptionVerification = {inscriptionVerification}) \n  Response: {apiResponse}");
+
+                return apiResponse;
             }
         }
 
@@ -124,8 +146,12 @@ namespace STIMULUS_V2.Server.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetTotalUsersCount()
         {
+            var log = Log.ForContext<AuthenticationController>();
             var users = await sTIMULUSContext.Utilisateur.ToListAsync();
-            return Ok(users.Count);
+            var apiResponse = Ok(users.Count);
+            log.Information($"SUCCESS ->  GetTotalUsersCount() \n  Response: {apiResponse}");
+
+            return apiResponse;
         }
 
         // Get Current User info, ONLY user can do that.
@@ -133,9 +159,13 @@ namespace STIMULUS_V2.Server.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> GetMyInfo(string identifiant)
         {
+            var log = Log.ForContext<AuthenticationController>();
             var user = await sTIMULUSContext.Utilisateur.FirstOrDefaultAsync(utilisateur => utilisateur.Identifiant.Equals(identifiant));
             string info = $"Name : {user.Prenom}{Environment.NewLine}Email: {user.Email}";
-            return Ok(info);
+            var apiResponse = Ok(info);
+            log.Information($"SUCCESS ->  GetMyInfo(string identifiant = {identifiant}) \n  Response: {apiResponse}");
+
+            return apiResponse;
         }
 
         //PUBLIC API ENPOINT FOR GENERATING NEW REFRESH TOKEN AND AUTHENTICATION TOKEN
@@ -143,6 +173,7 @@ namespace STIMULUS_V2.Server.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<SessionUtilisateur>> GetNewToken(SessionUtilisateur sessionUtilisateur)
         {
+            var log = Log.ForContext<AuthenticationController>();
             if (sessionUtilisateur is null) return null!;
             var rToken = await sTIMULUSContext.TokenInfo.Where(_ => _.RefreshToken!.Equals(sessionUtilisateur.RefreshToken)).FirstOrDefaultAsync();
 
@@ -173,7 +204,9 @@ namespace STIMULUS_V2.Server.Controllers
                 rTokenUser.TokenExpiry = DateTime.Now.AddMinutes(1);
                 await sTIMULUSContext.SaveChangesAsync();
             }
-            return Ok(new SessionUtilisateur() { Token = newToken, RefreshToken = newRefreshToken });
+            var apiResponse = Ok(new SessionUtilisateur() { Token = newToken, RefreshToken = newRefreshToken });
+            log.Information($"SUCCESS -> GetNewToken(SessionUtilisateur sessionUtilisateur) \n  Response: {apiResponse}");
+            return apiResponse;
         }
     }
 }
