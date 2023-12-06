@@ -291,13 +291,40 @@
         else
             nouveauNoeud.Type = NoeudType.CONTENU;
 
-        if (nouveauNoeud.Nom != null && nouveauNoeud.Description != null && nouveauNoeud.Nom.Length >= 3 && nouveauNoeud.Nom.Length <= 10 && nouveauNoeud.Description.Length >= 3 && nouveauNoeud.Description.Length <= 100 && nouveauNoeud.Rayon != null)
+        bool error = false;
+        string retour = "";
+        if (nouveauNoeud.Nom == null)
         {
-            AjoutNouveauNoeud(nouveauNoeud);
+            error = true;
+            retour += "Le noeud n'a pas de nom\n";
+        }
+        else if (nouveauNoeud.Nom.Length < 3 || nouveauNoeud.Nom.Length > 10)
+        {
+            error = true;
+            retour += $"Le nom doit être compris entre 3 et 10 caractères (actuellement : {nouveauNoeud.Nom.Length})\n";
+        }
+        if (nouveauNoeud.Description == null)
+        {
+            error = true;
+            retour += "Le noeud n'a pas de description\n";
+        }
+        else if (nouveauNoeud.Description.Length < 3 || nouveauNoeud.Description.Length > 100)
+        {
+            error = true;
+            retour += $"La description doit être comprise entre 3 et 100 caractères (actuellement : {nouveauNoeud.Description.Length})\n";
+        }
+        if (nouveauNoeud.Rayon == null)
+        {
+            error = true;
+            retour += "Le noeud n'a pas de rayon";
+        }
+        if (!error)
+        {
+            AjoutNouveauNoeud(nouveauNoeud);            
         }
         else
         {
-            await JsRunTime.InvokeAsync<object>("alert", "Les saisies ne sont pas valides");
+            await JsRunTime.InvokeAsync<object>("alert", retour);
         }
 
         // Dans le cadre de champs vide ou invalide, une alert box apparait
