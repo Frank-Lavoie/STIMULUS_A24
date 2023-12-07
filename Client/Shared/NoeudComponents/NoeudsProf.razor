@@ -326,7 +326,12 @@
         if (nouveauNoeud.Rayon == null)
         {
             error = true;
-            retour += "Le noeud n'a pas de rayon";
+            retour += "Le noeud n'a pas de rayon\n";
+        }
+        else if(nouveauNoeud.Rayon.ToString().Contains(",") || nouveauNoeud.Rayon.ToString().Contains("."))
+        {
+            error = true;
+            retour += "Le rayon contient un caractere non autorise";
         }
         if (!error)
         {
