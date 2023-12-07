@@ -40,6 +40,7 @@ builder.Services.AddScoped<ITexteFormaterService, TexteFormaterService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<UtilisateurFactory>();
 builder.Services.AddScoped<IPageEtudiantService, PageEtudiantService>();
+builder.Services.AddScoped<INoeudEtudiantService, NoeudEtudiantService>();
 builder.Services.AddDbContextPool<STIMULUSContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("STIMULUSConnection")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -69,6 +70,42 @@ using (var scope = app.Services.CreateScope())
     context.EnsureAdminUserCreated();
     context.EnsureEtuUserCreated();
     context.EnsureProfUserCreated();
+
+    //Création du trigger pour changer le status
+    //context.Database.ExecuteSqlRaw(@"
+    //    CREATE TRIGGER TRG_UpdateStatus
+    //    ON Noeud
+    //    AFTER UPDATE
+    //    AS
+    //    BEGIN
+    //        -- Mettre à jour le statut dans la table Noeud_Etudiant
+    //        UPDATE ne
+    //        SET ne.Status = n.Status
+    //        FROM Noeud_Etudiant ne
+    //        INNER JOIN inserted i ON ne.NoeudId = i.NoeudId 
+    //        INNER JOIN deleted d ON ne.NoeudId = d.NoeudId 
+    //        INNER JOIN Noeud n ON ne.NoeudId = n.NoeudId
+    //        WHERE i.Status <> d.Status OR (i.Status IS NULL AND d.Status IS NOT NULL) OR (i.Status IS NOT NULL AND d.Status IS NULL);
+    //    END;
+    //");
+    ////Création du trigger pour inséré des données dans Noeud_Etudiant
+    //context.Database.ExecuteSqlRaw(@"
+    //    CREATE TRIGGER TRG_AfterInsertNoeud
+    //    ON Noeud
+    //    AFTER INSERT
+    //    AS
+    //    BEGIN
+    //        -- Insertion des étudiants dans Noeud_Etudiant
+    //        INSERT INTO Noeud_Etudiant (NoeudId, CodeDA, Status)
+    //        SELECT i.NoeudId, ge.CodeDA, i.Status
+    //        FROM inserted i
+    //        JOIN Graphe g ON i.GrapheId = g.GrapheId
+    //        JOIN Groupe_Etudiant ge ON g.GroupeId = ge.GroupeId;
+    //    END;
+    //");
+
+
+
 }
 
 // Configure the HTTP request pipeline.

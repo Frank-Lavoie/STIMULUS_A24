@@ -14,7 +14,11 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IUpdateService updateService
 @inject INoeudService NoeudService;
+@inject IGrapheService GrapheService;
+@inject INoeudEtudiantService NoeudEtudiantService;
 @inject AppState State;
+@inject RerenderService Rerender
+
 
 <div class="row mt-2">
     <div class="col">
@@ -28,7 +32,7 @@
         </foreignObject>
         <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
             @*<rect width="180" height="180" x="0" y="5" fill="#32587a"></rect>*@
-            <foreignObject class="bg-transparent" x="0" y="5" width="160" height="205">
+            <foreignObject class="bg-transparent" x="0" y="5" width="180" height="310">
                 <RadzenPanel class="custom-graphe-legend-panel">
                     <RadzenStack class="custom-graphe-legend-stack" Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
                         <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>
@@ -41,7 +45,7 @@
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <RadzenLabel>Non consulté</RadzenLabel>
-                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/228-231-245.png"></RadzenImage>
+                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/non_compléter.png"></RadzenImage>
                             </div>
                         </div>
                         <div class="custom-graphe-legend-color-position">
@@ -53,7 +57,13 @@
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <RadzenLabel>Complété</RadzenLabel>
-                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/88-150-105.png"></RadzenImage>
+                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/complété.png"></RadzenImage>
+                            </div>
+                        </div>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel>Catégorie de noeuds</RadzenLabel>
+                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/structure.png"></RadzenImage>
                             </div>
                         </div>
                     </RadzenStack>
@@ -84,10 +94,12 @@
     private string viewForm = "hidden";
     private string displayNouveauNoeud = "hidden";
     private Noeud nouveauNoeud;
+    private Noeud_Etudiant noeudEtudiant;
 
     protected async override void OnInitialized()
-    {       
+    {
         await UpdateGraphe();
+        Rerender.OnNoeudStatus += HandleChangeNoeud;
     }
 
     /// <summary>
@@ -98,24 +110,131 @@
         Nodes = new();
         int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
 
-            // Wait until 'idGraphe' is not zero (use a timeout or cancellation token for safety).
-            while (idGraphe == 0)
-            {
-                // Add a delay to avoid continuous polling (e.g., 100ms).
-                await Task.Delay(100);
-            }
-
-            Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+        // Wait until 'idGraphe' is not zero (use a timeout or cancellation token for safety).
+        while (idGraphe == 0)
+        {
+            // Add a delay to avoid continuous polling (e.g., 100ms).
+            await Task.Delay(100);
+        }
+        Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+        foreach (var noeud in Nodes)
+        {
+            await CheckStatus(noeud);
+        }
 
         // Consider navigating using a relative URL
+        Nodes.Clear();
         StateHasChanged();
-        // NavigationManager.NavigateTo("/graphe");
+        Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+        StateHasChanged();
     }
     //Hardcode
     private int GetModeFond() => 2; 
 
     private void OnMouseHover() => displayHover = "show";
     private void OnMouseLeave() => displayHover = "hidden";
+
+    /// <summary>
+    /// Change le status des enfants selon le parent
+    /// </summary>
+    private async Task CheckStatus(Noeud noeud)
+    {
+        var graphe = await GrapheService.Get(await sessionStorage.GetItemAsync<int>("idGraphe"));
+
+        try
+        {
+            // Récupérer tous les nœuds enfants du nœud parent
+            var childrenNodesResponse = await NoeudService.GetAllById(noeud.NoeudId);
+
+            var childrenNodes = childrenNodesResponse.Data;
+
+            var parentNoeudEtudiant = await NoeudEtudiantService.GetByNoeudAndDa(noeud.NoeudId, await sessionStorage.GetItemAsync<string>("idConnexion"));
+
+            foreach (var childNode in childrenNodes)
+            {
+                var childNoeudEtudiant = await NoeudEtudiantService.GetByNoeudAndDa(childNode.NoeudId, await sessionStorage.GetItemAsync<string>("idConnexion"));
+
+                
+
+                if (childNoeudEtudiant.Data != null)
+                {
+                    if (parentNoeudEtudiant.Data.Status == 4 && childNode.Type == NoeudType.STRUCTURE && childNoeudEtudiant.Data.Status == 2)
+                    {
+
+                            childNoeudEtudiant.Data.Status = 4; // Bloqué par le prof
+
+                        await NoeudEtudiantService.Update(childNoeudEtudiant.Data.Noeud_EtudiantId, childNoeudEtudiant.Data);
+                    }
+
+                    else if (parentNoeudEtudiant.Data.Status == 1) // si la parent est bloqué par le prof
+                    {
+                        if (childNoeudEtudiant.Data.Status == 1) // et quer les enfants sont aussi bloqué par le prof
+                        {
+                            childNoeudEtudiant.Data.Status = 1; // Bloqué par le prof
+                        }
+                        else // sinon
+                            childNoeudEtudiant.Data.Status = 5; // bloqué par la progression
+                    }
+
+                    else if (parentNoeudEtudiant.Data.Status == 5) // si le parent est bloqué par la progression
+                    {
+                        if (childNoeudEtudiant.Data.Status != 1) // Et que le prof n'a pas bloqué le noeud
+                        {
+                            childNoeudEtudiant.Data.Status = 5; // les enfants sont bloqué par la progression
+                        }
+                    }
+                    else if (parentNoeudEtudiant.Data.Status == 2) // Si le parent est non  complété
+                    {
+                        if (childNoeudEtudiant.Data.Status == 1) // Si l'enfant est bloqué par le prof
+                        {
+                            childNoeudEtudiant.Data.Status = 1; // Bloqué par le prof
+                        }
+                        else
+                        {
+                            childNoeudEtudiant.Data.Status = 5; // Bloqué par la progression
+                        }
+                    }
+                    //OUVERTURE DE NOEUD ENFANT
+
+                    else if (parentNoeudEtudiant.Data.Status == 4 && childNoeudEtudiant.Data.Status == 4) // si le parent et l'enfant son complétés
+                    {
+                        childNoeudEtudiant.Data.Status = 4; // l'enfant est complété
+                    }
+
+                    else if (parentNoeudEtudiant.Data.Status == 4) // Si le parent est Complété
+                    {
+                        if (childNoeudEtudiant.Data.Status == 1) // Si l'enfant est bloqué par le prof
+                        {
+                            childNoeudEtudiant.Data.Status = 1; // reste bloqué
+                        }
+                        else
+                        {
+                            childNoeudEtudiant.Data.Status = 2; // si non il est non complété
+                        }
+                    }
+
+                        await NoeudEtudiantService.Update(childNoeudEtudiant.Data.Noeud_EtudiantId, childNoeudEtudiant.Data); // Update chaque enfants du noeud parents
+                    }
+                    
+                }        
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur : {ex}");
+            }
+    }
+            
+             
+
+
+    /// <summary>
+    /// Appeler un changement de status
+    /// </summary>
+    private async void HandleChangeNoeud()
+    {
+        await UpdateGraphe(); 
+        StateHasChanged();
+    }
 
     private void ResetViewbox()
     {

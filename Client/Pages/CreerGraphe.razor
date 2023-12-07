@@ -5,6 +5,8 @@
 
 @inject IJSRuntime JSRuntime
 @inject IGrapheService GrapheService
+@inject INoeudEtudiantService NoeudEtudiantService
+@inject IGroupeEtudiantService GroupeEtudiantService
 @inject INoeudService NoeudService
 @inject ILocalStorageService localStorageService
 @inject IGroupeService GroupeService
@@ -69,6 +71,7 @@
     public List<STIMULUS_V2.Shared.Models.Entities.Groupe> listGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Groupe>();
     public STIMULUS_V2.Shared.Models.Entities.Graphe graphe = new();
     public STIMULUS_V2.Shared.Models.Entities.Noeud nouveauNoeud = new();
+    public STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant noeudEtudiant = new();
 
     List<string> status = new List<string>() //Permet un affichage correct du Status
     {
@@ -112,13 +115,17 @@
             nouveauNoeud.Description = "Structure";
             nouveauNoeud.Disponibilite = DateTime.Now;
             nouveauNoeud.Obligatoire = false;
-            nouveauNoeud.Status = 4;
+            nouveauNoeud.Status = 0;
             nouveauNoeud.PosX = 0.0;
             nouveauNoeud.PosY = 0.0;
             nouveauNoeud.Rayon = 50;
             nouveauNoeud.Type = NoeudType.STRUCTURE;
 
-            await NoeudService.Create(nouveauNoeud);
+            var newNoeud = await NoeudService.Create(nouveauNoeud);
+            var node = newNoeud.Data;
+
+            var etudiant = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+            var etudiants = etudiant.Data;
 
             await sessionStorage.SetItemAsync<int>("idGraphe", newgraphe.GrapheId);
             await OnGrapheCreated.InvokeAsync();

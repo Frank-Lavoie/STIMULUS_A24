@@ -10,22 +10,19 @@
     <p class="lead">Votre plateforme d'apprentissage en ligne.</p>
     <AuthorizeView Roles="PROFESSEUR">
         <p class="lead">Vous êtes un Professeur</p>
-        @{
-            State.Identifiant = context.User.Identity!.Name;           
+        @{       
         }
     </AuthorizeView>
 
     <AuthorizeView Roles="ETUDIANT">
         <p class="lead">Vous êtes un Étudiant</p>
         @{
-            State.Identifiant = context.User.Identity!.Name;
         }
     </AuthorizeView>
 
     <AuthorizeView Roles="ADMIN">
         <p class="lead">Vous êtes un Administrateur</p>
         @{
-            State.Identifiant = context.User.Identity!.Name;
         }
     </AuthorizeView>
 </div>

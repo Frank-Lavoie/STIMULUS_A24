@@ -54,6 +54,7 @@
     </RadzenPanelMenu>
 </RadzenSidebar>
 
+
 @code {
     [Parameter]
     public bool sidebarExpanded { get; set; } = false;
@@ -81,42 +82,48 @@
 
         if (isProfesseur)
         {
-            var responseGroupeActif = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
-            var groupesActif = responseGroupeActif.Data;
-
-            groupesProf.AddRange(groupesActif);
-
-            foreach (var graphe in groupesActif)
+            if (await sessionStorage.GetItemAsync<string>("idConnexion") != null)
             {
-                var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
-                var graphesDuGroupe = responseGraphe.Data;
+                var responseGroupeActif = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
+                var groupesActif = responseGroupeActif.Data;
 
-                ListeGraphesProf.AddRange(graphesDuGroupe);
+                groupesProf.AddRange(groupesActif);
+
+                foreach (var graphe in groupesActif)
+                {
+                    var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
+                    var graphesDuGroupe = responseGraphe.Data;
+
+                    ListeGraphesProf.AddRange(graphesDuGroupe);
+                }
+                StateHasChanged();
             }
-            StateHasChanged();
         }
 
         if (isEtudiant)
         {
-            var responseGroupeEtudiant = await GroupeEtudiantService.GetAllGroupForStudent(await sessionStorage.GetItemAsync<string>("idConnexion"));
-            var groupes = responseGroupeEtudiant.Data;
-
-            foreach (var groupe in groupes)
+            if (await sessionStorage.GetItemAsync<string>("idConnexion") != null)
             {
-                var responseGraphe = await GrapheService.GetAllFromGroup((int)groupe.GroupeId);
-                var graphesDuGroupe = responseGraphe.Data;
+                var responseGroupeEtudiant = await GroupeEtudiantService.GetAllGroupForStudent(await sessionStorage.GetItemAsync<string>("idConnexion"));
+                var groupes = responseGroupeEtudiant.Data;
 
-                ListeGraphesEtudiant.AddRange(graphesDuGroupe);
+                foreach (var groupe in groupes)
+                {
+                    var responseGraphe = await GrapheService.GetAllFromGroup((int)groupe.GroupeId);
+                    var graphesDuGroupe = responseGraphe.Data;
+
+                    ListeGraphesEtudiant.AddRange(graphesDuGroupe);
+                }
+
+                foreach (var cours in groupes)
+                {
+                    var responseCours = await CoursService.GetAllById((int)cours.GroupeId);
+                    var nomDesCours = responseCours.Data;
+
+                    ListeCours.AddRange(nomDesCours);
+                }
+                StateHasChanged();
             }
-
-            foreach (var cours in groupes)
-            {
-                var responseCours = await CoursService.GetAllById((int)cours.GroupeId);
-                var nomDesCours = responseCours.Data;
-
-                ListeCours.AddRange(nomDesCours);
-            }
-            StateHasChanged();
         }
     }
     private async void HandleUpdateSideBar()

@@ -1,7 +1,6 @@
 @using STIMULUS_V2.Client.Services;
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
-@* @using STIMULUS_V2.Client.Shared.TheorieComponents; *@
 @using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
 
 @inject IJSRuntime JSRuntime
@@ -11,9 +10,14 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRunTime
 @inject IPageService PageService
+@inject IGrapheService GrapheService
 @inject IComposantService ComposantService
+@inject IEtudiantService EtudiantService
+@inject INoeudEtudiantService NoeudEtudiantService
+@inject IGroupeEtudiantService GroupeEtudiantService
 @inject AppState State;
 @inject Radzen.DialogService DialogService
+@inject RerenderService Rerender
 
 @for (int i = 0; i < Nodes.Count; i++)
 {
@@ -27,9 +31,9 @@
     <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(0,0,0,5); opacity:0.5" />
     @if (GetModeDeVue() == 2)
     {
-        <circle @onmouseup=@(e => SaveChangeNoeud(Node)) @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) @onclick="(e => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
+        <circle @onmouseup=@(e => SaveChangeNoeud(Node)) @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) @onclick="(e => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@COULEUR_BLOQUER" />
     }
-    @if (GetModeDeVue() == 2 || GetModeDeVue() == 3)
+    @if (GetModeDeVue() == 2)
     {
         <rect x="@(sizeValue*2- sizeValue/2 -10)" y="@(-180 + sizeValue/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
         <foreignObject x="@(sizeValue*2- Node.Rayon/2 -10)" y="@(-180 + sizeValue/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
@@ -52,7 +56,26 @@
 
             }
         }
-        
+
+        <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+        @if(Node.Status == 1)
+        {
+            <span title="Débloquer le noeud @Node.Nom" id="LockAndUnlocked" class="oi oi-lock-locked" aria-hidden="true" @onclick="(e => LockAndUnlocked(Node))"></span>
+        }
+        else if (Node.Status == 2)
+        {
+                <span title="Bloquer le noeud @Node.Nom" id="LockAndUnlocked" class="oi oi-lock-unlocked" aria-hidden="true" @onclick="(e => LockAndUnlocked(Node))"></span>
+        }
+            else if ((graphe != null) && (graphe.Status != null) && (graphe.Status == GrapheStatus.ACTIVER) && Node.Status == 0)
+        {
+                <span title="Désactiver le graphe" id="LockAndUnlockedGraphe" class="oi oi-lock-unlocked" aria-hidden="true" @onclick="(e => LockAndUnlockedGraphe(Node))"></span>
+        }
+            else if ((graphe != null) && (graphe.Status != null) && (graphe.Status == GrapheStatus.DESACTIVER) && Node.Status == 0)
+        {
+                <span title="Activer le graphe" id="LockAndUnlockedGraphe" class="oi oi-lock-locked" aria-hidden="true" @onclick="(e => LockAndUnlockedGraphe(Node))"></span>
+        }
+        </foreignObject>
+
         @if (Node.NoeudParentId == null || Node.NoeudId == Node.NoeudParentId)
         {
             <foreignObject x="@(-sizeValue)" y="@(sizeValue/2)" width="20" height="20">
@@ -88,9 +111,7 @@
                     <label for="status"><h5>Status :</h5></label>
                     <select class="form-control" id="status" @bind="nouveauNoeud.Status">
                         <option value="1" selected="@(nouveauNoeud.Status == 1)">Bloqué</option>
-                        <option value="2" selected="@(nouveauNoeud.Status == 2)">Non consulté</option>
-                        <option value="3" selected="@(nouveauNoeud.Status == 3)">Consulté</option>
-                        <option value="4" selected="@(nouveauNoeud.Status == 4)">Complété</option>
+                        <option value="2" selected="@(nouveauNoeud.Status == 2)">Débloqué</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -109,7 +130,7 @@
     @if (GetModeDeVue() == 1)
     {
         <NavLink @onclick="ViewPageTemplate">
-            <circle r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
+            <circle r="@Node.Rayon" class="cercle" style="fill:@COULEUR_BLOQUER" />
             @if (Node.Type == NoeudType.CONTENU)
             {
                 <foreignObject x="@((-sizeValue) )" y="@((sizeValue)/2 )" width="20" height="20">
@@ -152,32 +173,117 @@
     }
     else if (GetModeDeVue() == 3)
     {
-        @if(Node.Type == NoeudType.CONTENU)
-        {
-            <NavLink @onclick="DirectionPagesEtudiant">
-                <circle @onmouseover="@((e) => OnMouseHover())" @onmouseout="@((e) => OnMouseLeave())" @onclick="@((e) => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
-                <text @onmouseover="@((e) => OnMouseHover())" @onmouseout="@((e) => OnMouseLeave())" class="textLink" text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
-            </NavLink>
-        }
-        else
-        {   
-            <NavLink>
-                <circle @onmouseover="@((e) => OnMouseHover())" @onmouseout="@((e) => OnMouseLeave())" @onclick="@((e) => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
-                <text @onmouseover="@((e) => OnMouseHover())" @onmouseout="@((e) => OnMouseLeave())" class="textLink" text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
-            </NavLink>
-        }
+        @if (noeudEtudiant != null && (
+           ((noeudEtudiant.Status == 0) ||
+           (noeudEtudiant.Status == 5) ||
+           (noeudEtudiant.Status == 1))))
+            {
+                <NavLink id="lien">
+                    <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
+                    <circle @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
+                    <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
+                    <foreignObject x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
+                        <span> Nom :  @Node.Nom</span><br />
+                        <span> Desc : @Node.Description</span><br />
+                        @if (noeudEtudiant.Status == 5)
+                        {
+                            <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                <span title="Bloqué" class="oi oi-lock-locked" aria-hidden="true"></span>
+                            </foreignObject>
+                            <strong>@noeudEtudiant.CodeDA doit compléter <h>"@TestParent()"</h> pour débloquer ce noeud.</strong>
+                        }
+                        else if (noeudEtudiant.Status == 1)
+                        {
+                            <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                <span title="Bloqué" class="oi oi-ban" aria-hidden="true"></span>
+                            </foreignObject>
+                            <strong>Vous avez bloqué cette théorie.</strong>
+                        }
+                        else if (noeudEtudiant.Status == 0)
+                        {
+                            if (graphe.Status == GrapheStatus.ACTIVER)
+                            {
+                                <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                    <span title="Bloqué" class="oi oi-book" aria-hidden="true"></span>
+                                </foreignObject>
+                                <strong>Ce graphe peut être complété !</strong>
+                            }
+                            else
+                            {
+                                <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                    <span title="Bloqué" class="oi oi-ban" aria-hidden="true"></span>
+                                </foreignObject>
+                                <strong>Ce graph a été bloqué par votre professeur</strong>
+                            }
+                        }
+                    </foreignObject>
+                    <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
+                </NavLink>
+            }
+            else if (noeudEtudiant != null && (
+            ((noeudEtudiant.Status == 2) ||
+            (noeudEtudiant.Status == 3) ||
+            (noeudEtudiant.Status == 4))))
+            {
+                <NavLink @onclick="DirectionPagesEtudiant" id="lien">
+                    <circle @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
+                    <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
+                    <foreignObject x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
+                        <span> Nom :  @Node.Nom</span><br /> @*Pour ne pas avoir de champ vide*@
+                        <span> Desc : @Node.Description</span><br />
+                        @if (noeudEtudiant.Status == 2)
+                        {
+                            <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                <span title="Bloqué" class="oi oi-circle-x" aria-hidden="true"></span>
+                            </foreignObject>
+                            <strong>Cette théorie n'a pas été complété.</strong>
+                        }
+                        else if (noeudEtudiant.Status == 3)
+                        {
+                            <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                <span title="Bloqué" class="oi oi-magnifying-glass" aria-hidden="true"></span>
+                            </foreignObject>
+                            <strong>Cette théorie est en cours de complétion</strong>
+                        }
+                        else if (noeudEtudiant.Status == 4)
+                        {
+                            if (Node.Type == NoeudType.STRUCTURE)
+                            {
+                                <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                    <span title="Bloqué" class="oi oi-lock-unlocked" aria-hidden="true"></span>
+                                </foreignObject>
+                                <strong>@noeudEtudiant.CodeDA a débloquer cette catégorie</strong>
+                            }
+                            else
+                            {
+                                <foreignObject x="@(Node.Rayon)" y="@(-Node.Rayon )" width="20" height="20">
+                                    <span title="Bloqué" class="oi oi-circle-check" aria-hidden="true"></span>
+                                </foreignObject>
+                                <strong>Cette théorie a été complété.</strong>
+                            }
+                        }
+                    </foreignObject>
+                    <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
+                </NavLink>
+            }
+            else
+            {
+                <p>Chargement du graphe ...</p>
+            }
     }
 </Draggable>
 
 @code {
     private bool delete = false;
-
+    [Parameter]
+    public EventCallback OnStatusUpdated { get; set; }
     //ChildContent = Noeudception
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public Noeud Node { get; set; }
     [Parameter] public Page newPage { get; set; } = new();
     [Parameter] public Page LinkedPage { get; set; } = new();
     [Parameter] public List<Noeud> Nodes { get; set; }
+    [Parameter] public string Etudiant { get; set; }
 
     //Delegate Land
     [Parameter] public Action<Noeud> AjoutNouveauNoeud { get; set; }
@@ -197,6 +303,8 @@
     private string modelNoeud = "CONTENU";
     private string statusNom = "";
     private Noeud nouveauNoeud = new();
+    private Graphe graphe { get; set; }
+    private Noeud_Etudiant noeudEtudiant = new();
     private string displayNouveauNoeud = "hidden";
     private int formSizeH = 0;
     private int formSizeW = 0;
@@ -207,9 +315,9 @@
 
     //Variable couleurs
     private readonly string COULEUR_BLOQUER = "rgb(140,140,140)";
-    private readonly string COULEUR_NON_CONSULTER = "rgb(49, 140, 231)";
-    private readonly string COULEUR_CONSULTER = "rgb(199,160,53)";
-    private readonly string COULEUR_COMPLETER = "rgb(28, 90, 47)";
+    private readonly string COULEUR_NON_COMPLETER = "rgb(204, 0, 0)";
+    private readonly string COULEUR_EN_COURS = "rgb(199,160, 53)";
+    private readonly string COULEUR_COMPLETER = "rgb(0, 204, 0)";
     private string Couleur { get; set; }
     public List<Page> listePage { get; set; } = new List<Page>();
 
@@ -222,31 +330,42 @@
             sizeValue++;
         }
         Couleur = COULEUR_BLOQUER;
+        var grapheActuel = await GrapheService.Get(await sessionStorage.GetItemAsync<int>("idGraphe"));
+        graphe = grapheActuel.Data;
 
-        if (Node.Status == 1)
-        {
-            Couleur = COULEUR_BLOQUER;
-        }
-        else if (Node.Status == 2)
-        {
-            Couleur = COULEUR_NON_CONSULTER;
-        }
-        else if (Node.Status == 3)
-        {
-            Couleur = COULEUR_CONSULTER;
-        }
-        else if (Node.Status == 4)
-        {
-            Couleur = COULEUR_COMPLETER;
-        }
 
+        Rerender.OnEtudiantChanged += ReRenderDataNoeudEtudiant;
+
+        if(await sessionStorage.GetItemAsync<string>("daEtudiant") != null)
+        {
+            await GetDataNoeudEtudiant();
+        }
         var pageNoeud = await PageService.GetAllFromNoeud(Node.NoeudId);
         var affichPage = pageNoeud.Data;
         nouveauNoeud.Rayon = 40;
         listePage.AddRange(affichPage);
         StateHasChanged();
+
+    }
+    private async Task GetDataNoeudEtudiant()
+    {
+
+        var etudiantData = await NoeudEtudiantService.GetByNoeudAndDa(Node.NoeudId, await sessionStorage.GetItemAsync<string>("daEtudiant"));
+
+        if (etudiantData != null)
+        {
+            noeudEtudiant = etudiantData.Data;
+            UpdateChildrenColors();
+        }
+        else
+            UpdateChildrenColors();
     }
 
+    private async void ReRenderDataNoeudEtudiant()
+    {
+        await GetDataNoeudEtudiant();
+        StateHasChanged();
+    }
     private async void ViewPageTemplate()
     {
         if (!viewPage)
@@ -280,8 +399,17 @@
     /// (Visuel) permet de check si le noeud a un parent, et l'affiche dans le bulle d'info du noeud
     /// </summary>
     /// <returns></returns>
-    private string TestParent() => (Node.NoeudParentId != null && Node.NoeudParentId != Node.NoeudId) ? Node.NoeudParentId.ToString() : "Aucun";
-
+    private string TestParent()
+    {
+        if (Node.NoeudParent != null && Node.NoeudParent.Nom != null)
+        {
+            return Node.NoeudParent.Nom.ToString();
+        }
+        else
+        {
+            return "Aucun";
+        }
+    }
     /// <summary>
     /// Quand le formulaire d'ajout est valide, ajoute un noeud
     /// </summary>
@@ -347,6 +475,95 @@
 
         isOpen = false;
     }
+    private async Task LockAndUnlocked(Noeud noeud)
+    {
+
+        if (noeud.Status == 1)
+        {
+            Node.Status = 2;
+            await NoeudService.Update(Node.NoeudId, Node);
+        }
+        else
+        {
+            var result = await DialogService.Confirm("Êtes vous sûr de vouloir bloquer ce noeud ? Cette action entrainera une réinitialisation de la progression pour ce noeud.", "Bloquer le noeud : " + noeud.Nom);
+            if (result.HasValue && result.Value)
+            {
+                Node.Status = 1;
+                await NoeudService.Update(Node.NoeudId, Node);
+            }
+        }
+    }
+    private async Task LockAndUnlockedGraphe(Noeud noeud)
+    {
+        if (graphe.Status == GrapheStatus.ACTIVER)
+        {
+            var result = await DialogService.Confirm("Êtes vous sûr de vouloir bloquer ce graphe ? Cette action entrainera une réinitialisation de la progression pour ce graphe.", "Bloquer le graphe: " + graphe.Nom);
+            if (result.HasValue && result.Value)
+            {
+                graphe.Status = GrapheStatus.DESACTIVER;
+                await GrapheService.Update(graphe.GrapheId, graphe);
+                var childrenNodesResponse = await NoeudService.GetAllById(noeud.NoeudId); // Contient tous les enfants dans la table noeuds
+
+                var childrenNodes = childrenNodesResponse.Data;
+
+                var parentNoeudEtudiant = await NoeudEtudiantService.GetByNoeudId(noeud.NoeudId); // Contient le neoud parent dans la table Noeud Etudiant
+
+                foreach (var childNode in childrenNodes)
+                {
+                    var childNoeudEtudiant = await NoeudEtudiantService.GetByNoeudId(childNode.NoeudId);
+
+                    if (childNoeudEtudiant.Data != null)
+                    {
+                        // BARRURE DE NOEUD ENFANT
+                        if (parentNoeudEtudiant.Data.Status == 0) // Si l'enfant est bloqué par le prof
+                        {
+                            if (childNoeudEtudiant.Data.Status == 1) // et quer les enfants sont aussi bloqué par le prof
+                            {
+                                childNoeudEtudiant.Data.Status = 1; // Bloqué par le prof
+                            }
+                            else // sinon
+                                childNoeudEtudiant.Data.Status = 5; // bloqué par la progression
+
+                            await NoeudEtudiantService.Update(childNoeudEtudiant.Data.Noeud_EtudiantId, childNoeudEtudiant.Data); // Update chaque enfants du noeud parents
+                        }
+                    }
+                }
+            }    
+        }
+        else
+        {
+                graphe.Status = GrapheStatus.ACTIVER;
+                await GrapheService.Update(graphe.GrapheId, graphe);
+
+                var childrenNodesResponse = await NoeudService.GetAllById(noeud.NoeudId); // Contient tous les enfants dans la table noeuds
+
+                var childrenNodes = childrenNodesResponse.Data;
+
+                var parentNoeudEtudiant = await NoeudEtudiantService.GetByNoeudId(noeud.NoeudId); // Contient le neoud parent dans la table Noeud Etudiant
+
+                foreach (var childNode in childrenNodes)
+                {
+                    var childNoeudEtudiant = await NoeudEtudiantService.GetByNoeudId(childNode.NoeudId);
+
+                    if (childNoeudEtudiant.Data != null)
+                    {
+                        // BARRURE DE NOEUD ENFANT
+                        if (parentNoeudEtudiant.Data.Status == 0) // Si l'enfant est bloqué par le prof
+                        {
+                            if (childNoeudEtudiant.Data.Status == 1) // et quer les enfants sont aussi bloqué par le prof
+                            {
+                                childNoeudEtudiant.Data.Status = 1; // Bloqué par le prof
+                            }
+                            else // sinon
+                                childNoeudEtudiant.Data.Status = 2; // bloqué par la progression
+
+                            await NoeudEtudiantService.Update(childNoeudEtudiant.Data.Noeud_EtudiantId, childNoeudEtudiant.Data); // Update chaque enfants du noeud parents
+                        }
+                }
+            }           
+        }
+    }
+
     private async Task AjoutPage(int id)
     {
         // Récupère toutes les pages du nœud avant l'ajout
@@ -536,5 +753,48 @@
             await sessionStorage.SetItemAsync<int>("idPage", firstPage.PageId);
         }
         NavigationManager.NavigateTo("/Pages");
+    }
+    private void UpdateChildrenColors()
+    {
+        // Mettez à jour les couleurs des enfants en fonction de leur statut
+        // Vous pouvez utiliser une logique similaire à celle que vous avez utilisée dans OnInitializedAsync()
+
+        // Vérifiez si le nœud est un enfant du nœud actuel
+        if (noeudEtudiant.Status == 0)
+        {
+            if (graphe.Status == GrapheStatus.ACTIVER)
+            {
+                Couleur = "rgb(0,76,153)";
+            }
+            else
+                Couleur = COULEUR_BLOQUER;
+
+        }
+        if (noeudEtudiant.Status == 1)
+        {
+            Couleur = COULEUR_BLOQUER;
+        }
+        else if (noeudEtudiant.Status == 2)
+        {
+            Couleur = COULEUR_NON_COMPLETER;
+        }
+        else if (noeudEtudiant.Status == 3)
+        {
+            Couleur = COULEUR_EN_COURS;
+        }
+        else if (noeudEtudiant.Status == 4)
+        {
+            if (Node.Type == NoeudType.CONTENU)
+            {
+                Couleur = COULEUR_COMPLETER;
+            }
+            else
+                Couleur = "rgb(0,76,153)";
+        }
+        else if (noeudEtudiant.Status == 5)
+        {
+            //Status 5 sera le status bloquer car le noeud parent n'est pas terminé
+            Couleur = COULEUR_BLOQUER;
+        }
     }
 }

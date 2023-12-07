@@ -231,6 +231,8 @@
 
 
 @code {
+    [Parameter]
+    public EventCallback OnStatusUpdated { get; set; }
     bool sidebar1Expanded = true;
     Popup popup;
     RadzenButton button;

@@ -41,7 +41,7 @@ namespace STIMULUS_V2.Client.Services
 
         public async Task<APIResponse<IEnumerable<Noeud>>> GetAllById(int id)
         {
-            var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Noeud>>>($"api/Noeud/Fetch/AllBy/{id}");
+            var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Noeud>>>($"api/Noeud/Fetch/All/{id}");
             return result; ;
         }
 

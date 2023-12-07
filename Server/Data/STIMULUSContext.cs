@@ -96,6 +96,7 @@ namespace STIMULUS_V2.Server.Data
         public DbSet<Image> Image { get; set; }
         public DbSet<Importance> Importance { get; set; }
         public DbSet<Noeud> Noeud { get; set; }
+        public DbSet<Noeud_Etudiant> Noeud_Etudiant { get; set; }
         public DbSet<Page> Page { get; set; }
         public DbSet<Page_Etudiant> Page_Etudiant { get; set; }
         public DbSet<Professeur> Professeur { get; set; }

@@ -45,6 +45,12 @@ namespace STIMULUS_V2.Server.Controllers
             log.Information($"Get(int id = {id}) \n  Response: {apiResponse}");
             return apiResponse;
         }
+        [HttpGet("Fetch/Groupe/{id}")]
+        public async Task<IActionResult> GetGroupe(int id)
+        {
+            var response = await grapheService.GetGroupe(id);
+            return StatusCode(response.StatusCode, response);
+        }
 
         [HttpGet("Fetch/All")]
         public async Task<IActionResult> GetAll()
