@@ -1,0 +1,24 @@
+﻿.custom-adduser-title {
+    display: flex;
+    justify-content: center;
+    font-family: Oswald;
+    color: #14274E;
+    font-size: xx-large
+}
+
+.custom-adduser-subtitle {
+    font-family: Comfortaa;
+    color: #14274E;
+}
+
+.custom-adduser-textbox{
+    width: 150%;
+}
+
+.custom-adduser-btn-save {
+    margin-left: 105%;
+    border: none;
+    background-color: #14274E;
+    border-radius: 8px;
+    color: white;
+}

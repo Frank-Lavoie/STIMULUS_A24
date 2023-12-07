@@ -5,14 +5,17 @@
 @using System.Globalization
 @inject  IPageEtudiantService PageEtudiantService
 
-<div class="teacher-info-container">
-    <div class="container text-center">
-        <p class="lead">Vous êtes un Professeur</p>
+<div class="container text-center">
+    <h1 class="custom-home-title">Bienvenue sur Stimulus!</h1>
+    <div class="teacher-info-container">
+        <div class="container text-center">
+            <p class="lead custom-home-subtitle">Vous êtes un Professeur</p>
+        </div>
     </div>
 </div>
 
 <div class="box-display">
-    <RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
+    <RadzenText TextStyle="TextStyle.DisplayH3" class="custom-home-title">Tableau de bord</RadzenText>
     <div class="row">
         <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
             <RadzenCard class="w-100 mb-4">
@@ -44,17 +47,6 @@
         </div>
     </div>
 </div>
-<style>
-    .box-display {
-        text-align: center;
-        align-items: center;
-        background-color: lightgrey;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-</style>
 
 @code {
     bool showDataLabels = false;

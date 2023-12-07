@@ -2,23 +2,19 @@
 .custom-graphe-zoom-button {
     border-radius: 25%;
     margin-left: 1%;
-    background-color: darkblue;
+    background-color: #14274E;
+    font-family: Oswald;
 }
 
 .custom-graphe-zoomout-button {
     border-radius: 25%;
-    background-color: darkblue;
+    background-color: #14274E;
+    font-family: Oswald;
 }
 
 .custom-graphe-reset-button {
     border-radius: 25%;
-    background-color: darkblue;
-}
-
-.custom-graphe-zoom-text{
-    margin-top: 1%;
-    color: darkblue;
-    font-size: large;
+    background-color: #14274E;
 }
 
 .custom-graphe-foreignobject-bg{
@@ -44,4 +40,20 @@
 
 .custom-graphe-legend-stack {
     border: solid;
+    border-color: #14274E;
+}
+
+.custom-graphe-viewmodebutton-title {
+    font-family: Oswald;
+}
+
+.custom-graphe-legend-title {
+    margin-top: 1%;
+    font-family: Oswald;
+    font-size: larger;
+}
+
+.custom-graphe-legend-subtitle {
+    margin-top: 1%;
+    font-family: Comfortaa;
 }

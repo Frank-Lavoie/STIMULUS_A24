@@ -24,15 +24,13 @@
     <div class="col">
         <foreignObject class="custom-graphe-foreignobject-bg" x="5" y="5" width="150" height="50">
             <RadzenStack class="divGrapheEntete" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-                <RadzenButton Style="background-color: darkblue" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
-                <RadzenButton Style="background-color: darkblue" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
-                <RadzenButton Style="background-color: darkblue" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
-                <RadzenText class="custom-graphe-zoom-text" TextStyle="TextStyle.DisplayH3">Zoom: @AfficheZoom()</RadzenText>
+                <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
+                <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
+                <RadzenButton Style="background-color: #14274E;" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
             </RadzenStack>
         </foreignObject>
         <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
-            @*<rect width="180" height="180" x="0" y="5" fill="#32587a"></rect>*@
-            <foreignObject class="bg-transparent" x="0" y="5" width="180" height="310">
+            <foreignObject class="bg-transparent" x="0" y="5" width="180" height="350">
                 <RadzenPanel class="custom-graphe-legend-panel">
                     <RadzenStack class="custom-graphe-legend-stack" Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
                         <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>

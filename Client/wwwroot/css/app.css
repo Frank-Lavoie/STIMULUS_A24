@@ -27,17 +27,18 @@
     --rz-paginator-back-button-color: #ffffff;
     --rz-primary: #0021A5;
     --rz-primary-lighter: rgba(98, 27, 9, 0.12);
-    --rz-secondary: #FA4616;
+    --rz-secondary: #14274E;
     --rz-success: #6966db;
     --rz-info: #DEDEE0;
-    --rz-warning: #FFB500;
-    --rz-danger: #FA4616;
-    --rz-panel-menu-item-active-color: #FA4616;
-    --rz-panel-menu-item-2nd-level-active-color: #FA4616;
+    --rz-warning: #394867;
+    --rz-danger: #14274E;
+    --rz-panel-menu-item-active-color: #14274E;
+    --rz-panel-menu-item-2nd-level-active-color: #14274E;
 }
 
 .custom-padding-body {
     padding: 0;
+    background-color: #F1F6F9;
 }
 
 html, body {
@@ -45,6 +46,7 @@ html, body {
     height: 100%;
     width: 100%;
     flex-direction: column;
+    background-color: #F1F6F9;
 }
 
 .custom-index-background {
@@ -80,6 +82,7 @@ a, .btn-link {
 }
 
 .validation-message {
+    font-family: Comfortaa;
     color: red;
 }
 
@@ -207,6 +210,7 @@ text {
     stroke: #fff;
     stroke-width: 1;
 }
+
 .titleCode {
     margin: 0;
     padding: 0 2% 0 2%;
@@ -226,4 +230,8 @@ text {
     background-color: #f2f2f2;
     padding: 2%;
     margin: 0;
+}
+
+.page-title {
+    margin-top: 20px;
 }

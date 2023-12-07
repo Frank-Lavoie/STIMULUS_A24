@@ -12,8 +12,8 @@ using STIMULUS_V2.Server.Data;
 namespace STIMULUS_V2.Server.Migrations
 {
     [DbContext(typeof(STIMULUSContext))]
-    [Migration("20231124155939_Migratopn1")]
-    partial class Migratopn1
+    [Migration("20231207181719_progression")]
+    partial class progression
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -395,6 +395,32 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Noeud");
                 });
 
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant", b =>
+                {
+                    b.Property<int>("Noeud_EtudiantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Noeud_EtudiantId"), 1L, 1);
+
+                    b.Property<string>("CodeDA")
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("NoeudId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Noeud_EtudiantId");
+
+                    b.HasIndex("CodeDA");
+
+                    b.HasIndex("NoeudId");
+
+                    b.ToTable("Noeud_Etudiant");
+                });
+
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page", b =>
                 {
                     b.Property<int>("PageId")
@@ -612,6 +638,21 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Graphe");
 
                     b.Navigation("NoeudParent");
+                });
+
+            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant", b =>
+                {
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Etudiant", "Etudiant")
+                        .WithMany()
+                        .HasForeignKey("CodeDA");
+
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Noeud", "Noeud")
+                        .WithMany()
+                        .HasForeignKey("NoeudId");
+
+                    b.Navigation("Etudiant");
+
+                    b.Navigation("Noeud");
                 });
 
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page", b =>
