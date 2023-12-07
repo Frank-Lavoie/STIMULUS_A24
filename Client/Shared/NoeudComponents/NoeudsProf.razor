@@ -24,15 +24,15 @@
 }
 
 <Draggable GetModeDeVue="GetModeDeVue" @bind-X=Node.PosX @bind-Y=Node.PosY>
-    <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
+    <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(0,0,0,5); opacity:0.5" />
     @if (GetModeDeVue() == 2)
     {
         <circle @onmouseup=@(e => SaveChangeNoeud(Node)) @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) @onclick="(e => RelinkBindNode(Node))" r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
     }
     @if (GetModeDeVue() == 2 || GetModeDeVue() == 3)
     {
-        <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
-        <foreignObject x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
+        <rect x="@(sizeValue*2- sizeValue/2 -10)" y="@(-180 + sizeValue/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
+        <foreignObject x="@(sizeValue*2- Node.Rayon/2 -10)" y="@(-180 + sizeValue/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
             <span> Nom :  @Node.Nom </span><br />
             <span>Parent : @TestParent()</span><br /> @*Pour ne pas avoir de champ vide*@
             <span> Desc : @Node.Description</span><br />
@@ -44,19 +44,22 @@
         @if(Nodes.Count > 1){
             @if (Nodes.Where(c => c.NoeudParentId == Node.NoeudId).ToList().Count == 0 || Node.NoeudId == Node.NoeudParentId)
             {
-                <foreignObject x="@(-Node.Rayon )" y="@(-Node.Rayon )" width="20" height="20">
-                    <span id="deleteNoeud" title="Supprimer le noeud @Node.Status" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"></span>
+                <foreignObject x="@(-sizeValue/2 -20)" y="@(-sizeValue)" width="20" height="20">
+                    <span id="deleteNoeud" title="Supprimer le noeud @Node.Status" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"
+              style="display: block; text-anchor: middle; dominant-baseline: middle; text-align: center;">
+                    </span>
                 </foreignObject>
+
             }
         }
         
         @if (Node.NoeudParentId == null || Node.NoeudId == Node.NoeudParentId)
         {
-            <foreignObject x="@((-Node.Rayon) )" y="@((Node.Rayon)/2 )" width="20" height="20">
+            <foreignObject x="@(-sizeValue)" y="@(sizeValue/2)" width="20" height="20">
                 <span class="oi oi-link-broken" id="reLink" @onclick="(e => ReLinkNoeud(Node))"></span>
             </foreignObject>
         }
-        <foreignObject x="@(Node.Rayon/2 )" y="@(Node.Rayon/2 )" width="20" height="20">
+        <foreignObject x="@(sizeValue -20)" y="@(sizeValue/2)" width="20" height="20">
             @if (!isOpen)
             {
                 <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-plus" aria-hidden="true" @onclick="@NouveauNoeud"></span>
@@ -66,8 +69,8 @@
                 <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-minus" aria-hidden="true" @onclick="@FermeForm"></span>
             }
         </foreignObject>
-        <rect x="@(Node.Rayon/2 + 20)" y="@(Node.Rayon/2 + 20)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="fill: rgba(0, 0, 0, 0.8); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
-        <foreignObject x="@(Node.Rayon/2 +20 )" y="@(Node.Rayon/2 +20)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="padding:5px">
+        <rect x="@(sizeValue)" y="@(sizeValue)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="fill: rgba(0, 0, 0, 0.8); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
+        <foreignObject x="@(Node.Rayon )" y="@(Node.Rayon)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="padding:5px">
             <EditForm Model="nouveauNoeud" OnSubmit="AjoutNoeud" visibility="@displayNouveauNoeud" class="formLogin">
                 <div class="form-group">
                     <label for="nomNoeud"><h5>Nom du noeud :</h5></label>
@@ -109,10 +112,10 @@
             <circle r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
             @if (Node.Type == NoeudType.CONTENU)
             {
-                <foreignObject x="@((-Node.Rayon) )" y="@((Node.Rayon)/2 )" width="20" height="20">
+                <foreignObject x="@((-sizeValue) )" y="@((sizeValue)/2 )" width="20" height="20">
                     <span title="Aller vers l'édition" class="oi oi-book" id="reLink" @onclick="DirectionPages"></span>
                 </foreignObject>
-                <foreignObject x="@(Node.Rayon/2 )" y="@(Node.Rayon/2 )" width="20" height="20">
+                <foreignObject x="@(sizeValue -20)" y="@(sizeValue/2)" width="20" height="20">
                 <span title="Ajouter une nouvelle page à @Node.Nom" id="addNoeud" class="oi oi-plus" aria-hidden="true" @onclick="@(args => AjoutPage(Node.NoeudId))"></span>
                 </foreignObject>
             }
@@ -200,6 +203,7 @@
     private bool isOpen = false;
     private bool pageLink = false;
     private int newPageId;
+    private int sizeValue;
 
     //Variable couleurs
     private readonly string COULEUR_BLOQUER = "rgb(140,140,140)";
@@ -211,6 +215,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Vers le haut
+        sizeValue = (int)Math.Ceiling(Node.Rayon);
+        if (sizeValue % 2 != 0)
+        {
+            sizeValue++;
+        }
         Couleur = COULEUR_BLOQUER;
 
         if (Node.Status == 1)
