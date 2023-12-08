@@ -38,7 +38,7 @@
                         <RadzenDatePicker class="custom-creategroup-subtitle" Style="width: 100%;" Name="DateCloture" @bind-Value="groupe.DateCloture" />
                     </div>
                     <div class="form-group mt-2">
-                        <RadzenLabel class="custom-creategroup-subtitle">Groupe associé</RadzenLabel>
+                        <RadzenLabel class="custom-creategroup-subtitle">Cours associé</RadzenLabel>
                         <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="groupe.CoursId" AllowClear="true" Placeholder="Sélectionnez un cours" Data="@listCours" Style="width: 100%;" TextProperty="Code" ValueProperty="CoursId" Name="Code"></RadzenDropDown>
                     </div>
                     <div class="form-group mt-2">
@@ -48,12 +48,9 @@
                     <div class="form-group mt-2">
                         <RadzenButton class="custom-creategroup-title custom-creategroup-savebutton" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
                         <RadzenButton class="custom-creategroup-title" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
-                    </div>
-                    
+                    </div>                    
                 </div>
-
             </RadzenStack>
-
         </RadzenStack>
     </RadzenCard>
 </EditForm>
