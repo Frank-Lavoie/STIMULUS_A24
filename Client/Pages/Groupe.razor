@@ -16,7 +16,9 @@
 @page "/Groupe"
 
 <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
     <RadzenButton Click=SupprimerGroupe Text="Supprimer le groupe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
+    </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
         <RadzenImage Path="@imageActif" Style="width: 50px; height: 50px; border-radius: 50%;" />
         <RadzenStack Gap="2">
@@ -30,7 +32,7 @@
         </RadzenStack>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
-        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Graphe(s) associé(s) : </RadzenText>
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@((listGrapheGroupe.Any() ? "Graphe(s) associé(s): " : "Aucun graphe pour ce groupe"))</RadzenText>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="3">
         @foreach (var graphe in listGrapheGroupe)
@@ -38,9 +40,13 @@
             <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;background-color: #14274E;" />
         }
     </RadzenStack>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="3">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Style="margin-top:10px;" Gap="2">
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Mettre à jour la liste d'étudiant</RadzenText>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Style="margin-top:10px;" Gap="3">
             <RadzenDropDown class="custom-gestion-subtitle" @bind-Value=@selectedStudents Data=@listEtudiant TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Ajouter des étudiants" Chips="true" Style="width: 100%; max-width: 400px;">
-            </RadzenDropDown>     
+            </RadzenDropDown>
+        <RadzenButton Click=UpdateEtudiant Icon="refresh" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
     </RadzenStack>
     <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
     <RadzenRow RowGap="2" Class="justify-content-center">
@@ -55,6 +61,12 @@
             </RadzenDataGrid>
         }
     </RadzenRow>
+        @if (listEtudiantAjoute.Count() == 0)
+        {
+          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">   
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Ce groupe ne contient aucun étudiant.</RadzenText>
+          </RadzenStack>
+        }
 </RadzenCard>
 
 @code {
@@ -159,20 +171,31 @@
         }
     }
 
-    private async void AjoutEtudiant()
+    private async void UpdateEtudiant()
     {
-        foreach (var etudiantId in selectedStudents)
+        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+        try
         {
-            groupe_etudiant.GroupeId = await sessionStorage.GetItemAsync<int>("idGroupe");
-            groupe_etudiant.CodeDA = etudiantId; // Utilisez l'identifiant de l'étudiant
+            foreach (var etudiantDelete in eleve.Data)
+            {
+                await GroupeEtudiantService.Delete(etudiantDelete.Groupe_EtudiantId);
+            }
+            listEtudiantAjoute.Clear();
+            StateHasChanged();
 
-            var etudiantAjoute = await GroupeEtudiantService.Create(groupe_etudiant);
-            var etudiant = await EtudiantService.Get(etudiantAjoute.Data.CodeDA);
+            foreach (var etudiantId in selectedStudents)
+            {
+                groupe_etudiant.GroupeId = await sessionStorage.GetItemAsync<int>("idGroupe");
+                groupe_etudiant.CodeDA = etudiantId; // Utilisez l'identifiant de l'étudiant
 
-            listEtudiant.Add(etudiant.Data);
+                var etudiantAjoute = await GroupeEtudiantService.Create(groupe_etudiant);
+                var etudiant = await EtudiantService.Get(etudiantAjoute.Data.CodeDA);
+
+                listEtudiantAjoute.Add(etudiant.Data);
+            }
             StateHasChanged();
         }
-
+        catch { }
     }
 
     private async void RedirectionGraphe(int id)
