@@ -1,31 +1,50 @@
-﻿@page "/teacher-dashboard"
-
-@using Radzen.Blazor.Rendering
+﻿@using Radzen.Blazor.Rendering
 @using STIMULUS_V2.Client.Shared.TheoryComponent
 @using STIMULUS_V2.Shared.Interface.ChildInterface
 @using STIMULUS_V2.Shared.Models.Entities
 @using System.Globalization
-@inject IPageEtudiantService PageEtudiantService
+@inject IGroupeService GroupeService
+@inject IEtudiantService EtudiantService
+@inject ICoursService CoursService
+@inject IGroupeEtudiantService GroupeEtudiantService
+@inject IPageEtudiantService DashBoardService
+
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
+<!-- Section de l'interface utilisateur -->
 <div class="teacher-info-container">
     <div class="container text-center">
         <p class="lead">Vous êtes un Professeur</p>
+
+        <!-- Dropdown pour sélectionner le groupe -->
+        <div class="mb-3 custom-dropdown">
+            <label for="ddlGroupes" class="form-label">Sélectionnez un groupe :</label>
+            <select class="form-select" id="ddlGroupes" @onchange="OnGroupeSelectionChange">
+                @foreach (var groupe in groupeProf)
+                {
+                    <option value="@groupe.GroupeId">@groupe.Nom</option>
+                }
+            </select>
+        </div>
     </div>
 </div>
 
+<!-- Section principale du tableau de bord -->
 <div class="box-display">
     <RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
-    <div class="row">
-        <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
-            <RadzenCard class="w-100 mb-4">
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                <RadzenLabel Text="Smooth" For="smooth" Class="rz-mr-6" />
-            </RadzenCard>
-        </div>
 
+    <!-- Carte de configuration avec des options -->
+    <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+        <RadzenCard class="w-100 mb-4">
+            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+            <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+            <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+            <RadzenLabel Text="Smooth" For="smooth" Class="rz-mr-6" />
+        </RadzenCard>
+    </div>
+
+    <!-- Deux graphiques représentant les données -->
+    <div class="row">
         <div class="col-sm-11 col-lg-5 my-5">
             <RadzenChart>
                 <RadzenPieSeries Data="@progression" Title="Student" CategoryProperty="Student" ValueProperty="Progression">
@@ -43,6 +62,8 @@
         </div>
     </div>
 </div>
+
+<!-- Style pour le tableau de bord -->
 <style>
     .box-display {
         text-align: center;
@@ -53,11 +74,28 @@
         margin-left: 10px;
         margin-right: 10px;
     }
+
+    .custom-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+        .custom-dropdown select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            width: 100%;
+        }
 </style>
 
 @code {
     bool showDataLabels = false;
     bool smooth = true;
+    int selectedGroupeId = 1;
+    public List<Etudiant> listEtudiant { get; set; } = new List<Etudiant>();
+    public List<Groupe> groupeProf { get; set; } = new List<Groupe>();
 
     class DataItem
     {
@@ -67,32 +105,66 @@
 
     DataItem[] progression;
 
+    string errorMessage = string.Empty;
+
     async Task UpdateProgression()
     {
-        int groupeId = 1;
-        string codeDa = "Q1";
-        string professeurIdentifiant = await sessionStorage.GetItemAsync<string>("idProf"); ;
-
-        foreach (var item in progression)
+        try
         {
-            var response = await PageEtudiantService.CalculerPourcentage(groupeId, codeDa, professeurIdentifiant);
+            // Récupérer l'identifiant du professeur depuis le stockage de session
+            string professeurIdentifiant = await sessionStorage.GetItemAsync<string>("idConnexion");
 
-            if (response.StatusCode >= 200 && response.StatusCode <= 299)
+            // Récupérer la liste des groupes pour le professeur
+            var groupe = await GroupeService.GetAllForTeacher(professeurIdentifiant);
+            groupeProf = groupe.Data.ToList();
+
+            // Récupérer la liste des étudiants pour le groupe sélectionné
+            var eleveResponse = await GroupeEtudiantService.GetAllStudentForGroup(selectedGroupeId);
+            var etudiants = eleveResponse.Data;
+
+            // Initialiser la liste des données
+            List<DataItem> dataItems = new List<DataItem>();
+
+            // Parcourir chaque étudiant et récupérer la progression
+            foreach (var etudiant in etudiants)
             {
-                item.Progression = response.Data;
-                Console.WriteLine(item);
+                try
+                {
+                    // Appeler le service pour calculer la progression
+                    var response = await DashBoardService.CalculerPourcentage(selectedGroupeId, etudiant.CodeDA, professeurIdentifiant);
+                    dataItems.Add(new DataItem { Student = etudiant.CodeDA, Progression = response.Data });
+                }
+                catch (Exception ex)
+                {
+                    // Gérer l'exception, par exemple, imprimer le message d'erreur
+                    Console.WriteLine($"Erreur lors du calcul pour {etudiant.CodeDA}: {ex.Message}");
+                }
             }
-            else
-            {
-                // Handle error, e.g., log or display a message
-                Console.WriteLine($"Error updating progression for {item.Student}: {response.Message}");
-            }
+
+            // Affecter les données à la variable de progression
+            progression = dataItems.ToArray();
+
+            // Forcer la mise à jour du composant
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            // Gérer l'exception, par exemple, imprimer le message d'erreur
+            Console.WriteLine($"Erreur lors de la mise à jour de la progression : {ex.Message}");
         }
     }
 
-    // Call the UpdateProgression method when the component is initialized
+    async Task OnGroupeSelectionChange(ChangeEventArgs e)
+    {
+        // Mettre à jour le groupe sélectionné
+        selectedGroupeId = Convert.ToInt32(e.Value.ToString());
+        await UpdateProgression();
+    }
+
+    // Méthode d'initialisation du composant
     protected override async Task OnInitializedAsync()
     {
+        // Appeler la méthode de mise à jour au chargement du composant
         await UpdateProgression();
     }
 }
