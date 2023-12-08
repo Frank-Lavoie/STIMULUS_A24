@@ -160,7 +160,7 @@ namespace STIMULUS_V2.Server.Services
         {
             try
             {
-                var itemList = await sTIMULUSContext.Groupe.Where(item => item.GroupeId == id).ToListAsync();
+                var itemList = await sTIMULUSContext.Groupe.Where(item => item.CoursId == id).ToListAsync();
 
                 if (itemList != null)
                 {

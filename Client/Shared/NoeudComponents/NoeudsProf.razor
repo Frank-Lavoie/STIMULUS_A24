@@ -349,22 +349,29 @@
     }
     private async Task GetDataNoeudEtudiant()
     {
-
-        var etudiantData = await NoeudEtudiantService.GetByNoeudAndDa(Node.NoeudId, await sessionStorage.GetItemAsync<string>("daEtudiant"));
-
-        if (etudiantData != null)
+        try
         {
-            noeudEtudiant = etudiantData.Data;
-            UpdateChildrenColors();
+            var etudiantData = await NoeudEtudiantService.GetByNoeudAndDa(Node.NoeudId, await sessionStorage.GetItemAsync<string>("daEtudiant"));
+
+            if (etudiantData != null)
+            {
+                noeudEtudiant = etudiantData.Data;
+                UpdateChildrenColors();
+            }
+            else
+                UpdateChildrenColors();
         }
-        else
-            UpdateChildrenColors();
+        catch { }
     }
 
     private async void ReRenderDataNoeudEtudiant()
     {
-        await GetDataNoeudEtudiant();
-        StateHasChanged();
+        try
+        {
+            await GetDataNoeudEtudiant();
+            StateHasChanged();
+        }
+        catch { }
     }
     private async void ViewPageTemplate()
     {

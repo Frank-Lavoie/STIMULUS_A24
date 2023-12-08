@@ -83,6 +83,7 @@ namespace STIMULUS_V2.Server.Data
             }
         }
 
+       
         public DbSet<Code> Code { get; set; }
         public DbSet<Composant> Composant { get; set; }
         public DbSet<Cours> Cours { get; set; }

@@ -1,4 +1,5 @@
-﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
 
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -7,19 +8,23 @@
 @inject ICoursService CoursService
 @inject NavigationManager NavigationManager
 @inject IGrapheService GrapheService
+@inject RerenderService Rerender
 @inject IGroupeEtudiantService GroupeEtudiantService
+@inject Radzen.DialogService DialogService
 @inject AppState State;
 
 @page "/Groupe"
 
 <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
+    <RadzenButton Click=SupprimerGroupe Text="Supprimer le groupe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
-        <RadzenImage Path="@imageActif" Style="width: 100px; height: 100px; border-radius: 50%;" />
+        <RadzenImage Path="@imageActif" Style="width: 50px; height: 50px; border-radius: 50%;" />
         <RadzenStack Gap="2">
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Nom</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeProf != null) ? groupeProf.Nom : "")</b></RadzenText>
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Status</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@siActif</b></RadzenText>
+            <RadzenText TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Cours associé</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
         </RadzenStack>
@@ -30,22 +35,27 @@
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="3">
         @foreach (var graphe in listGrapheGroupe)
         {
-            <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;" />
+            <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;background-color: #14274E;" />
         }
     </RadzenStack>
     <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
     <RadzenRow RowGap="2" Class="justify-content-center">
-        <RadzenDataGrid TItem="Etudiant" Data="@listEtudiant" EmptyText="Aucun élève dans ce groupe." AllowPaging="true" AllowSorting="true" Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
-            <Columns>
-                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Identifiant" Title="Code DA" />
-                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Prenom" Title="Prénom" />
-                <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Nom" Title="Nom" />
-            </Columns>
-        </RadzenDataGrid>
+        @if(listEtudiant.Any())
+        {
+            <RadzenDataGrid TItem="Etudiant" Data="@listEtudiant" EmptyText="Aucun élève dans ce groupe." Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
+                <Columns>
+                    <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Identifiant" Title="Code DA" />
+                    <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Prenom" Title="Prénom" />
+                    <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Nom" Title="Nom" />
+                </Columns>
+            </RadzenDataGrid>
+        }
     </RadzenRow>
 </RadzenCard>
 
 @code {
+    [Parameter]
+    public EventCallback OnGroupeDelete { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
@@ -53,12 +63,12 @@
     public DateTime dateDuJour = DateTime.Now.Date;
     public string imageActif;
     public string siActif;
+    public string dateAffichee;
 
     protected override async Task OnInitializedAsync()
     {
         await GetDataGroupe();
     }  
-
     private async Task GetDataGroupe()
     {
         var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
@@ -74,6 +84,9 @@
             imageActif = "/RessourceVisuel/groupeinactif.jpg";
             siActif = "Inactif";
         }
+
+        var dateCloture = (groupeProf != null) ? groupeProf.DateCloture : DateTime.MinValue;
+        dateAffichee = dateCloture.ToString("yyyy-MM-dd");
 
         var cours = await CoursService.Get((int)groupeProf.CoursId);
         groupeCours = cours.Data;
@@ -103,6 +116,31 @@
             }
         }
         StateHasChanged();
+    }
+    private async void SupprimerGroupe()
+    {
+        var responseGroupeEtudiant = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+        var responseGraphe = await GrapheService.GetAllFromGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer ce groupe ? Il contient : "+ responseGroupeEtudiant.Data.Count() +" étudiant(s) et " +responseGraphe.Data.Count()+ " graphe(s)", "Supprimer");
+
+        if (result.HasValue && result.Value)
+        {
+            foreach (var etudiantGroupeDelete in responseGroupeEtudiant.Data)
+            {
+                await GroupeEtudiantService.Delete(etudiantGroupeDelete.Groupe_EtudiantId);
+
+                foreach(var grapheGroupe in responseGraphe.Data)
+                {
+                    await GrapheService.Delete(grapheGroupe.GrapheId);
+                }
+            }
+
+            await GroupeService.Delete(await sessionStorage.GetItemAsync<int>("idGroupe"));
+            await OnGroupeDelete.InvokeAsync();
+            Rerender.TriggerGroupeDelete();
+            NavigationManager.NavigateTo("/");
+        }
     }
 
     private async void RedirectionGraphe(int id)
