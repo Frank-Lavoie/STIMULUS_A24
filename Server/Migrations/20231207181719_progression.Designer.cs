@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using STIMULUS_V2.Server.Data;
 
@@ -11,9 +12,10 @@ using STIMULUS_V2.Server.Data;
 namespace STIMULUS_V2.Server.Migrations
 {
     [DbContext(typeof(STIMULUSContext))]
-    partial class STIMULUSContextModelSnapshot : ModelSnapshot
+    [Migration("20231207181719_progression")]
+    partial class progression
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,7 +409,7 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Property<int?>("NoeudId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Noeud_EtudiantId");

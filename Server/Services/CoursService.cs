@@ -133,7 +133,7 @@ namespace STIMULUS_V2.Server.Services
                 return new APIResponse<IEnumerable<Cours>>(null, 500, $"Erreur lors de la récupération du model par son parent {typeof(Cours).Name}. Message : {ex.Message}.");
             }
         }
-
+       
         public async Task<APIResponse<Cours>> Update(int id, Cours item)
         {
             try

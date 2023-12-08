@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 namespace STIMULUS_V2.Shared.Models.Authentication
 {
     public class InscriptionVerification
-    {        
-        [Required]
+    {
+        [Required(ErrorMessage = "Veuillez entrer un nom")]
         public string Nom { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Veuillez entrer un prénom")]
         public string Prenom { get; set; }
 
-        [Required, DataType(DataType.EmailAddress), EmailAddress]
+        [Required(ErrorMessage = "Veuillez entrer une adresse courriel"), DataType(DataType.EmailAddress), EmailAddress]
         public string? Email { get; set; }
 
-        [Required, DataType(DataType.Password)]
+        [Required(ErrorMessage = "Veuillez entrer un mot de passe"), DataType(DataType.Password) ]
         public string? Password { get; set; }
 
-        [Required, Compare("Password"), DataType(DataType.Password)]
+        [Required(ErrorMessage = "Veuillez confirmer un mot de passe"), Compare("Password"), DataType(DataType.Password)]
         public string? ConfirmPassword { get; set; }
     }
 }

@@ -10,10 +10,14 @@
 
 @inject INoeudService NoeudService
 @inject IGrapheService GrapheService
+@inject IGroupeService GroupeService
 @inject IPageService PageService
 @inject IComposantService ComposantService
+@inject IGroupeEtudiantService GroupeEtudiantService
+@inject INoeudEtudiantService NoeudEtudiantService
 @inject MouseService mouseSrv
 @inject IUpdateService updateService
+@inject IEtudiantService EtudiantService
 @inject NavigationManager NavigationManager
 @inject AppState State;
 @inject IJSRuntime JSRuntim
@@ -24,44 +28,67 @@
 <div class="row mt-2">
     <foreignObject class="custom-graphe-foreignobject-bg" x="5" y="5" width="150" height="50">
         <RadzenStack class="divGrapheEntete" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-            <RadzenButton Style="background-color: darkblue" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
-            <RadzenButton Style="background-color: darkblue" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
-            <RadzenButton Style="background-color: darkblue" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
-            <RadzenText class="custom-graphe-zoom-text" TextStyle="TextStyle.DisplayH3">Zoom: @AfficheZoom()</RadzenText>
-            <RadzenButton Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="@modeDeVuButtonEdition" />
-            <RadzenButton Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="@modeDeVuButtonPage" />
-            <RadzenButton Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="@modeDeVuButtonEtudiant" />
-            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto;" />
+            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
+            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
+            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
+            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="@modeDeVuButtonEdition" />
+            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="@modeDeVuButtonPage" />
+            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="@modeDeVuButtonEtudiant" />
+            @if(modeDeVue == 3)
+            {
+                @if (listEtudiant.Any())
+                {
+                    <RadzenText class="custom-grapheprof-selectuser-title">Sélectionner un étudiant :</RadzenText>
+                        <RadzenDropDown @bind-Value="@etudiant" AllowFiltering="true" Data="@listEtudiant" Style="width: 100%; max-width: 170px;" Name="DropDownBindValue" Change="OnValueChanged" />
+                }
+            }
+            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto; background-color: #14274E;" />
         </RadzenStack>
     </foreignObject>
     <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
-        @*<rect width="180" height="180" x="0" y="5" fill="#32587a"></rect>*@
-        <foreignObject class="bg-transparent" x="0" y="5" width="160" height="205">
+        <foreignObject class="bg-transparent" x="0" y="5" width="160" height="520">
             <RadzenPanel class="custom-graphe-legend-panel">
                 <RadzenStack class="custom-graphe-legend-stack" Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-                    <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>
+                    <RadzenLabel class="custom-graphe-legend-title" style="color:black;text-decoration: underline;">Légende</RadzenLabel>
                     <div class="custom-graphe-legend-color-position">
                         <div style="display: flex; align-items: center; justify-content: center;">
-                            <RadzenLabel>Bloqué</RadzenLabel>
-                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/140-140-140.png"></RadzenImage>
+                            <RadzenLabel class="custom-graphe-legend-subtitle">Ajouter</RadzenLabel>
+                            <span id="addNoeud" class="oi oi-plus" aria-hidden="true" style="margin-left:4px"></span>
                         </div>
                     </div>
                     <div class="custom-graphe-legend-color-position">
                         <div style="display: flex; align-items: center; justify-content: center;">
-                            <RadzenLabel>Disponible</RadzenLabel>
-                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/228-231-245.png"></RadzenImage>
+                            <RadzenLabel class="custom-graphe-legend-subtitle">Supprimer</RadzenLabel>
+                            <span id="deleteNoeud" class="oi oi-circle-x" aria-hidden="true" style="margin-left:10px"></span>
                         </div>
                     </div>
                     <div class="custom-graphe-legend-color-position">
                         <div style="display: flex; align-items: center; justify-content: center;">
-                            <RadzenLabel>Consulté</RadzenLabel>
-                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/199-160-53.png"></RadzenImage>
+                            <RadzenLabel class="custom-graphe-legend-subtitle">Bloquer</RadzenLabel>
+                            <span id="LockAndUnlocked" class="oi oi-lock-locked" aria-hidden="true" style="margin-left:10px"></span>
                         </div>
                     </div>
                     <div class="custom-graphe-legend-color-position">
                         <div style="display: flex; align-items: center; justify-content: center;">
-                            <RadzenLabel>Complété</RadzenLabel>
-                            <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/88-150-105.png"></RadzenImage>
+                            <RadzenLabel class="custom-graphe-legend-subtitle">Débloquer</RadzenLabel>
+                            <span id="LockAndUnlocked" class="oi oi-lock-unlocked" aria-hidden="true" style="margin-left:10px"></span>
+                        </div>
+                    </div>
+                    <div class="custom-graphe-legend-color-position">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <RadzenLabel class="custom-graphe-legend-subtitle">Définir parent</RadzenLabel>
+                            <span class="oi oi-link-broken" id="reLink" style="margin-left:10px"></span>
+                        </div>
+                    </div>
+                    <div class="custom-graphe-legend-color-position">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <RadzenLabel class="custom-graphe-legend-subtitle">Édition des pages</RadzenLabel>
+                            <span class="oi oi-book" id="reLink" style="margin-left:10px"></span>
+                        </div>
+                    </div>
+                    <div class="custom-graphe-legend-color-position">
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <RadzenLabel class="custom-graphe-legend-subtitle">Zoom: @AfficheZoom()</RadzenLabel>
                         </div>
                     </div>
                 </RadzenStack>
@@ -82,7 +109,7 @@
                         AjoutNouveauNoeud="AjoutNouveauNoeud" 
                         SupprNoeud="SupprimerNoeud"
                         ReLinkBindPage="ReLinkBindPage"
-                        ReLinkPage="ReLinkPage"/>
+                        ReLinkPage="ReLinkPage" />
                 }
             </Draggable>
         </svg>
@@ -92,6 +119,8 @@
 @code {
     [Parameter]
     public EventCallback OnGrapheDelete { get; set; }
+    [Parameter]
+    public EventCallback OnEtudiantChanged { get; set; }
     private string displayHover = "hidden";
     private double viewBoxX = 0;
     private double viewBoxY = 0;
@@ -99,6 +128,7 @@
     private double viewBoxHeight = 2000;
     private double zoomIncrement = 100;
     private Noeud enfantRechercheParent = new();
+    private string modelNoeud = "CONTENU";
     private bool enRecherche = false;
     private Page pageRechercheNoeud = new();
     private bool enRecherchePage = new();
@@ -108,14 +138,48 @@
     private ButtonStyle modeDeVuButtonPage = ButtonStyle.Primary;
     private ButtonStyle modeDeVuButtonEtudiant = ButtonStyle.Primary;
 
+    private List<string> listEtudiant { get; set; } = new();
     private Noeud nouveauNoeud = new();
+    private string etudiant { get; set; }
+    private Noeud_Etudiant noeudEtudiant = new();
     public List<Noeud> Nodes { get; set; } = new();
 
     protected async override void OnInitialized()
     {
+        StateHasChanged();   
         await UpdateGraphe();
+        await GetDataGroupe();
+    }
+    private async Task GetDataGroupe()
+    {
+        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+        var etudiants = eleve.Data;
+
+        foreach (var etudiant in etudiants)
+        {
+            var responseEtudiant = await EtudiantService.Get(etudiant.CodeDA);
+            var etudiantGroupe = responseEtudiant.Data;
+
+            // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
+            if (etudiantGroupe != null)
+            {
+                listEtudiant.Add(etudiantGroupe.Identifiant);
+            }
+        }
+        etudiant = listEtudiant.FirstOrDefault();
+        await sessionStorage.SetItemAsync<string>("daEtudiant", etudiant);
+        await OnEtudiantChanged.InvokeAsync();
+        Rerender.TriggerEtudiantChanged();
     }
 
+    private async Task OnValueChanged(object value)
+    {
+        // Mettre à jour la valeur de l'étudiant dans le stockage de session
+        await sessionStorage.SetItemAsync<string>("daEtudiant", etudiant);
+
+        await OnEtudiantChanged.InvokeAsync();
+        Rerender.TriggerEtudiantChanged();
+    }
     /// <summary>
     /// Permet de set le mode de vu. 1 => Page, 2 => Edit, 3 => Etudiant
     /// </summary>
@@ -139,6 +203,7 @@
             modeDeVuButtonPage = ButtonStyle.Primary;
             modeDeVuButtonEdition = ButtonStyle.Primary;
             modeDeVuButtonEtudiant = ButtonStyle.Warning;
+
         }
         modeDeVue = v;
         Console.WriteLine($"Mode de vu : {v}");
@@ -156,7 +221,7 @@
     /// </summary>
     /// <returns></returns>
     private int GetModeFond() => 2; 
-      
+
     //Quand la souris survole
     private void OnMouseHover() => displayHover = "show";
 
@@ -251,6 +316,10 @@
         {
             int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
 
+            var groupeGraphe = await GrapheService.Get(idGraphe);
+            var groupe = groupeGraphe.Data;
+            await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
+
             // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
             while (idGraphe == 0)
             {
@@ -271,7 +340,7 @@
     /// </summary>
     private async void AjoutNouveauNoeud(Noeud nouveauNoeud)
     {
-        await SaveNouveauNoeud(nouveauNoeud);
+        await SaveNouveauNoeud(nouveauNoeud);       
         await UpdateGraphe();
     }
 
@@ -289,14 +358,14 @@
             var allPage = await PageService.GetAllFromNoeud(id);
             var pages = allPage.Data;
 
-            if (pages != null)
+            if (pages.Count() != 0)
             {
                 foreach (var pageDelete in pages)
                 {
                     var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
                     var composant = allComposant.Data;
 
-                    if (composant != null)
+                    if (composant.Count() != 0)
                     {
                         foreach (var composantDelete in composant)
                         {
@@ -305,15 +374,24 @@
                     }
                     await PageService.Delete(pageDelete.PageId);
                 }
+            }
 
-                await NoeudService.Delete(id);
+            var noeud = await NoeudEtudiantService.GetAllById(id);
+            var etudiantNoeudDelete = noeud.Data;
 
+            foreach (var etudiantNoeud in etudiantNoeudDelete)
+            {
+                await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
             }
 
             // Supprimer le graphe
-            await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
+            await NoeudService.Delete(id);
+
+            // Attendre la fin des opérations asynchrones avant de mettre à jour l'interface utilisateur
             var allNodesFromGraph = await NoeudService.GetAllFromGraph(await sessionStorage.GetItemAsync<int>("idGraphe"));
             Nodes = allNodesFromGraph.Data.ToList();
+
+            // Mettre à jour l'interface utilisateur
             StateHasChanged();
         }
         else
@@ -336,7 +414,10 @@
     {
         if (noeud != null)
         {
-            await NoeudService.Create(noeud);
+            var newNoeud = await NoeudService.Create(noeud).ConfigureAwait(false);
+            var createNoeud = newNoeud.Data;
+            var nouveauNoeud = await NoeudService.Get(createNoeud.NoeudId).ConfigureAwait(false);
+            var newNode = nouveauNoeud.Data;
             Console.WriteLine($"Nouveau noeud : {noeud.Nom}");
         }
     }
@@ -372,11 +453,23 @@
                         }
                         await PageService.Delete(pageDelete.PageId);
                     }
-                    await NoeudService.Delete(noeudDelete.NoeudId);
                 }
                 foreach (var noeudDeleteParent in noeuds)
                 {
-                    await NoeudService.Delete(noeudDeleteParent.NoeudId);
+                    var noeud = await NoeudEtudiantService.GetAllById(noeudDeleteParent.NoeudId);
+                    var etudiantNoeudDelete = noeud.Data;
+
+                    foreach (var etudiantNoeud in etudiantNoeudDelete)
+                    {
+                        await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
+                    }
+
+                }
+
+                foreach (var nodeDelete in noeuds)
+                {
+                    await NoeudService.Delete(nodeDelete.NoeudId);
+
                 }
             }
             // Supprimer le graphe

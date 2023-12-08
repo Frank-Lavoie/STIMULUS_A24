@@ -92,6 +92,27 @@ namespace STIMULUS_V2.Server.Services
             }
         }
 
+        public async Task<APIResponse<Graphe>> GetGroupe(int id)
+        {
+            try
+            {
+                var item = await sTIMULUSContext.Graphe.Where(item => item.GroupeId == id).FirstOrDefaultAsync();
+
+                if (item != null)
+                {
+                    return new APIResponse<Graphe>(item, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<Graphe>(null, 404, $"{typeof(Graphe).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<Graphe>(null, 500, $"Erreur lors de la récupération du model {typeof(Graphe).Name}. Message : {ex.Message}.");
+            }
+        }
+
         public async Task<APIResponse<IEnumerable<Graphe>>> GetAll()
         {
             try

@@ -1,4 +1,5 @@
-﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
 
 @inject AuthenticationStateProvider authStateProvider
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
@@ -58,7 +59,6 @@
     {    
         await CoursService.Create(cours);
         NavigationManager.NavigateTo("/");
-        ReRender();
     }
 
     void Cancel()
@@ -66,8 +66,4 @@
         NavigationManager.NavigateTo("/");
     }
 
-    private void ReRender()
-    {
-        StateHasChanged();
-    }
 }

@@ -28,8 +28,4 @@
     <None Include="Shared\HomeComponent\HomeTeacherComponent.razor" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\RessourceVisuel\Legende\" />
-  </ItemGroup>
-
 </Project>

@@ -12,7 +12,7 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public int CodeId { get; set; }
 
         [Column(TypeName = "nvarchar(max)")]
-        public string Contenue { get; set; }
+        public string Contenu { get; set; }
 
         [Column(TypeName = "nvarchar(20)")]
         public string? Titre { get; set; }

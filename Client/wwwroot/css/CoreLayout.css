@@ -1,6 +1,15 @@
 ﻿/*Cette section concerne l'ensemble du header*/
 .custom-header-background {
-    background-color: darkblue; 
+    background-color: #394867;
+}
+
+#logo-container-header {
+    width: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: #394867;
 }
 
 .custom-header-radzen-breadcrumb {
@@ -13,9 +22,25 @@
     border: none;
 }
 
+.custom-header-title{
+    font-family: Oswald;
+}
+
+.custom-header-cepi {
+    font-family: Oswald;
+    color: white;
+    font-size: x-large;
+    margin-right: 90%;
+    margin-top: 2%
+}
+
+.custom-header-subtitle{
+    font-family: Comfortaa;
+}
+
 /*Cette section concerne l'ensemble du footer*/
 .custom-footer-background {
-    background-color: darkblue;
+    background-color: #394867;
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -73,47 +98,120 @@
     font-size: 12px;
 }
 
-/*POUR LE LOGO ANNIMÉ*/
-#logo-container {
+/*Cette section concerne l'ensemble du logo animé*/
+#logo-container-loading {
     width: 150px;
-    height: 50px;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
+    position: relative;
+    color: #394867;
+    margin-left: 50%;
+    margin-top: 23%;
 }
 
 #animated-text {
-    /* ajustez la durée de l'animation */
-    animation: stroke 5s infinite alternate;
-    stroke-width: 2;
-    font-size: 20px;
+    font-family: Oswald;
+    font-size: xx-large;
+    fill: #394867;
+    stroke: #394867;
+    stroke-dashoffset: -25%;
+    stroke-dasharray: 50% 0;
+    stroke-width: 0;
+    font-weight: normal;
+}
+
+#logo-container-loading #animated-text {
+    animation: stroke 2s infinite alternate;
 }
 
 @keyframes stroke {
     0% {
-        fill: white;
-        stroke: darkblue;
         stroke-dashoffset: 25%;
         stroke-dasharray: 0 50%;
         stroke-width: 2;
+        font-weight: bold; 
     }
 
     70% {
-        fill: white;
-        stroke: darkblue;
+        stroke: #394867;
     }
 
     80% {
-        fill: white;
-        stroke: darkblue;
         stroke-width: 3;
     }
 
     100% {
-        fill: white;
-        stroke: darkblue;
         stroke-dashoffset: -25%;
         stroke-dasharray: 50% 0;
         stroke-width: 0;
+        font-weight: normal; 
+    }
+}
+
+/*Cette section concerne l'ensemble du MenuSideBar*/
+.custom-menusidebar-title{
+    font-family: Oswald;
+    font-size: larger;
+}
+
+.custom-menusidebar-subtilte{
+    font-family: Comfortaa;
+    font-size: small;
+}
+
+/*Cette section concerne l'ensemble de Login*/
+.custom-login-background {
+    display: flex;
+    justify-content:center; 
+    padding-top:7%;
+    background: linear-gradient(360deg, hsla(215, 33%, 23%, 1) 5%, hsla(206, 31%, 90%, 1) 100%);
+}
+
+#logo-container-loadinginloading {
+    width: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: #394867;
+}
+
+#animated-text {
+    font-family: Oswald;
+    font-size: 20px;
+    fill: #394867;
+    stroke: #394867;
+    stroke-dashoffset: -25%;
+    stroke-dasharray: 50% 0;
+    stroke-width: 0;
+    font-weight: normal;
+}
+
+#logo-container-loadinginloading #animated-text {
+    animation: stroke 2s infinite alternate;
+}
+
+@keyframes stroke {
+    0% {
+        stroke-dashoffset: 25%;
+        stroke-dasharray: 0 50%;
+        stroke-width: 2;
+        font-weight: bold;
+    }
+
+    70% {
+        stroke: #394867;
+    }
+
+    80% {
+        stroke-width: 3;
+    }
+
+    100% {
+        stroke-dashoffset: -25%;
+        stroke-dasharray: 50% 0;
+        stroke-width: 0;
+        font-weight: normal; 
     }
 }
