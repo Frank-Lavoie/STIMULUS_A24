@@ -14,6 +14,7 @@
 @inject ICoursService CoursService
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject AppState State;
+@inject Radzen.DialogService DialogService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject RerenderService Rerender
 
@@ -21,7 +22,7 @@
     <RadzenPanelMenu DisplayStyle="@(sidebarExpanded ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon)" ShowArrow="@sidebarExpanded">
         <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Accueil" Icon="home" Path="/" />
         <AuthorizeView Roles="ETUDIANT">
-            @foreach (var cours in ListeCours)
+            @foreach (var cours in ListeCoursEtudiant)
             {
                 @foreach (var graphe in ListeGraphesEtudiant)
                 {
@@ -30,22 +31,26 @@
             }
         </AuthorizeView>
         <AuthorizeView Roles="PROFESSEUR">
-            <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de Graphe" Icon="workspaces">
+            <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de graphe" Icon="workspaces">
                 @foreach (var graphe in ListeGraphesProf)
                 {
                     <RadzenPanelMenuItem Icon="workspaces_outline" class="custom-menusidebar-subtilte" Text="@graphe.Nom" Click="(() => ChargerGraphe(graphe.GrapheId))"></RadzenPanelMenuItem>
                 }
-                <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau Graphe" Icon="add" Path="/CreerGraphe" />
+                <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau graphe" Icon="add" Path="/CreerGraphe" />
             </RadzenPanelMenuItem>
-            <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de Groupe" Icon="groups">
+            <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de groupe" Icon="groups">
                 @foreach (var groupe in groupesProf)
                 {
                     <RadzenPanelMenuItem Icon="group" class="custom-menusidebar-subtilte" Text="@groupe.Nom" Click="(() => ChargerGroupe(groupe.GroupeId))"></RadzenPanelMenuItem>
                 }
-                <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau Groupe" Icon="group_add" Path="/CreerGroupe" />
+                <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau groupe" Icon="group_add" Path="/CreerGroupe" />
             </RadzenPanelMenuItem>
-            <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de Cours" Icon="school">
-                <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau Cours" Icon="add" Path="/CreerCours" />
+            <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de cours" Icon="school">
+                @foreach (var cours in ListeCoursProf)
+                {
+                    <RadzenPanelMenuItem Icon="event" class="custom-menusidebar-subtilte" Text="@cours.Code" Click=@(args => DialogService.Alert("Description du cours : "+ cours.Description, @cours.Code, new AlertOptions() { OkButtonText = "Ok" }))></RadzenPanelMenuItem>
+                }
+                <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau cours" Icon="add" Path="/CreerCours" />
             </RadzenPanelMenuItem>
         </AuthorizeView>
         <AuthorizeView Roles="ADMIN">
@@ -60,7 +65,8 @@
     public bool sidebarExpanded { get; set; } = false;
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> ListeGraphesProf { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> ListeGraphesEtudiant { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
-    public List<STIMULUS_V2.Shared.Models.Entities.Cours> ListeCours { get; set; } = new List<Cours>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Cours> ListeCoursEtudiant { get; set; } = new List<Cours>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Cours> ListeCoursProf { get; set; } = new List<Cours>();
     public List<STIMULUS_V2.Shared.Models.Entities.Groupe> groupesProf { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Groupe>();
 
     protected async override void OnInitialized()
@@ -79,25 +85,40 @@
         var isEtudiant = user.IsInRole("ETUDIANT");
         groupesProf.Clear();
         ListeGraphesProf.Clear();
+        ListeCoursProf.Clear();
+        ListeCoursEtudiant.Clear();
 
         if (isProfesseur)
         {
             if (await sessionStorage.GetItemAsync<string>("idConnexion") != null)
             {
-                var responseGroupeActif = await GroupeService.GetAllGroupActif(await sessionStorage.GetItemAsync<string>("idConnexion"));
-                var groupesActif = responseGroupeActif.Data;
+                var responseGroupe = await GroupeService.GetAllForTeacher(await sessionStorage.GetItemAsync<string>("idConnexion"));
+                var groupes = responseGroupe.Data;
 
-                groupesProf.AddRange(groupesActif);
+                groupesProf.AddRange(groupes);
 
-                foreach (var graphe in groupesActif)
+                foreach (var graphe in groupes)
                 {
                     var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
                     var graphesDuGroupe = responseGraphe.Data;
 
                     ListeGraphesProf.AddRange(graphesDuGroupe);
                 }
-                StateHasChanged();
+                HashSet<int> uniqueCoursIds = new HashSet<int>(); //Permet d'afficher un cours une seul fois même si il est lié à plusieurs groupes
+                foreach (var cours in groupes)
+                {
+                    var responseCours = await CoursService.Get((int)cours.CoursId);
+
+                    // Check if the course ID is not already in the HashSet
+                    if (uniqueCoursIds.Add(responseCours.Data.CoursId))
+                    {
+                        // If not present, add the course to the list
+                        ListeCoursProf.Add(responseCours.Data);
+                    }
+                }
             }
+            else
+                await SideBarData();
         }
 
         if (isEtudiant)
@@ -120,10 +141,12 @@
                     var responseCours = await CoursService.GetAllById((int)cours.GroupeId);
                     var nomDesCours = responseCours.Data;
 
-                    ListeCours.AddRange(nomDesCours);
+                    ListeCoursEtudiant.AddRange(nomDesCours);
                 }
                 StateHasChanged();
             }
+            else
+                await SideBarData();
         }
     }
     private async void HandleUpdateSideBar()

@@ -42,7 +42,7 @@
                         <RadzenDropDown @bind-Value="@etudiant" AllowFiltering="true" Data="@listEtudiant" Style="width: 100%; max-width: 170px;" Name="DropDownBindValue" Change="OnValueChanged" />
                 }
             }
-            <RadzenButton Style="background-color: #14274E; margin-left: auto;" class="custom-graphe-viewmodebutton-title" Click=SupprimerGraphe Text="Supprimer le graphe" ButtonStyle="ButtonStyle.Danger" />         
+            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto; background-color: #14274E;" />
         </RadzenStack>
     </foreignObject>
     <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
@@ -453,7 +453,6 @@
                         }
                         await PageService.Delete(pageDelete.PageId);
                     }
-                    await NoeudService.Delete(noeudDelete.NoeudId);
                 }
                 foreach (var noeudDeleteParent in noeuds)
                 {
@@ -465,7 +464,12 @@
                         await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
                     }
 
-                    await NoeudService.Delete(noeudDeleteParent.NoeudId);
+                }
+
+                foreach (var nodeDelete in noeuds)
+                {
+                    await NoeudService.Delete(nodeDelete.NoeudId);
+
                 }
             }
             // Supprimer le graphe
