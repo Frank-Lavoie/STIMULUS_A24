@@ -10,6 +10,8 @@
 @inject INoeudService NoeudService
 @inject ILocalStorageService localStorageService
 @inject IGroupeService GroupeService
+@inject IPageService PageService
+@inject IComposantService ComposantService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject AuthenticationStateProvider authStateProvider
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
@@ -161,7 +163,7 @@
             else
             {
                 var graphecopier = await NoeudService.GetAllFromGraph(grapheCopie.GrapheId);
-                var correspondanceIds = new Dictionary<int, int>();
+                var correspondanceNoeudParent = new Dictionary<int, int>();
 
 
                 foreach(var noeud in graphecopier.Data)
@@ -178,14 +180,45 @@
                             Rayon = noeud.Rayon,
                             Type = noeud.Type,
                             GrapheId = newgraphe.GrapheId,
-                            NoeudParentId = noeud.NoeudParentId.HasValue ? correspondanceIds[noeud.NoeudParentId.Value] : (int?)null
+                            NoeudParentId = noeud.NoeudParentId.HasValue && correspondanceNoeudParent.ContainsKey(noeud.NoeudParentId.Value) ? correspondanceNoeudParent[noeud.NoeudParentId.Value] : (int?)null
                     };
 
-                   var nouveauNoeud =  await NoeudService.Create(noeudCopier);
+                    var nouveauNoeud =  await NoeudService.Create(noeudCopier);
 
-                    correspondanceIds.Add(noeud.NoeudId, (int)nouveauNoeud.Data.NoeudId);
+                    correspondanceNoeudParent.Add(noeud.NoeudId, (int)nouveauNoeud.Data.NoeudId);
+
+                    var pagenoeud = await PageService.GetAllFromNoeud(noeud.NoeudId);
+
+                    foreach(var page in pagenoeud.Data)
+                    {
+                        var pageCopier = new Page
+                        {
+                                Ordre = page.Ordre,
+                                NoeudId = nouveauNoeud.Data.NoeudId,
+                                ImportanceId = 1 //TEMPORAIRE
+                        };
+                        var nouvellePage = await PageService.Create(pageCopier);
+
+
+                        var composantpage = await ComposantService.GetAllById(page.PageId);
+
+
+                        foreach(var composant in composantpage.Data)
+                        {
+                            var composantCopier = new Composant
+                            {
+                                    Ordre = composant.Ordre,
+                                    Reference = composant.Reference,
+                                    Type = composant.Type,
+                                    PageId = nouvellePage.Data.PageId
+                            };
+
+                            var nouveauComposant = await ComposantService.Create(composantCopier);
+                        }
+
+                    }
+
                 }
-
 
                 var etudiant = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
                 var etudiants = etudiant.Data;
