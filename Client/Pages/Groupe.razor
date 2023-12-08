@@ -8,6 +8,8 @@
 @inject ICoursService CoursService
 @inject NavigationManager NavigationManager
 @inject IGrapheService GrapheService
+@inject INoeudService NoeudService
+@inject INoeudEtudiantService NoeudEtudiantService
 @inject RerenderService Rerender
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject Radzen.DialogService DialogService
@@ -26,7 +28,10 @@
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeProf != null) ? groupeProf.Nom : "")</b></RadzenText>
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Status</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@siActif</b></RadzenText>
-            <RadzenText TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
+            @if(siActif == "Actif" )
+            {
+                <RadzenText TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
+            }
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Cours associé</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
         </RadzenStack>
@@ -74,6 +79,7 @@
     public EventCallback OnGroupeDelete { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
+    public STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant noeud_etudiant { get; set; }
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
     public STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant groupe_etudiant = new();
     public List<Etudiant> listEtudiant { get; set; } = new List<Etudiant>();
@@ -174,11 +180,23 @@
     private async void UpdateEtudiant()
     {
         var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+
         try
         {
             foreach (var etudiantDelete in eleve.Data)
             {
                 await GroupeEtudiantService.Delete(etudiantDelete.Groupe_EtudiantId);
+
+                foreach (var graphe in listGrapheGroupe)
+                {
+                    var allNoeud = await NoeudService.GetAllFromGraph(graphe.GrapheId);
+
+                    foreach (var noeud in allNoeud.Data)
+                    {
+                        var noeud_etudiantDelete = await NoeudEtudiantService.GetByNoeudAndDa(noeud.NoeudId, etudiantDelete.CodeDA);
+                        await NoeudEtudiantService.Delete(noeud_etudiantDelete.Data.Noeud_EtudiantId);
+                    }
+                }
             }
             listEtudiantAjoute.Clear();
             StateHasChanged();
@@ -190,6 +208,24 @@
 
                 var etudiantAjoute = await GroupeEtudiantService.Create(groupe_etudiant);
                 var etudiant = await EtudiantService.Get(etudiantAjoute.Data.CodeDA);
+
+                foreach(var graphe in listGrapheGroupe)
+                {
+                    var allNoeud = await NoeudService.GetAllFromGraph(graphe.GrapheId);
+
+                    foreach(var noeud in allNoeud.Data)
+                    {
+                        var newNoeudEtudiant =  new Noeud_Etudiant
+                        {
+                            CodeDA = etudiantId,
+                            NoeudId = noeud.NoeudId,
+                            Status = noeud.Status
+                        };
+
+                        await NoeudEtudiantService.Create(newNoeudEtudiant);
+                    }
+                }
+
 
                 listEtudiantAjoute.Add(etudiant.Data);
             }
