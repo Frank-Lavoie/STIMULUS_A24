@@ -35,8 +35,8 @@
     }
     @if (GetModeDeVue() == 2)
     {
-        <rect x="@(sizeValue*2- sizeValue/2 -10)" y="@(-180 + sizeValue/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
-        <foreignObject x="@(sizeValue*2- Node.Rayon/2 -10)" y="@(-180 + sizeValue/2)" visibility="@displayHover" width="200" height="150" style="padding:5px">
+        <rect x="@((int)Math.Ceiling((double)(sizeValue*2- sizeValue/2 -10)))" y="@((int)Math.Ceiling((double)(-180 + sizeValue/2)))" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
+        <foreignObject x="@((int)Math.Ceiling((double)sizeValue*2- Node.Rayon/2 -10))" y="@((int)Math.Ceiling((double)(-180 + sizeValue/2)))" visibility="@displayHover" width="200" height="150" style="padding:5px">
             <span> Nom :  @Node.Nom </span><br />
             <span>Parent : @TestParent()</span><br /> @*Pour ne pas avoir de champ vide*@
             <span> Desc : @Node.Description</span><br />
@@ -49,7 +49,7 @@
             @if (Nodes.Where(c => c.NoeudParentId == Node.NoeudId).ToList().Count == 0 || Node.NoeudId == Node.NoeudParentId)
             {
                 <foreignObject x="@(-sizeValue/2 -20)" y="@(-sizeValue)" width="20" height="20">
-                    <span id="deleteNoeud" title="Supprimer le noeud @Node.Status" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"
+                    <span id="deleteNoeud" title="Supprimer le noeud @Node.Nom" class="oi oi-circle-x" aria-hidden="true" @onclick="@SupprimerNoeud"
               style="display: block; text-anchor: middle; dominant-baseline: middle; text-align: center;">
                     </span>
                 </foreignObject>
@@ -92,40 +92,44 @@
                 <span title="Ajouter un nouveau noeud a @Node.Nom" id="addNoeud" class="oi oi-minus" aria-hidden="true" @onclick="@FermeForm"></span>
             }
         </foreignObject>
-        <rect x="@(sizeValue)" y="@(sizeValue)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="fill: rgba(0, 0, 0, 0.8); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
-        <foreignObject x="@(Node.Rayon )" y="@(Node.Rayon)" visibility="@displayNouveauNoeud" width="@formSizeW" height="@formSizeH" style="padding:5px">
-            <EditForm Model="nouveauNoeud" OnSubmit="AjoutNoeud" visibility="@displayNouveauNoeud" class="formLogin">
-                <div class="form-group">
-                    <label for="nomNoeud"><h5>Nom du noeud :</h5></label>
-                    <InputText type="text" class="form-control" id="nomNoeud" @bind-Value="nouveauNoeud.Nom" />
-                </div>
-                <div class="form-group">
-                    <label for="description"><h5>Description :</h5></label>
-                    <InputTextArea type="text" class="form-control" id="description" @bind-Value="nouveauNoeud.Description" />
-                </div>
-                <div class="form-group">
-                    <label for="rayon"><h5>Rayon :</h5></label>
-                    <InputNumber type="number" class="form-control" id="rayon" min="40" max="80" placeholder="40-80" @bind-Value="nouveauNoeud.Rayon" />
-                </div>
-                <div class="form-group">
-                    <label for="status"><h5>Status :</h5></label>
-                    <select class="form-control" id="status" @bind="nouveauNoeud.Status">
-                        <option value="1" selected="@(nouveauNoeud.Status == 1)">Bloqué</option>
-                        <option value="2" selected="@(nouveauNoeud.Status == 2)">Débloqué</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="modelNoeud"><h5>Modèle de Noeud :</h5></label>
-                    <select class="form-control" id="modelNoeud" @bind="modelNoeud">
-                        <option value="CONTENU">Noeud Contenu</option>
-                        <option value="STRUCTURE">Noeud Structure</option>
-                    </select>
-                </div>
-                <div class="form-group" style="text-align: center;">
-                    <button style="margin-top: 10px" type="submit" class="btn btn-primary btn-lg w-100">Ajouter</button>
-                </div>
-            </EditForm>
-        </foreignObject>
+        @if (isOpen)
+        {
+            <rect x="@(sizeValue)" y="@(sizeValue)" width="250" height="445" style="fill: rgba(0, 0, 0, 0.8); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
+            <foreignObject x="@(Node.Rayon )" y="@(Node.Rayon)" width="250" height="445" style="padding:5px">
+                <EditForm Model="nouveauNoeud" OnSubmit="AjoutNoeud" class="formLogin">
+                    <div class="form-group">
+                        <label for="nomNoeud"><h5>Nom du noeud :</h5></label>
+                        <InputText type="text" class="form-control" id="nomNoeud" @bind-Value="nouveauNoeud.Nom" />
+                    </div>
+                    <div class="form-group">
+                        <label for="description"><h5>Description :</h5></label>
+                        <InputTextArea type="text" class="form-control" id="description" @bind-Value="nouveauNoeud.Description" />
+                    </div>
+                    <div class="form-group">
+                        <label for="rayon"><h5>Rayon :</h5></label>
+                        <InputNumber type="number" class="form-control" id="rayon" min="40" max="80" placeholder="40-80" @bind-Value="nouveauNoeud.Rayon" />
+                    </div>
+                    <div class="form-group">
+                        <label for="status"><h5>Status :</h5></label>
+                        <select class="form-control" id="status" @bind="nouveauNoeud.Status">
+                            <option value="1" selected="@(nouveauNoeud.Status == 1)">Bloqué</option>
+                            <option value="2" selected="@(nouveauNoeud.Status == 2)">Débloqué</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelNoeud"><h5>Modèle de Noeud :</h5></label>
+                        <select class="form-control" id="modelNoeud" @bind="modelNoeud">
+                            <option value="CONTENU">Noeud Contenu</option>
+                            <option value="STRUCTURE">Noeud Structure</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                        <button style="margin-top: 10px" type="submit" class="btn btn-primary btn-lg w-100">Ajouter</button>
+                    </div>
+                </EditForm>
+            </foreignObject>
+        }
+        
     }
     @if (GetModeDeVue() == 1)
     {
@@ -288,6 +292,7 @@
     //Delegate Land
     [Parameter] public Action<Noeud> AjoutNouveauNoeud { get; set; }
     [Parameter] public Action<int> SupprNoeud { get; set; }
+    [Parameter] public Action<int> NoeudValueFormOpen { get; set; }
     [Parameter] public Action<Noeud> SaveChangeNoeud { get; set; }
     [Parameter] public Action<Noeud> RelinkBindNode { get; set; }
     [Parameter] public Action<Noeud> ReLinkNoeud { get; set; }
@@ -305,9 +310,6 @@
     private Noeud nouveauNoeud = new();
     private Graphe graphe { get; set; }
     private Noeud_Etudiant noeudEtudiant = new();
-    private string displayNouveauNoeud = "hidden";
-    private int formSizeH = 0;
-    private int formSizeW = 0;
     private bool isOpen = false;
     private bool pageLink = false;
     private int newPageId;
@@ -326,13 +328,11 @@
         // Vers le haut
         sizeValue = (int)Math.Ceiling(Node.Rayon);
         if (sizeValue % 2 != 0)
-        {
             sizeValue++;
-        }
+
         Couleur = COULEUR_BLOQUER;
         var grapheActuel = await GrapheService.Get(await sessionStorage.GetItemAsync<int>("idGraphe"));
         graphe = grapheActuel.Data;
-
 
         Rerender.OnEtudiantChanged += ReRenderDataNoeudEtudiant;
 
@@ -415,9 +415,6 @@
     /// </summary>
     private async void AjoutNoeud()
     {
-        displayNouveauNoeud = "hidden";
-        formSizeW = 0;
-        formSizeH = 0;
         nouveauNoeud.GrapheId = await sessionStorage.GetItemAsync<int>("idGraphe");
         nouveauNoeud.PosX = Node.PosX;
         nouveauNoeud.PosY = Node.PosY + 180;
@@ -630,9 +627,6 @@
     private void NouveauNoeud()
     {
         //Base du nouveau noeud
-        formSizeW = 250;
-        formSizeH = 445;
-        displayNouveauNoeud = "visible";
         isOpen = true;
     }
 
@@ -641,9 +635,6 @@
     /// </summary>
     private void FermeForm()
     {
-        formSizeW = 0;
-        formSizeH = 0;
-        displayNouveauNoeud = "hidden";
         isOpen = false;
     }
 

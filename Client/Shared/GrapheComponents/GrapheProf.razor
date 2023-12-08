@@ -109,7 +109,7 @@
                         AjoutNouveauNoeud="AjoutNouveauNoeud" 
                         SupprNoeud="SupprimerNoeud"
                         ReLinkBindPage="ReLinkBindPage"
-                        ReLinkPage="ReLinkPage"/>
+                        ReLinkPage="ReLinkPage" />
                 }
             </Draggable>
         </svg>
@@ -128,6 +128,7 @@
     private double viewBoxHeight = 2000;
     private double zoomIncrement = 100;
     private Noeud enfantRechercheParent = new();
+    private string modelNoeud = "CONTENU";
     private bool enRecherche = false;
     private Page pageRechercheNoeud = new();
     private bool enRecherchePage = new();
@@ -149,7 +150,6 @@
         await UpdateGraphe();
         await GetDataGroupe();
     }
-
     private async Task GetDataGroupe()
     {
         var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
