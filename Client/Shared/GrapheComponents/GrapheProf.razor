@@ -467,13 +467,12 @@
                     {
                         await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
                     }
-
+                    
                 }
 
                 foreach (var nodeDelete in noeuds)
                 {
                     await NoeudService.Delete(nodeDelete.NoeudId);
-
                 }
             }
             // Supprimer le graphe
