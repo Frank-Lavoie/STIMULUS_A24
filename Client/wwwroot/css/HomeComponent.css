@@ -30,6 +30,7 @@
 
 .custom-homestudent-background {
     background-image: url('/RessourceVisuel/gradiant.png');
+    height: 64%;
 }
 
 .custom-homestudent-searchbar {
@@ -67,12 +68,10 @@
 .custom-homestudent-wave-effect-color {
     padding: 0;
     margin: 0;
-    height: 20%
 }
 
 .custom-homestudent-wave-effect-color .shape-fill {
     fill: #F1F6F9;
-    height: 30%;
 }
 
 .custom-homestudent-search-icon {

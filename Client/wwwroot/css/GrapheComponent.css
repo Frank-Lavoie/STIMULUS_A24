@@ -57,3 +57,13 @@
     margin-top: 1%;
     font-family: Comfortaa;
 }
+
+.custom-grapheprof-selectuser-title {
+    font-family: Oswald;
+    font-size: larger;
+}
+
+.custom-grapheprof-selecteduser-title {
+    font-family: Comfortaa;
+    font-size: large;
+}

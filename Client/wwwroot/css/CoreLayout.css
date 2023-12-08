@@ -112,7 +112,7 @@
 
 #animated-text {
     font-family: Oswald;
-    font-size: 20px;
+    font-size: xx-large;
     fill: #394867;
     stroke: #394867;
     stroke-dashoffset: -25%;
@@ -145,7 +145,7 @@
         stroke-dashoffset: -25%;
         stroke-dasharray: 50% 0;
         stroke-width: 0;
-        font-weight: normal; /* Revenir à la normale à la fin de l'animation */
+        font-weight: normal; 
     }
 }
 

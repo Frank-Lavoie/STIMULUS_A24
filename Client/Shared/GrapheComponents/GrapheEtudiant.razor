@@ -33,35 +33,40 @@
             <foreignObject class="bg-transparent" x="0" y="5" width="180" height="350">
                 <RadzenPanel class="custom-graphe-legend-panel">
                     <RadzenStack class="custom-graphe-legend-stack" Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-                        <RadzenLabel style="color:black;text-decoration: underline;">Légende</RadzenLabel>
+                        <RadzenLabel class="custom-graphe-legend-title" style="color:black;text-decoration: underline;">Légende</RadzenLabel>
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                <RadzenLabel>Bloqué</RadzenLabel>
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Bloqué</RadzenLabel>
                                 <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/140-140-140.png"></RadzenImage>
                             </div>
                         </div>
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                <RadzenLabel>Non consulté</RadzenLabel>
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Non consulté</RadzenLabel>
                                 <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/non_compléter.png"></RadzenImage>
                             </div>
                         </div>
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                <RadzenLabel>Consulté</RadzenLabel>
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Consulté</RadzenLabel>
                                 <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/199-160-53.png"></RadzenImage>
                             </div>
                         </div>
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                <RadzenLabel>Complété</RadzenLabel>
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Complété</RadzenLabel>
                                 <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/complété.png"></RadzenImage>
                             </div>
                         </div>
                         <div class="custom-graphe-legend-color-position">
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                <RadzenLabel>Catégorie de noeuds</RadzenLabel>
-                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/structure.png"></RadzenImage>
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Catégorie de noeuds</RadzenLabel>
+                                <RadzenImage class="custom-graphe-legend-color-size" Style="margin-right: 7%;" Path="/RessourceVisuel/Legende/structure.png"></RadzenImage>
+                            </div>
+                        </div>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Zoom: @AfficheZoom()</RadzenLabel>
                             </div>
                         </div>
                     </RadzenStack>
