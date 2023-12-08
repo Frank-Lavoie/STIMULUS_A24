@@ -18,52 +18,49 @@
 
 @page "/CreerGroupe"
 
+
+
+<div >
+    <RadzenLabel class="custom-creategroup-titletop"> Création de groupe</RadzenLabel>
+</div>
+
 <EditForm Model="groupe" OnSubmit="AjoutGroupe">
-    <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenStack>
-                <RadzenFieldset Text="Créer un nouveau Groupe">
-                    <RadzenStack Gap="1rem">
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenColumn Size="12" SizeMD="4">
-                                <RadzenLabel Text="Nom" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Style="width: 100%;" Name="Nom" @bind-Value="groupe.Nom" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenColumn Size="12" SizeMD="4">
-                                <RadzenLabel Text="Date de clôture" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenDatePicker Style="width: 100%;" Name="DateCloture" @bind-Value="groupe.DateCloture" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenColumn Size="12" SizeMD="4">
-                                <RadzenLabel Text="Cours associé" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenDropDown @bind-Value="groupe.CoursId" AllowClear="true" Placeholder="Sélectionnez un cours" Data="@listCours" Style="width: 100%;" TextProperty="Code" ValueProperty="CoursId" Name="Code"></RadzenDropDown>
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="4">
-                                <RadzenLabel Text="Liste des étudiants à ajouter" />
-                            </RadzenColumn>
-                            <RadzenColumn>
-                                <RadzenCheckBoxList @bind-Value="selectedStudents" Data="@listEtudiant" TextProperty="Identifiant" ValueProperty="Identifiant" Style="width: 100%;" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                    </RadzenStack>
-                </RadzenFieldset>
+    <RadzenCard class="rz-mx-auto" style="max-width: 50%;">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            <RadzenStack Gap="o">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Nom</RadzenLabel>
+                        <RadzenTextBox class="custom-creategroup-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="groupe.Nom" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Date de cloture</RadzenLabel>
+                        <RadzenDatePicker class="custom-creategroup-subtitle" Style="width: 100%;" Name="DateCloture" @bind-Value="groupe.DateCloture" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Groupe associé</RadzenLabel>
+                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="groupe.CoursId" AllowClear="true" Placeholder="Sélectionnez un cours" Data="@listCours" Style="width: 100%;" TextProperty="Code" ValueProperty="CoursId" Name="Code"></RadzenDropDown>
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Étudiant à ajouter</RadzenLabel>
+                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="selectedStudents" Data="@listEtudiant" TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Sélectionner les étudiants" Chips="true" Style="width: 100%; max-width: 400px;"></RadzenDropDown>
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenButton class="custom-creategroup-title custom-creategroup-savebutton" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+                        <RadzenButton class="custom-creategroup-title" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
+                    </div>
+                    
+                </div>
+
             </RadzenStack>
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
-        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
-        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
-    </RadzenStack>
+
+        </RadzenStack>
+    </RadzenCard>
 </EditForm>
+
+
+
+
 
 @code {
     [Parameter]
