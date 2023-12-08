@@ -38,11 +38,15 @@
             <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;background-color: #14274E;" />
         }
     </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="3">
+            <RadzenDropDown class="custom-gestion-subtitle" @bind-Value=@selectedStudents Data=@listEtudiant TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Ajouter des étudiants" Chips="true" Style="width: 100%; max-width: 400px;">
+            </RadzenDropDown>     
+    </RadzenStack>
     <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
     <RadzenRow RowGap="2" Class="justify-content-center">
-        @if(listEtudiant.Any())
+        @if(listEtudiantAjoute.Any())
         {
-            <RadzenDataGrid TItem="Etudiant" Data="@listEtudiant" EmptyText="Aucun élève dans ce groupe." Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
+            <RadzenDataGrid TItem="Etudiant" Data="@listEtudiantAjoute" EmptyText="Aucun élève dans ce groupe." Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
                 <Columns>
                     <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Identifiant" Title="Code DA" />
                     <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Prenom" Title="Prénom" />
@@ -59,7 +63,10 @@
     public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
-    public List<Etudiant> listEtudiant { get; set; }  = new List<Etudiant>();
+    public STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant groupe_etudiant = new();
+    public List<Etudiant> listEtudiant { get; set; } = new List<Etudiant>();
+    public List<Etudiant> listEtudiantAjoute { get; set; } = new List<Etudiant>();
+    List<string> selectedStudents = new List<string>();
     public DateTime dateDuJour = DateTime.Now.Date;
     public string imageActif;
     public string siActif;
@@ -71,6 +78,14 @@
     }  
     private async Task GetDataGroupe()
     {
+        try
+        {
+            var etudiant = await EtudiantService.GetAll();
+            var student = etudiant.Data;
+            listEtudiant.AddRange(student);
+        }
+        catch { }
+
         var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
         groupeProf = groupe.Data;
 
@@ -112,7 +127,8 @@
             // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
             if (etudiantGroupe != null)
             {
-                listEtudiant.Add(etudiantGroupe);
+                listEtudiantAjoute.Add(etudiantGroupe);
+                selectedStudents.Add(etudiantGroupe.Identifiant);
             }
         }
         StateHasChanged();
@@ -141,6 +157,22 @@
             Rerender.TriggerGroupeDelete();
             NavigationManager.NavigateTo("/");
         }
+    }
+
+    private async void AjoutEtudiant()
+    {
+        foreach (var etudiantId in selectedStudents)
+        {
+            groupe_etudiant.GroupeId = await sessionStorage.GetItemAsync<int>("idGroupe");
+            groupe_etudiant.CodeDA = etudiantId; // Utilisez l'identifiant de l'étudiant
+
+            var etudiantAjoute = await GroupeEtudiantService.Create(groupe_etudiant);
+            var etudiant = await EtudiantService.Get(etudiantAjoute.Data.CodeDA);
+
+            listEtudiant.Add(etudiant.Data);
+            StateHasChanged();
+        }
+
     }
 
     private async void RedirectionGraphe(int id)
