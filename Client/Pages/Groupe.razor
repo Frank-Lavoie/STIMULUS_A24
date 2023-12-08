@@ -8,6 +8,8 @@
 @inject ICoursService CoursService
 @inject NavigationManager NavigationManager
 @inject IGrapheService GrapheService
+@inject INoeudService NoeudService
+@inject INoeudEtudiantService NoeudEtudiantService
 @inject RerenderService Rerender
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject Radzen.DialogService DialogService
@@ -16,7 +18,9 @@
 @page "/Groupe"
 
 <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
     <RadzenButton Click=SupprimerGroupe Text="Supprimer le groupe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
+    </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
         <RadzenImage Path="@imageActif" Style="width: 50px; height: 50px; border-radius: 50%;" />
         <RadzenStack Gap="2">
@@ -24,13 +28,16 @@
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeProf != null) ? groupeProf.Nom : "")</b></RadzenText>
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Status</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@siActif</b></RadzenText>
-            <RadzenText TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
+            @if(siActif == "Actif" )
+            {
+                <RadzenText TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
+            }
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Cours associé</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
         </RadzenStack>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
-        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Graphe(s) associé(s) : </RadzenText>
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@((listGrapheGroupe.Any() ? "Graphe(s) associé(s): " : "Aucun graphe pour ce groupe"))</RadzenText>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="3">
         @foreach (var graphe in listGrapheGroupe)
@@ -38,11 +45,19 @@
             <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;background-color: #14274E;" />
         }
     </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Style="margin-top:10px;" Gap="2">
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Mettre à jour la liste d'étudiant</RadzenText>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Style="margin-top:10px;" Gap="3">
+            <RadzenDropDown class="custom-gestion-subtitle" @bind-Value=@selectedStudents Data=@listEtudiant TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Ajouter des étudiants" Chips="true" Style="width: 100%; max-width: 400px;">
+            </RadzenDropDown>
+        <RadzenButton Click=UpdateEtudiant Icon="refresh" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
+    </RadzenStack>
     <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
     <RadzenRow RowGap="2" Class="justify-content-center">
-        @if(listEtudiant.Any())
+        @if(listEtudiantAjoute.Any())
         {
-            <RadzenDataGrid TItem="Etudiant" Data="@listEtudiant" EmptyText="Aucun élève dans ce groupe." Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
+            <RadzenDataGrid TItem="Etudiant" Data="@listEtudiantAjoute" EmptyText="Aucun élève dans ce groupe." Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
                 <Columns>
                     <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Identifiant" Title="Code DA" />
                     <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Prenom" Title="Prénom" />
@@ -51,6 +66,12 @@
             </RadzenDataGrid>
         }
     </RadzenRow>
+        @if (listEtudiantAjoute.Count() == 0)
+        {
+          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">   
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Ce groupe ne contient aucun étudiant.</RadzenText>
+          </RadzenStack>
+        }
 </RadzenCard>
 
 @code {
@@ -58,8 +79,12 @@
     public EventCallback OnGroupeDelete { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
+    public STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant noeud_etudiant { get; set; }
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
-    public List<Etudiant> listEtudiant { get; set; }  = new List<Etudiant>();
+    public STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant groupe_etudiant = new();
+    public List<Etudiant> listEtudiant { get; set; } = new List<Etudiant>();
+    public List<Etudiant> listEtudiantAjoute { get; set; } = new List<Etudiant>();
+    List<string> selectedStudents = new List<string>();
     public DateTime dateDuJour = DateTime.Now.Date;
     public string imageActif;
     public string siActif;
@@ -71,6 +96,14 @@
     }  
     private async Task GetDataGroupe()
     {
+        try
+        {
+            var etudiant = await EtudiantService.GetAll();
+            var student = etudiant.Data;
+            listEtudiant.AddRange(student);
+        }
+        catch { }
+
         var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
         groupeProf = groupe.Data;
 
@@ -112,7 +145,8 @@
             // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
             if (etudiantGroupe != null)
             {
-                listEtudiant.Add(etudiantGroupe);
+                listEtudiantAjoute.Add(etudiantGroupe);
+                selectedStudents.Add(etudiantGroupe.Identifiant);
             }
         }
         StateHasChanged();
@@ -141,6 +175,63 @@
             Rerender.TriggerGroupeDelete();
             NavigationManager.NavigateTo("/");
         }
+    }
+
+    private async void UpdateEtudiant()
+    {
+        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+
+        try
+        {
+            foreach (var etudiantDelete in eleve.Data)
+            {
+                await GroupeEtudiantService.Delete(etudiantDelete.Groupe_EtudiantId);
+
+                foreach (var graphe in listGrapheGroupe)
+                {
+                    var allNoeud = await NoeudService.GetAllFromGraph(graphe.GrapheId);
+
+                    foreach (var noeud in allNoeud.Data)
+                    {
+                        var noeud_etudiantDelete = await NoeudEtudiantService.GetByNoeudAndDa(noeud.NoeudId, etudiantDelete.CodeDA);
+                        await NoeudEtudiantService.Delete(noeud_etudiantDelete.Data.Noeud_EtudiantId);
+                    }
+                }
+            }
+            listEtudiantAjoute.Clear();
+            StateHasChanged();
+
+            foreach (var etudiantId in selectedStudents)
+            {
+                groupe_etudiant.GroupeId = await sessionStorage.GetItemAsync<int>("idGroupe");
+                groupe_etudiant.CodeDA = etudiantId; // Utilisez l'identifiant de l'étudiant
+
+                var etudiantAjoute = await GroupeEtudiantService.Create(groupe_etudiant);
+                var etudiant = await EtudiantService.Get(etudiantAjoute.Data.CodeDA);
+
+                foreach(var graphe in listGrapheGroupe)
+                {
+                    var allNoeud = await NoeudService.GetAllFromGraph(graphe.GrapheId);
+
+                    foreach(var noeud in allNoeud.Data)
+                    {
+                        var newNoeudEtudiant =  new Noeud_Etudiant
+                        {
+                            CodeDA = etudiantId,
+                            NoeudId = noeud.NoeudId,
+                            Status = noeud.Status
+                        };
+
+                        await NoeudEtudiantService.Create(newNoeudEtudiant);
+                    }
+                }
+
+
+                listEtudiantAjoute.Add(etudiant.Data);
+            }
+            StateHasChanged();
+        }
+        catch { }
     }
 
     private async void RedirectionGraphe(int id)

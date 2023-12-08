@@ -489,6 +489,8 @@
         {
             Node.Status = 2;
             await NoeudService.Update(Node.NoeudId, Node);
+            await OnStatusUpdated.InvokeAsync();
+            Rerender.TriggerStatusNoeud();
         }
         else
         {
@@ -499,6 +501,8 @@
                 await NoeudService.Update(Node.NoeudId, Node);
             }
         }
+        await OnStatusUpdated.InvokeAsync();
+        Rerender.TriggerStatusNoeud();
     }
     private async Task LockAndUnlockedGraphe(Noeud noeud)
     {

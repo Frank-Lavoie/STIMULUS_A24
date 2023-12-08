@@ -118,6 +118,8 @@
 
 @code {
     [Parameter]
+    public EventCallback OnStatusUpdated { get; set; }
+    [Parameter]
     public EventCallback OnGrapheDelete { get; set; }
     [Parameter]
     public EventCallback OnEtudiantChanged { get; set; }
@@ -169,6 +171,8 @@
         etudiant = listEtudiant.FirstOrDefault();
         await sessionStorage.SetItemAsync<string>("daEtudiant", etudiant);
         await OnEtudiantChanged.InvokeAsync();
+        await OnStatusUpdated.InvokeAsync();
+        Rerender.TriggerStatusNoeud();
         Rerender.TriggerEtudiantChanged();
     }
 
