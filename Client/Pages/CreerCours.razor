@@ -16,37 +16,32 @@
 
 @page "/CreerCours"
 
+<div>
+    <RadzenLabel class="custom-gestion-titletop">Création de cours</RadzenLabel>
+</div>
+
 <EditForm Model="cours" OnSubmit="AjoutCours">
-    <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
-        <RadzenColumn Size="12" SizeMD="6">
-            <RadzenStack>
-                <RadzenFieldset Text="Créer un nouveau Cours">
-                    <RadzenStack Gap="1rem">
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenColumn Size="12" SizeMD="4">
-                                <RadzenLabel Text="Code du cours" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Style="width: 100%;" Name="Nom" @bind-Value="cours.Code" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenColumn Size="12" SizeMD="4">
-                                <RadzenLabel Text="Description" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Style="width: 100%;" Name="Nom" @bind-Value="cours.Description" />
-                            </RadzenColumn>
-                        </RadzenRow>                       
-                    </RadzenStack>
-                </RadzenFieldset>
+    <RadzenCard class="rz-mx-auto" style="max-width: 50%;">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            <RadzenStack Gap="o">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Nom</RadzenLabel>
+                        <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="cours.Code" />
+                    </div>                   
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Description</RadzenLabel>
+                        <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="cours.Description" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenButton class="custom-gestion-subtitle" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+                        <RadzenButton class="custom-gestion-subtitle" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
+                    </div>
+                </div>
             </RadzenStack>
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
-        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
-        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
-    </RadzenStack>
+
+        </RadzenStack>
+    </RadzenCard>
 </EditForm>
 
 @code {

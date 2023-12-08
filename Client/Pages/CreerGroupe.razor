@@ -21,7 +21,7 @@
 
 
 <div >
-    <RadzenLabel class="custom-creategroup-titletop"> Création de groupe</RadzenLabel>
+    <RadzenLabel class="custom-gestion-titletop"> Création de groupe</RadzenLabel>
 </div>
 
 <EditForm Model="groupe" OnSubmit="AjoutGroupe">
@@ -30,30 +30,27 @@
             <RadzenStack Gap="o">
                 <div class="card-body">
                     <div class="form-group mt-2">
-                        <RadzenLabel class="custom-creategroup-subtitle">Nom</RadzenLabel>
-                        <RadzenTextBox class="custom-creategroup-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="groupe.Nom" />
+                        <RadzenLabel class="custom-gestion-subtitle">Nom</RadzenLabel>
+                        <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="groupe.Nom" />
                     </div>
                     <div class="form-group mt-2">
-                        <RadzenLabel class="custom-creategroup-subtitle">Date de cloture</RadzenLabel>
-                        <RadzenDatePicker class="custom-creategroup-subtitle" Style="width: 100%;" Name="DateCloture" @bind-Value="groupe.DateCloture" />
+                        <RadzenLabel class="custom-gestion-subtitle">Date de cloture</RadzenLabel>
+                        <RadzenDatePicker class="custom-gestion-subtitle" Style="width: 100%;" Name="DateCloture" @bind-Value="groupe.DateCloture" />
                     </div>
                     <div class="form-group mt-2">
-                        <RadzenLabel class="custom-creategroup-subtitle">Groupe associé</RadzenLabel>
-                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="groupe.CoursId" AllowClear="true" Placeholder="Sélectionnez un cours" Data="@listCours" Style="width: 100%;" TextProperty="Code" ValueProperty="CoursId" Name="Code"></RadzenDropDown>
+                        <RadzenLabel class="custom-gestion-subtitle">Groupe associé</RadzenLabel>
+                        <RadzenDropDown class="custom-gestion-subtitle" @bind-Value="groupe.CoursId" AllowClear="true" Placeholder="Sélectionnez un cours" Data="@listCours" Style="width: 100%;" TextProperty="Code" ValueProperty="CoursId" Name="Code"></RadzenDropDown>
                     </div>
                     <div class="form-group mt-2">
-                        <RadzenLabel class="custom-creategroup-subtitle">Étudiant à ajouter</RadzenLabel>
-                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="selectedStudents" Data="@listEtudiant" TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Sélectionner les étudiants" Chips="true" Style="width: 100%; max-width: 400px;"></RadzenDropDown>
+                        <RadzenLabel class="custom-gestion-subtitle">Étudiant à ajouter</RadzenLabel>
+                        <RadzenDropDown class="custom-gestion-subtitle" @bind-Value="selectedStudents" Data="@listEtudiant" TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Sélectionner les étudiants" Chips="true" Style="width: 100%; max-width: 400px;"></RadzenDropDown>
                     </div>
                     <div class="form-group mt-2">
-                        <RadzenButton class="custom-creategroup-title custom-creategroup-savebutton" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
-                        <RadzenButton class="custom-creategroup-title" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
-                    </div>
-                    
+                        <RadzenButton class="custom-gestion-subtitle" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+                        <RadzenButton class="custom-gestion-subtitle" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
+                    </div>                    
                 </div>
-
             </RadzenStack>
-
         </RadzenStack>
     </RadzenCard>
 </EditForm>

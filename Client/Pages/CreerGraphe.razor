@@ -20,7 +20,7 @@
 
 @page "/CreerGraphe"
 
-<EditForm Model="graphe" OnSubmit="AjoutGraphe">
+@*<EditForm Model="graphe" OnSubmit="AjoutGraphe">
     <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack>
@@ -59,7 +59,43 @@
         <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
         <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
     </RadzenStack>
+</EditForm>*@
+
+<div>
+    <RadzenLabel class="custom-creategroup-titletop"> Création de graphe</RadzenLabel>
+</div>
+
+<EditForm Model="graphe" OnSubmit="AjoutGraphe">
+    <RadzenCard class="rz-mx-auto" style="max-width: 50%;">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            <RadzenStack Gap="o">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Nom</RadzenLabel>
+                        <RadzenTextBox class="custom-creategroup-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="graphe.Nom" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Status</RadzenLabel>
+                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="Status" Placeholder="ACTIVER" Data="status" Style="width: 100%;" Name="Status"></RadzenDropDown>
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Groupe associé</RadzenLabel>
+                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="graphe.GroupeId" AllowClear="true" Placeholder="Sélectionné un groupe" Data="@listGroupe" Style="width: 100%;" TextProperty="Nom" ValueProperty="GroupeId" Name="Nom"></RadzenDropDown>
+                    </div>                    
+                    <div class="form-group mt-2">
+                        <RadzenButton class="custom-creategroup-title custom-creategroup-savebutton" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+                        <RadzenButton class="custom-creategroup-title" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />                       
+                    </div>
+
+                </div>
+
+            </RadzenStack>
+
+        </RadzenStack>
+    </RadzenCard>
 </EditForm>
+
+
 
 @code {
     [Parameter]
