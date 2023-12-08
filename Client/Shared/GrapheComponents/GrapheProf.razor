@@ -31,9 +31,9 @@
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
-            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="@modeDeVuButtonEdition" />
-            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="@modeDeVuButtonPage" />
-            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="@modeDeVuButtonEtudiant" />
+            <RadzenButton Style="@modeDeVuButtonEdition" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="ButtonStyle.Warning" />
+            <RadzenButton Style="@modeDeVuButtonPage" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="ButtonStyle.Warning" />
+            <RadzenButton Style="@modeDeVuButtonEtudiant" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Warning" />
             @if(modeDeVue == 3)
             {
                 @if (listEtudiant.Any())
@@ -134,9 +134,9 @@
     private bool enRecherchePage = new();
     private bool upt = false;
     private int modeDeVue = 2;
-    private ButtonStyle modeDeVuButtonEdition = ButtonStyle.Warning;
-    private ButtonStyle modeDeVuButtonPage = ButtonStyle.Primary;
-    private ButtonStyle modeDeVuButtonEtudiant = ButtonStyle.Primary;
+    private string modeDeVuButtonEdition = "background-color: #24A7FF;";
+    private string modeDeVuButtonPage = "background-color: #14274E;";
+    private string modeDeVuButtonEtudiant = "background-color: #14274E;";
 
     private List<string> listEtudiant { get; set; } = new();
     private Noeud nouveauNoeud = new();
@@ -188,21 +188,21 @@
     {
         if (v == 1)
         {
-            modeDeVuButtonPage = ButtonStyle.Warning;
-            modeDeVuButtonEdition = ButtonStyle.Primary;
-            modeDeVuButtonEtudiant = ButtonStyle.Primary;
+            modeDeVuButtonPage = "background-color: #24A7FF;";
+            modeDeVuButtonEdition = "background-color: #14274E;"; ;
+            modeDeVuButtonEtudiant = "background-color: #14274E;";
         }
         else if (v == 2)
         {
-            modeDeVuButtonPage = ButtonStyle.Primary;
-            modeDeVuButtonEdition = ButtonStyle.Warning;
-            modeDeVuButtonEtudiant = ButtonStyle.Primary;
+            modeDeVuButtonPage = "background-color: #14274E;";
+            modeDeVuButtonEdition = "background-color: #24A7FF;";
+            modeDeVuButtonEtudiant = "background-color: #14274E;";
         }
         else
         {
-            modeDeVuButtonPage = ButtonStyle.Primary;
-            modeDeVuButtonEdition = ButtonStyle.Primary;
-            modeDeVuButtonEtudiant = ButtonStyle.Warning;
+            modeDeVuButtonPage = "background-color: #14274E;";
+            modeDeVuButtonEdition = "background-color: #14274E;";
+            modeDeVuButtonEtudiant = "background-color: #24A7FF;"; ;
 
         }
         modeDeVue = v;
