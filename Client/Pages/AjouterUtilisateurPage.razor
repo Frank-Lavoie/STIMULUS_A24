@@ -6,37 +6,47 @@
 
 @page "/AjouterUtilisateur"
 
+<div class="custom-adduser-title">
+    <RadzenLabel class="custom-adduser-title">Création de compte Stimulus</RadzenLabel>
+</div>
 <EditForm Model="RegisterModel" OnValidSubmit="HandleRegister">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="card">
-        <div class="card-header">Ajouter un utilisateur</div>
-        <div class="card-body">
-            <div class="form-group mt-2">
-                <label class="form-label"> Prenom</label>
-                <InputText class="form-control" @bind-Value="RegisterModel.Prenom"></InputText>
-            </div>
-            <div class="form-group mt-2">
-                <label class="form-label"> Nom</label>
-                <InputText class="form-control" @bind-Value="RegisterModel.Nom"></InputText>
-            </div>
-            <div class="form-group mt-2">
-                <label class="form-label"> Email Address</label>
-                <InputText class="form-control" @bind-Value="RegisterModel.Email"></InputText>
-            </div>
-            <div class="form-group mt-2">
-                <label class="form-label"> Password</label>
-                <InputText class="form-control" @bind-Value="RegisterModel.Password"></InputText>
-            </div>
-            <div class="form-group mt-2">
-                <label class="form-label">Confirm Password</label>
-                <InputText class="form-control" @bind-Value="RegisterModel.ConfirmPassword"></InputText>
-            </div>
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-primary float-end">Register</button>
-            </div>
-        </div>
-    </div>
+    <RadzenCard class="rz-mx-auto" Style="max-width: 50%;">
+        <DataAnnotationsValidator />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+            <RadzenStack Gap="0">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Prenom</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Prenom"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Prenom)" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Nom</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Nom"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Nom)" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Adresse courriel</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Email"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Email)" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Mot de passe</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Password"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Password)"  />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Confirmer le mot de passe</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.ConfirmPassword"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.ConfirmPassword)" />
+                    </div>
+                    <div class="form-group mt-3">
+                        <button type="submit" class="custom-adduser-btn-save custom-adduser-subtitle">Enregistrer</button>
+                    </div>
+                </div>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
 </EditForm>
 
 @code {

@@ -12,5 +12,7 @@ namespace STIMULUS_V2.Shared.Interface.ChildInterface
     public interface IGrapheService : IModelService<Graphe, int>
     {
         Task<APIResponse<IEnumerable<Graphe>>> GetAllFromGroup(int id);
+
+        Task<APIResponse<Graphe>> GetGroupe(int id);
     }
 }

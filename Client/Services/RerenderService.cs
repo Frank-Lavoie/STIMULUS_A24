@@ -6,6 +6,8 @@
         public event Action OnGrapheCreated;
         public event Action OnGroupeDelete;
         public event Action OnGrapheDelete;
+        public event Action OnNoeudStatus;
+        public event Action OnEtudiantChanged;
 
         public void TriggerGroupeCreated()
         {
@@ -22,6 +24,14 @@
         public void TriggerGroupeDelete()
         {
             OnGrapheDelete?.Invoke();
+        }
+        public void TriggerStatusNoeud()
+        {
+            OnNoeudStatus?.Invoke();
+        }
+        public void TriggerEtudiantChanged()
+        {
+            OnEtudiantChanged?.Invoke();
         }
     }
 }

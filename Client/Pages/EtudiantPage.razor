@@ -1,4 +1,5 @@
 ﻿@using Radzen.Blazor.Rendering;
+@using STIMULUS_V2.Client.Services;
 @using STIMULUS_V2.Client.Shared.TheoryComponent
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
@@ -14,75 +15,81 @@
 @inject ICodeService CodeService
 @inject IExerciceService ExerciceService
 @inject IReferenceService ReferenceService
+@inject INoeudEtudiantService NoeudEtudiantService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IJSRuntime JSRuntime
+@inject RerenderService Rerender
 @inject Radzen.DialogService DialogService
 
 @page "/Pages"
 
-<RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'; height: 3200px;">   ­
-    <RadzenSidebar>
-        <RadzenPanelMenu>
-            @foreach (var page in listePage.OrderBy(c => c.Ordre))
-            {
-                <RadzenPanelMenuItem Text="@((page.Ordre != null) ? "Page #" + page.Ordre : "")" Click="@(args => ChangePage(page.PageId))" Icon="book" />
-            }          
-        </RadzenPanelMenu>
-    </RadzenSidebar>
-    <RadzenBody>
-        <div style="text-align: center;">
-            <RadzenButton Text="Page Précédente" Click="@(args => PreviousPage())" />
-            <RadzenButton Text="Page Suivante" Click="@(args => NextPage())" />
-        </div>
-        <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1500px; margin : 30px">
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Page</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@((page.Ordre != null) ? "#" + page.Ordre : "")</b></RadzenText>
-            </RadzenStack>
-            <RadzenRow RowGap="2" Class="justify-content-center">
-                @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
-                {
-                    <div style="margin: 0 auto; width: 100%;max-width: 1200px; padding: 10px; text-align: center; box-sizing: content-box;">
+@if(listePage.Count == 0 || listePage == null)
+{
+    <p>Aucune page sur ce noeud pour le moment.   </p>
+    <button onclick="@(() => NavigationManager.NavigateTo("/Graphe"))">Revenir au graphe</button>
+}
+else
+{
+    <RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'; height: 3200px;">
+        
+        <RadzenBody>
+            <div style="text-align: center;">
+                <RadzenButton Text="Page Précédente" Click="@(args => PreviousPage())" />
+                <RadzenButton Text="Page Suivante" Click="@(args => NextPage())" />
+            </div>
+            <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1500px; margin : 30px">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Page</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@((page.Ordre != null) ? "#" + page.Ordre + " / " + listePage.Count :"")</b></RadzenText>
+                </RadzenStack>
+                <RadzenRow RowGap="2" Class="justify-content-center">
+                    @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
+                    {
+                        <div style="margin: 0 auto; width: 100%;max-width: 1200px; padding: 10px; text-align: center; box-sizing: content-box;">
 
-                        <!-- Conteneur du composant spécifique -->
-                        <div style="text-align: center;">
-                            @if (composant.Type == "Code")
-                            {
-                                <CodeComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Exercice")
-                            {
-                                <ExerciceComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Image")
-                            {
-                                <ImageComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Reference")
-                            {
-                                <ReferenceComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Texte")
-                            {
-                                <TextComponent Reference="composant.Reference" />
-                            }
-                            @if (composant.Type == "Video")
-                            {
-                                <VideoComponent Reference="composant.Reference" />
-                            }
+                            <!-- Conteneur du composant spécifique -->
+                            <div style="text-align: center;">
+                                @if (composant.Type == "Code")
+                                {
+                                    <CodeComponent Reference="composant.Reference" />
+                                }
+                                @if (composant.Type == "Exercice")
+                                {
+                                    <ExerciceComponent Reference="composant.Reference" />
+                                }
+                                @if (composant.Type == "Image")
+                                {
+                                    <ImageComponent Reference="composant.Reference" />
+                                }
+                                @if (composant.Type == "Reference")
+                                {
+                                    <ReferenceComponent Reference="composant.Reference" />
+                                }
+                                @if (composant.Type == "Texte")
+                                {
+                                    <TextComponent Reference="composant.Reference" />
+                                }
+                                @if (composant.Type == "Video")
+                                {
+                                    <VideoComponent Reference="composant.Reference" />
+                                }
+                            </div>
                         </div>
-                    </div>
-                }
-            </RadzenRow>
-        </RadzenCard>
-    </RadzenBody>
-</RadzenLayout>
+                    }
+                </RadzenRow>
+            </RadzenCard>
+        </RadzenBody>
+    </RadzenLayout>
+}
 
 @code {
+    [Parameter]
+    public EventCallback OnStatusUpdated { get; set; }
     bool sidebar1Expanded = true;
     Popup popup;
     RadzenButton button;
     private List<Composant> listComposant { get; set; } = new List<Composant>();
+    private List<int> pagesVisitees { get; set; } = new List<int>();
     public List<Page> listePage { get; set; } = new List<Page>();
     private Page page { get; set; } = new();
     private Page newPage { get; set; } = new();
@@ -134,35 +141,38 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
-        var composants = allComposant.Data;
+        if (await sessionStorage.GetItemAsync<int>("idPage") != null)
+        {
+            try
+            {
+                var allComposant = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
+                var composants = allComposant.Data;
 
-        listComposant.AddRange(composants);
+                listComposant.AddRange(composants);
 
-        var pageActuelle = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
-        page = pageActuelle.Data;
+                var pageActuelle = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
+                page = pageActuelle.Data;
 
-        var noeudActuelle = await NoeudService.Get(await sessionStorage.GetItemAsync<int>("idNoeud"));
-        noeud = noeudActuelle.Data;
+                var noeudActuelle = await NoeudService.Get(await sessionStorage.GetItemAsync<int>("idNoeud"));
+                noeud = noeudActuelle.Data;
 
-        var pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
-        var affichPage = pageNoeud.Data;
+                var pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
+                var affichPage = pageNoeud.Data;
 
-        listePage.AddRange(affichPage);
+                listePage.AddRange(affichPage);
+
+                if (pagesVisitees.Count() == pageNoeud.Data.Count())
+                {
+                    await CheckProgressionPage();
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+
+            }
+        }
+
     }
-
-    private async Task ChangePage(int id)
-    {
-        await sessionStorage.SetItemAsync<int>("idPage", id);
-        var obj = await PageService.Get(id);
-        page = obj.Data;
-        listComposant.Clear();
-        StateHasChanged();
-        var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
-        listComposant = composantsRefresh.Data.ToList();
-        StateHasChanged();
-    }  
-    
     private async void NextPage()
     {
         var currentPageId = await sessionStorage.GetItemAsync<int>("idPage");
@@ -181,10 +191,18 @@
             {
                 // Mettre à jour la session avec l'id de la page suivante
                 await sessionStorage.SetItemAsync<int>("idPage", nextPage.PageId);
+
+
+                foreach(var page in pagesVisitees)
+                {
+                    if(page != currentPageId)
+                    {
+                        pagesVisitees.Add(currentPageId);
+                    }
+                }
             }
         }
 
-        // Naviguer vers la page correspondante
         var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
         page = obj.Data;
         listComposant.Clear();
@@ -196,7 +214,7 @@
 
     private async void PreviousPage()
     {
-        var currentPageId = await sessionStorage.GetItemAsync<int>("idPage");
+        var currentPageId = await sessionStorage.GetItemAsync<int>("idPage"); ;
         var pageNoeud = await PageService.GetAllFromNoeud(await sessionStorage.GetItemAsync<int>("idNoeud"));
         var affichPage = pageNoeud.Data;
 
@@ -215,7 +233,6 @@
             }
         }
 
-        // Naviguer vers la page correspondante
         var obj = await PageService.Get(await sessionStorage.GetItemAsync<int>("idPage"));
         page = obj.Data;
         listComposant.Clear();
@@ -223,5 +240,16 @@
         var composantsRefresh = await ComposantService.GetAllById(await sessionStorage.GetItemAsync<int>("idPage"));
         listComposant = composantsRefresh.Data.ToList();
         StateHasChanged();
+    }
+
+    private async Task CheckProgressionPage()
+    {
+        var noeudData = await NoeudEtudiantService.GetByNoeudId(await sessionStorage.GetItemAsync<int>("idNoeud"));
+
+        noeudData.Data.Status = 3;
+        await NoeudEtudiantService.Update(noeudData.Data.Noeud_EtudiantId, noeudData.Data);
+
+        await OnStatusUpdated.InvokeAsync();
+        Rerender.TriggerStatusNoeud();
     }
 }

@@ -14,11 +14,6 @@
 
 @page "/"
 
-<div class="container text-center page-title">
-    <h1 class="display-4">Bienvenue sur STIMULUS_V2</h1>
-    <p class="lead">Votre plateforme d'apprentissage en ligne.</p>
-</div>
-
 <div>
     <AuthorizeView Roles="ADMIN">
         <HomeAdminComponent />
@@ -29,16 +24,9 @@
     </AuthorizeView>
 
     <AuthorizeView Roles="ETUDIANT">
-        <HomeStudentComponent />
+        <HomeStudentComponent />   
     </AuthorizeView>
 </div>
-
-<style>
-    .page-title {
-    
-        margin-top: 20px;
-    }
-</style>
 
 @code {
 

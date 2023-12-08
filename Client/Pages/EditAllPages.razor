@@ -161,7 +161,7 @@
                                                 </RadzenRow>
                                                 <RadzenRow AlignItems="AlignItems.Center">
                                                     <RadzenColumn Size="12" SizeMD="4">
-                                                        <RadzenLabel Text="Contenue" />
+                                                        <RadzenLabel Text="Contenu" />
                                                     </RadzenColumn>
                                                     <RadzenColumn Size="12" SizeMD="8">
                                                         <RadzenTextBox @bind-Value="contenuCode" Style="width: 200px;" />@* TEMPORAIRE *@
@@ -226,11 +226,11 @@
             </RadzenRow>
         </RadzenCard>
     </RadzenBody>
-
-    </RadzenLayout>
-
+</RadzenLayout>
 
 @code {
+    [Parameter]
+    public EventCallback OnStatusUpdated { get; set; }
     bool sidebar1Expanded = true;
     Popup popup;
     RadzenButton button;
@@ -344,7 +344,6 @@
         {
             NavigationManager.NavigateTo("/ModifierPages");
         }
-
     }
 
     private async void AddComposant()
@@ -355,7 +354,7 @@
         if (typeComposant == "Code")
         {
             code.Titre = titreCode;
-            code.Contenue = contenuCode;
+            code.Contenu = contenuCode;
 
             var codeNew = await CodeService.Create(code);
             var newCode = codeNew.Data;
@@ -391,7 +390,7 @@
         }
         if (typeComposant == "Texte")
         {
-            texte.Contenue = contenuTexte;
+            texte.Contenu = contenuTexte;
 
             var texteNew = await TexteService.Create(texte);
             var newTexte = texteNew.Data;

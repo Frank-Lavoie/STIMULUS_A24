@@ -9,16 +9,12 @@
         <!-- SidebarToggle et Logo dans le même conteneur flex -->
         <div style="display: flex; align-items: center;">
             <RadzenSidebarToggle Click="@ToggleSidebar" />
-            <div id="logo-container">
-                <svg xmlns="http://www.w3.org/2000/svg" width="150" height="50">
-                    <text x="50%" y="50%" font-size="20" stroke-width="2" stroke="#365FA0" fill="lightyellow" id="animated-text" text-anchor="middle" dy="0.3em">
-                        C E P I
-                    </text>
-                </svg>
+            <div id="logo-container-header" >
+                <h2 class="custom-header-cepi">CEPI</h2>
             </div>
         </div>
         <div style="display: flex; align-items: center;">
-            <RadzenProfileMenu Style="background-color: darkblue">
+            <RadzenProfileMenu Style="background-color: #394867;">
                 <Template>
                     <div style="display: flex; flex-direction:row; ">
                         <RadzenIcon Icon="account_circle"></RadzenIcon>
@@ -27,7 +23,7 @@
                                 @{
                                     sessionStorage.SetItemAsync<string>("idConnexion", context.User.Identity!.Name);
                                  }
-                                <span>@context.User.Identity!.Name</span>
+                                <span class="custom-header-subtitle">@context.User.Identity!.Name</span>
                             </Authorized>
                             <NotAuthorized>
                                 <span>Guest</span>
@@ -41,9 +37,11 @@
                             <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="list"></RadzenProfileMenuItem>
                         </Authorized>
                     </AuthorizeView>
-                    <RadzenProfileMenuItem Text="Réglages" Path="settings" Icon="build"></RadzenProfileMenuItem>
-                    <RadzenProfileMenuItem Text="Profile" @onclick="Logout" Icon="account_circle"></RadzenProfileMenuItem>
-                    <Button style="width:100%; border:none; background-color: #FFFFFF" @onclick="Logout"><RadzenIcon Icon="exit_to_app" /><span>Déconnexion</span></Button>
+                    <RadzenProfileMenuItem class="custom-header-title" Text="Réglages" Path="settings" Icon="settings"></RadzenProfileMenuItem>
+                    <RadzenProfileMenuItem class="custom-header-title" Text="Profile" Path="/dsadsa" Icon="account_circle"></RadzenProfileMenuItem>
+                    <Button style="border:none; background-color: #FFFFFF; padding: 0;" @onclick="Logout">
+                        <RadzenProfileMenuItem class="custom-header-title" Text="Déconnexion" Icon="logout"></RadzenProfileMenuItem>
+                    </Button>
                 </ChildContent>
             </RadzenProfileMenu>
         </div>

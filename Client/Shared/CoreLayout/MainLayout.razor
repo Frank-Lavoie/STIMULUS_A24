@@ -12,7 +12,7 @@
     <Authorized>
         <RadzenLayout >
             <Header />
-            <Menu sidebarExpanded=false />
+            <Menu sidebarExpanded=true />
             <RadzenBody class="custom-padding-body">
                 @Body
                 <Footer />
@@ -20,7 +20,7 @@
         </RadzenLayout>
     </Authorized>
     <NotAuthorized>
-        <RadzenLayout Style="display: flex; justify-content:center; background-image: url('/RessourceVisuel/Fond.png');">
+        <RadzenLayout class="custom-login-background">
             <LoginComponent />
         </RadzenLayout>
     </NotAuthorized>
