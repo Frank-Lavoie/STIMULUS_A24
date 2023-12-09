@@ -48,7 +48,7 @@
             <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de cours" Icon="school">
                 @foreach (var cours in ListeCoursProf)
                 {
-                    <RadzenPanelMenuItem Icon="event" class="custom-menusidebar-subtilte" Text="@cours.Code" Click=@(args => DialogService.Alert("Description du cours : "+ cours.Description, @cours.Code, new AlertOptions() { OkButtonText = "Ok" }))></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="@cours.Code" Icon="event" Click=@(args => DialogService.Alert("Description du cours : "+ cours.Description, @cours.Code, new AlertOptions() { OkButtonText = "Ok" }))></RadzenPanelMenuItem>
                 }
                 <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau cours" Icon="add" Path="/CreerCours" />
             </RadzenPanelMenuItem>

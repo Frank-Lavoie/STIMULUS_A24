@@ -97,7 +97,7 @@
         </foreignObject>
         @if (isOpen)
         {
-            <rect x="@(sizeValue)" y="@(sizeValue)" width="250" height="445" style="fill: rgba(0, 0, 0, 0.8); stroke: black; stroke-width: 1; rx: 10; ry: 10;" />
+            <rect x="@(sizeValue)" y="@(sizeValue)" width="250" height="445" style="fill: rgba(0, 0, 0, 0.8); stroke: black; stroke-width: 1; rx: 10; ry: 10;z-index: 1000;" />
             <foreignObject x="@(Node.Rayon )" y="@(Node.Rayon)" width="250" height="445" style="padding:5px">
                 <EditForm Model="nouveauNoeud" OnSubmit="AjoutNoeud" class="formLogin">
                     <div class="form-group">
@@ -149,6 +149,11 @@
             }
             <text @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) class="textLink" text-anchor="middle" alignment-baseline="central">@Node.Nom</text>
         </NavLink>
+
+        <rect x="@((int)Math.Ceiling((double)(sizeValue*2- sizeValue/2 -10)))" y="@((int)Math.Ceiling((double)(-100 + sizeValue/2)))" visibility="@displayHover" width="200" height="50" style="fill: rgba(255,255,255,255)" />
+        <foreignObject x="@((int)Math.Ceiling((double)sizeValue*2- Node.Rayon/2 -10))" y="@((int)Math.Ceiling((double)(-100 + sizeValue/2)))" visibility="@displayHover" width="200" height="150" style="padding:5px">
+            <span> Nombre de page(s) :  @listePage.Count() </span><br />
+        </foreignObject>
         if (viewPage)
         {
             int offsetX = 0;
@@ -185,7 +190,7 @@
            (noeudEtudiant.Status == 5) ||
            (noeudEtudiant.Status == 1))))
             {
-                <NavLink id="lien">
+            <NavLink id="lien" @onclick="DirectionPagesEtudiant">
                     <circle visibility="@displayHover" r="@(Node.Rayon + 3)" class="cercle" style="fill: rgba(255,255,255,5); opacity:0.5" />
                     <circle @onmouseover=@(e => OnMouseHover()) @onmouseout=@(e => OnMouseLeave()) r="@Node.Rayon" class="cercle" style="fill:@Couleur" />
                     <rect x="@(Node.Rayon*2- Node.Rayon/2 -10)" y="@(-180 + Node.Rayon/2)" visibility="@displayHover" width="200" height="150" style="fill: rgba(255,255,255,255)" />
@@ -358,7 +363,8 @@
 
             if (etudiantData != null)
             {
-                noeudEtudiant = etudiantData.Data;
+                noeudEtudiant = etudiantData.Data;       
+
                 UpdateChildrenColors();
             }
             else
@@ -489,8 +495,6 @@
         {
             Node.Status = 2;
             await NoeudService.Update(Node.NoeudId, Node);
-            await OnStatusUpdated.InvokeAsync();
-            Rerender.TriggerStatusNoeud();
         }
         else
         {
@@ -501,8 +505,6 @@
                 await NoeudService.Update(Node.NoeudId, Node);
             }
         }
-        await OnStatusUpdated.InvokeAsync();
-        Rerender.TriggerStatusNoeud();
     }
     private async Task LockAndUnlockedGraphe(Noeud noeud)
     {
@@ -759,6 +761,7 @@
         }
         NavigationManager.NavigateTo("/Pages");
     }
+
     private void UpdateChildrenColors()
     {
         // Mettez à jour les couleurs des enfants en fonction de leur statut

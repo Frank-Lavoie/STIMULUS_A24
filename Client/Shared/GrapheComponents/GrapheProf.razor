@@ -33,16 +33,20 @@
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
             <RadzenButton Style="@modeDeVuButtonEdition" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="ButtonStyle.Warning" />
             <RadzenButton Style="@modeDeVuButtonPage" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="ButtonStyle.Warning" />
-            <RadzenButton Style="@modeDeVuButtonEtudiant" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Warning" />
-            @if(modeDeVue == 3)
+            @if(listEtudiant.Any())
             {
-                @if (listEtudiant.Any())
+                <RadzenButton Style="@modeDeVuButtonEtudiant" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Warning" />
+                @if (modeDeVue == 3)
                 {
                     <RadzenText class="custom-grapheprof-selectuser-title">Sélectionner un étudiant :</RadzenText>
                         <RadzenDropDown @bind-Value="@etudiant" AllowFiltering="true" Data="@listEtudiant" Style="width: 100%; max-width: 170px;" Name="DropDownBindValue" Change="OnValueChanged" />
                 }
             }
             <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto; background-color: #14274E;" />
+            @if (loading == true)
+            {
+                <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            }
         </RadzenStack>
     </foreignObject>
     <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
@@ -123,6 +127,7 @@
     public EventCallback OnGrapheDelete { get; set; }
     [Parameter]
     public EventCallback OnEtudiantChanged { get; set; }
+    private bool loading;
     private string displayHover = "hidden";
     private double viewBoxX = 0;
     private double viewBoxY = 0;
@@ -170,10 +175,6 @@
         }
         etudiant = listEtudiant.FirstOrDefault();
         await sessionStorage.SetItemAsync<string>("daEtudiant", etudiant);
-        await OnEtudiantChanged.InvokeAsync();
-        await OnStatusUpdated.InvokeAsync();
-        Rerender.TriggerStatusNoeud();
-        Rerender.TriggerEtudiantChanged();
     }
 
     private async Task OnValueChanged(object value)
@@ -193,7 +194,7 @@
         if (v == 1)
         {
             modeDeVuButtonPage = "background-color: #24A7FF;";
-            modeDeVuButtonEdition = "background-color: #14274E;"; ;
+            modeDeVuButtonEdition = "background-color: #14274E;"; 
             modeDeVuButtonEtudiant = "background-color: #14274E;";
         }
         else if (v == 2)
@@ -206,8 +207,7 @@
         {
             modeDeVuButtonPage = "background-color: #14274E;";
             modeDeVuButtonEdition = "background-color: #14274E;";
-            modeDeVuButtonEtudiant = "background-color: #24A7FF;"; ;
-
+            modeDeVuButtonEtudiant = "background-color: #24A7FF;"; 
         }
         modeDeVue = v;
         Console.WriteLine($"Mode de vu : {v}");
@@ -432,51 +432,23 @@
 
         if (result.HasValue && result.Value)
         {
-            var allNoeud = await NoeudService.GetAllFromGraph(await sessionStorage.GetItemAsync<int>("idGraphe"));
-            var noeuds = allNoeud.Data;
+            loading = true;
 
+            var grapheId = await sessionStorage.GetItemAsync<int>("idGraphe");
+
+            // Récupérer tous les nœuds du graphe
+            var allNoeuds = await NoeudService.GetAllFromGraph(grapheId);
+            var noeuds = allNoeuds.Data;
+
+            // Supprimer les nœuds et leurs enfants récursivement
             foreach (var noeudDelete in noeuds)
             {
-                // Supprimer les pages associées au nœud
-                var allPage = await PageService.GetAllFromNoeud(noeudDelete.NoeudId);
-                var pages = allPage.Data;
-
-                if (pages != null)
-                {
-                    foreach (var pageDelete in pages)
-                    {
-                        var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
-                        var composant = allComposant.Data;
-
-                        if (composant != null)
-                        {
-                            foreach (var composantDelete in composant)
-                            {
-                                await ComposantService.Delete(composantDelete.ComposantId);
-                            }
-                        }
-                        await PageService.Delete(pageDelete.PageId);
-                    }
-                }
-                foreach (var noeudDeleteParent in noeuds)
-                {
-                    var noeud = await NoeudEtudiantService.GetAllById(noeudDeleteParent.NoeudId);
-                    var etudiantNoeudDelete = noeud.Data;
-
-                    foreach (var etudiantNoeud in etudiantNoeudDelete)
-                    {
-                        await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
-                    }
-                    
-                }
-
-                foreach (var nodeDelete in noeuds)
-                {
-                    await NoeudService.Delete(nodeDelete.NoeudId);
-                }
+                await SupprimerNoeudEtSesEnfants(noeudDelete.NoeudId);
             }
+
             // Supprimer le graphe
-            await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
+            await GrapheService.Delete(grapheId);
+            loading = false;
             await OnGrapheDelete.InvokeAsync();
             Rerender.TriggerGrapheDelete();
             NavigationManager.NavigateTo("/");
@@ -485,6 +457,52 @@
         {
             NavigationManager.NavigateTo("/Graphe");
         }
+    }
+
+    private async Task SupprimerNoeudEtSesEnfants(int noeudId)
+    {
+        // Supprimer les pages associées au nœud
+        var allPage = await PageService.GetAllFromNoeud(noeudId);
+        var pages = allPage.Data;
+
+        if (pages != null)
+        {
+            foreach (var pageDelete in pages)
+            {
+                var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
+                var composant = allComposant.Data;
+
+                if (composant != null)
+                {
+                    foreach (var composantDelete in composant)
+                    {
+                        await ComposantService.Delete(composantDelete.ComposantId);
+                    }
+                }
+                await PageService.Delete(pageDelete.PageId);
+            }
+        }
+
+        // Supprimer les enfants récursivement
+        var children = await NoeudService.GetAllById(noeudId);
+        foreach (var child in children.Data)
+        {
+            await SupprimerNoeudEtSesEnfants(child.NoeudId);
+        }
+
+        // Supprimer les associations d'étudiants pour le nœud
+        var noeudEtudiants = await NoeudEtudiantService.GetAllById(noeudId);
+        var etudiantNoeudDelete = noeudEtudiants.Data;
+        if (etudiantNoeudDelete != null)
+        {
+            foreach (var etudiantNoeud in etudiantNoeudDelete)
+            {
+                await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
+            }
+        }
+
+        // Supprimer le nœud lui-même
+        await NoeudService.Delete(noeudId);
     }
 
     /// <summary>

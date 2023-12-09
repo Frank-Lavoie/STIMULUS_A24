@@ -34,11 +34,11 @@
                         <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="groupe.Nom" />
                     </div>
                     <div class="form-group mt-2">
-                        <RadzenLabel class="custom-gestion-subtitle">Date de cloture</RadzenLabel>
+                        <RadzenLabel class="custom-gestion-subtitle">Date de clôture</RadzenLabel>
                         <RadzenDatePicker class="custom-gestion-subtitle" Style="width: 100%;" Name="DateCloture" @bind-Value="groupe.DateCloture" />
                     </div>
                     <div class="form-group mt-2">
-                        <RadzenLabel class="custom-gestion-subtitle">Groupe associé</RadzenLabel>
+                        <RadzenLabel class="custom-gestion-subtitle">Cours associé</RadzenLabel>
                         <RadzenDropDown class="custom-gestion-subtitle" @bind-Value="groupe.CoursId" AllowClear="true" Placeholder="Sélectionnez un cours" Data="@listCours" Style="width: 100%;" TextProperty="Code" ValueProperty="CoursId" Name="Code"></RadzenDropDown>
                     </div>
                     <div class="form-group mt-2">

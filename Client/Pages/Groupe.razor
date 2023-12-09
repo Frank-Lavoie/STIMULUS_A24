@@ -49,13 +49,13 @@
         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Mettre à jour la liste d'étudiant</RadzenText>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Style="margin-top:10px;" Gap="3">
-            <RadzenDropDown class="custom-gestion-subtitle" @bind-Value=@selectedStudents Data=@listEtudiant TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Ajouter des étudiants" Chips="true" Style="width: 100%; max-width: 400px;">
-            </RadzenDropDown>
-        <RadzenButton Click=UpdateEtudiant Icon="refresh" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
+        <RadzenDropDown class="custom-gestion-subtitle" @bind-Value=@selectedEtudiants Data=@listEtudiant TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Ajouter des étudiants" Chips="true" Style="width: 100%; max-width: 400px;">
+        </RadzenDropDown>
+        <RadzenButton Click=@(() => UpdateEtudiant()) Icon="refresh" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
     </RadzenStack>
     <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
     <RadzenRow RowGap="2" Class="justify-content-center">
-        @if(listEtudiantAjoute.Any())
+        @if (listEtudiantAjoute.Any())
         {
             <RadzenDataGrid TItem="Etudiant" Data="@listEtudiantAjoute" EmptyText="Aucun élève dans ce groupe." Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
                 <Columns>
@@ -66,7 +66,7 @@
             </RadzenDataGrid>
         }
     </RadzenRow>
-        @if (listEtudiantAjoute.Count() == 0)
+    @if (listEtudiantAjoute.Count() == 0)
         {
           <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">   
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Ce groupe ne contient aucun étudiant.</RadzenText>
@@ -76,6 +76,8 @@
 
 @code {
     [Parameter]
+    public EventCallback OnEtudiantChanged { get; set; }
+    [Parameter]
     public EventCallback OnGroupeDelete { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Groupe groupeProf { get; set; }
     public STIMULUS_V2.Shared.Models.Entities.Cours groupeCours { get; set; }
@@ -84,7 +86,7 @@
     public STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant groupe_etudiant = new();
     public List<Etudiant> listEtudiant { get; set; } = new List<Etudiant>();
     public List<Etudiant> listEtudiantAjoute { get; set; } = new List<Etudiant>();
-    List<string> selectedStudents = new List<string>();
+    private List<string> selectedEtudiants = new List<string>();
     public DateTime dateDuJour = DateTime.Now.Date;
     public string imageActif;
     public string siActif;
@@ -94,6 +96,7 @@
     {
         await GetDataGroupe();
     }  
+
     private async Task GetDataGroupe()
     {
         try
@@ -146,7 +149,7 @@
             if (etudiantGroupe != null)
             {
                 listEtudiantAjoute.Add(etudiantGroupe);
-                selectedStudents.Add(etudiantGroupe.Identifiant);
+                selectedEtudiants.Add(etudiantGroupe.Identifiant);
             }
         }
         StateHasChanged();
@@ -177,13 +180,17 @@
         }
     }
 
-    private async void UpdateEtudiant()
+    private async Task UpdateEtudiant()
     {
-        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+        var groupeId = await sessionStorage.GetItemAsync<int>("idGroupe");
+        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(groupeId);
 
         try
         {
-            foreach (var etudiantDelete in eleve.Data)
+            // Supprimer les étudiants qui ne sont plus sélectionnés
+            var etudiantsASupprimer = eleve.Data.Where(etudiant => !selectedEtudiants.Contains(etudiant.CodeDA)).ToList();
+
+            foreach (var etudiantDelete in etudiantsASupprimer)
             {
                 await GroupeEtudiantService.Delete(etudiantDelete.Groupe_EtudiantId);
 
@@ -198,41 +205,71 @@
                     }
                 }
             }
-            listEtudiantAjoute.Clear();
-            StateHasChanged();
 
-            foreach (var etudiantId in selectedStudents)
+            // Ajouter les nouveaux étudiants
+            var nouveauxEtudiants = new List<Etudiant>();
+
+            foreach (var etudiantDa in selectedEtudiants)
             {
-                groupe_etudiant.GroupeId = await sessionStorage.GetItemAsync<int>("idGroupe");
-                groupe_etudiant.CodeDA = etudiantId; // Utilisez l'identifiant de l'étudiant
+                var existingEtudiant = eleve.Data.FirstOrDefault(e => e.CodeDA == etudiantDa);
 
-                var etudiantAjoute = await GroupeEtudiantService.Create(groupe_etudiant);
-                var etudiant = await EtudiantService.Get(etudiantAjoute.Data.CodeDA);
-
-                foreach(var graphe in listGrapheGroupe)
+                if (existingEtudiant == null)
                 {
-                    var allNoeud = await NoeudService.GetAllFromGraph(graphe.GrapheId);
+                    var groupe_etudiant = new Groupe_Etudiant
+                            {
+                                GroupeId = groupeId,
+                                CodeDA = etudiantDa
+                            };
 
-                    foreach(var noeud in allNoeud.Data)
+                    var etudiantAjoute = await GroupeEtudiantService.Create(groupe_etudiant);
+                    var etudiant = await EtudiantService.Get(etudiantAjoute.Data.CodeDA);
+
+                    foreach (var graphe in listGrapheGroupe)
                     {
-                        var newNoeudEtudiant =  new Noeud_Etudiant
+                        var allNoeud = await NoeudService.GetAllFromGraph(graphe.GrapheId);
+
+                        foreach (var noeud in allNoeud.Data)
                         {
-                            CodeDA = etudiantId,
-                            NoeudId = noeud.NoeudId,
-                            Status = noeud.Status
-                        };
+                            var newNoeudEtudiant = new Noeud_Etudiant
+                                    {
+                                        CodeDA = etudiantDa,
+                                        NoeudId = noeud.NoeudId,
+                                        Status = noeud.Status
+                                    };
 
-                        await NoeudEtudiantService.Create(newNoeudEtudiant);
+                            await NoeudEtudiantService.Create(newNoeudEtudiant);
+                        }
                     }
+
+                    nouveauxEtudiants.Add(etudiant.Data);
                 }
+            }
+            listEtudiantAjoute.Clear();
+            selectedEtudiants.Clear();
+            StateHasChanged();
+            var eleves = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+            var etudiants = eleves.Data;
+            foreach (var etudiant in etudiants)
+            {
+                var responseEtudiant = await EtudiantService.Get(etudiant.CodeDA);
+                var etudiantGroupe = responseEtudiant.Data;
 
-
-                listEtudiantAjoute.Add(etudiant.Data);
+                // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
+                if (etudiantGroupe != null)
+                {
+                    listEtudiantAjoute.Add(etudiantGroupe);
+                    selectedEtudiants.Add(etudiantGroupe.Identifiant);
+                }
             }
             StateHasChanged();
         }
-        catch { }
+        catch (Exception ex)
+        {
+            // Gérer les exceptions
+            Console.WriteLine($"Erreur : {ex.Message}");
+        }
     }
+
 
     private async void RedirectionGraphe(int id)
     {
