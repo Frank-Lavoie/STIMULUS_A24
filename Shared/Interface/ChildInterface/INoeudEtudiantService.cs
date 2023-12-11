@@ -15,5 +15,6 @@ namespace STIMULUS_V2.Shared.Interface.ChildInterface
 
         Task<APIResponse<Noeud_Etudiant>> GetByNoeudId(int id);
         Task<APIResponse<Noeud_Etudiant>> GetByNoeudAndDa(int id, string da);
+        Task<APIResponse<bool>> GetProgression(string da, int graphe, int noeud);
     }
 }

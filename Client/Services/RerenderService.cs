@@ -8,6 +8,7 @@
         public event Action OnGrapheDelete;
         public event Action OnNoeudStatus;
         public event Action OnEtudiantChanged;
+        public event Action OnNoeudProf;
 
         public void TriggerGroupeCreated()
         {
@@ -32,6 +33,10 @@
         public void TriggerEtudiantChanged()
         {
             OnEtudiantChanged?.Invoke();
+        }
+        public void TriggerNoeudProf()
+        {
+            OnNoeudProf?.Invoke();
         }
     }
 }

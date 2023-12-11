@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Validations;
 using STIMULUS_V2.Client.Shared.NoeudComponents;
 using STIMULUS_V2.Server.Data;
 using STIMULUS_V2.Shared.Interface.ChildInterface;
@@ -193,6 +194,127 @@ namespace STIMULUS_V2.Server.Services
             catch (Exception ex)
             {
                 return new APIResponse<IEnumerable<Noeud_Etudiant>>(null, 500, $"Erreur lors de la récupération du model par son parent {typeof(Noeud_Etudiant).Name}. Message : {ex.Message}.");
+            }
+        }
+        public async Task<APIResponse<bool>> GetProgression(string da, int graphe, int noeud)
+        {
+            try
+            {
+                var CodeDa = await sTIMULUSContext.Noeud_Etudiant.Where(e => e.CodeDA == da).FirstOrDefaultAsync();
+                var Graphe = await sTIMULUSContext.Graphe.Where(e => e.GrapheId == graphe).FirstOrDefaultAsync();
+                var ChildrenNode = await sTIMULUSContext.Noeud.Where(item => item.NoeudParentId == noeud).ToListAsync();
+                var ParentNode = await GetByNoeudAndDa(noeud, da);
+
+                foreach (var childNode in ChildrenNode)
+                {
+                    var ChildNode = await GetByNoeudAndDa(childNode.NoeudId, da);
+
+                    if (Graphe.Status == GrapheStatus.DESACTIVER)
+                    {
+                        if (ParentNode.Data.Status == 0) // Noeud inital
+                        {
+                            if (ChildNode.Data.Status == 1) //Bloqué par le prof
+                            {
+                                ChildNode.Data.Status = 1;//Bloqué par le prof
+                            }
+                            else
+                                ChildNode.Data.Status = 5; // Bloqué par le prof
+                        }
+                        else if (ParentNode.Data.Status == 5)
+                        {
+                            if (ChildNode.Data.Status == 1)//Bloqué par le prof
+                            {
+                                ChildNode.Data.Status = 1;//Bloqué par le prof
+                            }
+                            else
+                                ChildNode.Data.Status = 5;
+                        }
+                        await Update(ChildNode.Data.Noeud_EtudiantId, ChildNode.Data);
+                    }
+                    else
+                    {
+                        if (ChildNode.Data != null)
+                        {
+                            if (ParentNode.Data.Status == 4 && childNode.Type == NoeudType.STRUCTURE && ChildNode.Data.Status == 2)
+                            {
+
+                                ChildNode.Data.Status = 4; // Bloqué par le prof
+
+                                await Update(ChildNode.Data.Noeud_EtudiantId, ChildNode.Data);
+                            }
+
+                            else if (ParentNode.Data.Status == 1) // si la parent est bloqué par le prof
+                            {
+                                if (ChildNode.Data.Status == 1) // et quer les enfants sont aussi bloqué par le prof
+                                {
+                                    ChildNode.Data.Status = 1; // Bloqué par le prof
+                                }
+                                else // sinon
+                                    ChildNode.Data.Status = 5; // bloqué par la progression
+                            }
+
+                            else if (ParentNode.Data.Status == 5) // si le parent est bloqué par la progression
+                            {
+                                if (ChildNode.Data.Status != 1) // Et que le prof n'a pas bloqué le noeud
+                                {
+                                    ChildNode.Data.Status = 5; // les enfants sont bloqué par la progression
+                                }
+                            }
+                            else if (ParentNode.Data.Status == 2) // Si le parent est non  complété
+                            {
+                                if (ChildNode.Data.Status == 1) // Si l'enfant est bloqué par le prof
+                                {
+                                    ChildNode.Data.Status = 1; // Bloqué par le prof
+                                }
+                                else
+                                {
+                                    ChildNode.Data.Status = 5; // Bloqué par la progression
+                                }
+                            }
+                            //OUVERTURE DE NOEUD ENFANT        
+                            else if (ParentNode.Data.Status == 4 && ChildNode.Data.Status == 4) // si le parent et l'enfant son complétés
+                            {
+                                ChildNode.Data.Status = 4; // l'enfant est complété
+                            }
+
+                            else if (ParentNode.Data.Status == 4) // Si le parent est Complété
+                            {
+                                if (ChildNode.Data.Status == 1) // Si l'enfant est bloqué par le prof
+                                {
+                                    ChildNode.Data.Status = 1; // reste bloqué
+                                }
+                                else
+                                {
+                                    ChildNode.Data.Status = 2; // si non il est non complété
+                                }
+                            }
+                            else if (ParentNode.Data.Status == 0 && ChildNode.Data.Status == 4) // si la parent est bloqué par le prof
+                            {
+                                if (ChildNode.Data.Status == 1) // et quer les enfants sont aussi bloqué par le prof
+                                {
+                                    ChildNode.Data.Status = 1; // Bloqué par le prof
+                                }
+                                else // sinon
+                                    ChildNode.Data.Status = 4; // bloqué par la progression
+                            }
+                            else if (ParentNode.Data.Status == 0) // si la parent est bloqué par le prof
+                            {
+                                if (ChildNode.Data.Status == 1) // et quer les enfants sont aussi bloqué par le prof
+                                {
+                                    ChildNode.Data.Status = 1; // Bloqué par le prof
+                                }
+                                else // sinon
+                                    ChildNode.Data.Status = 2; // bloqué par la progression
+                            }
+                        }
+                        await Update(ChildNode.Data.Noeud_EtudiantId, ChildNode.Data); // Update chaque enfants du noeud parents
+                    }
+                } 
+                return new APIResponse<bool>(true, 200, "Progression enregistré");
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<bool>(false, 500, "Erreur dans la progression");
             }
         }
 

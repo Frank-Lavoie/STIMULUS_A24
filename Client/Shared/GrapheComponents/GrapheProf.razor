@@ -33,13 +33,19 @@
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
             <RadzenButton Style="@modeDeVuButtonEdition" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="ButtonStyle.Warning" />
             <RadzenButton Style="@modeDeVuButtonPage" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="ButtonStyle.Warning" />
-            @if(listEtudiant.Any())
+            @if(listEtudiant.Any() || listEtudiant != null)
             {
                 <RadzenButton Style="@modeDeVuButtonEtudiant" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Warning" />
                 @if (modeDeVue == 3)
                 {
                     <RadzenText class="custom-grapheprof-selectuser-title">Sélectionner un étudiant :</RadzenText>
                         <RadzenDropDown @bind-Value="@etudiant" AllowFiltering="true" Data="@listEtudiant" Style="width: 100%; max-width: 170px;" Name="DropDownBindValue" Change="OnValueChanged" />
+                    @if (loadingEtudiant == true)
+                    {
+                        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Size="ProgressBarCircularSize.Medium" Mode="ProgressBarMode.Indeterminate">
+                        </RadzenProgressBarCircular>
+                        <RadzenText class="custom-grapheprof-selectuser-title">Chargement de la progression des étudiants ...</RadzenText>
+                    }
                 }
             }
             <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto; background-color: #14274E;" />
@@ -113,7 +119,8 @@
                         AjoutNouveauNoeud="AjoutNouveauNoeud" 
                         SupprNoeud="SupprimerNoeud"
                         ReLinkBindPage="ReLinkBindPage"
-                        ReLinkPage="ReLinkPage" />
+                        ReLinkPage="ReLinkPage" 
+                        Etudiant ="@listEtudiant"/>
                 }
             </Draggable>
         </svg>
@@ -128,7 +135,9 @@
     [Parameter]
     public EventCallback OnEtudiantChanged { get; set; }
     private bool loading;
+    private bool loadingEtudiant;
     private string displayHover = "hidden";
+    private string etudiantLoading;
     private double viewBoxX = 0;
     private double viewBoxY = 0;
     private double viewBoxWidth = 2000;
@@ -152,11 +161,50 @@
     public List<Noeud> Nodes { get; set; } = new();
 
     protected async override void OnInitialized()
-    {
-        StateHasChanged();   
-        await UpdateGraphe();
+    {  
+        Rerender.OnGroupeDelete += SupprimerGraphe;
+        Rerender.OnNoeudProf += OnStatusChanged;
         await GetDataGroupe();
+        await UpdateGraphe();
+        StateHasChanged();
     }
+
+    /// <summary>
+    /// Recupere les noeuds du graph Numero X et permet la MAJ du graph
+    /// </summary>
+    private async Task UpdateGraphe()
+    {
+        Nodes = new();
+        if (sessionStorage != null)
+        {
+            int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
+
+            var groupeGraphe = await GrapheService.Get(idGraphe);
+            var groupe = groupeGraphe.Data;
+            await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
+
+            // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
+            while (idGraphe == 0)
+            {
+                //Plus chill qu'une boucle industrielle
+                await Task.Delay(100);
+            }
+            Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+            loadingEtudiant = true;
+            foreach (var noeud in Nodes)
+            {
+                foreach(var student in listEtudiant)
+                {
+                    await NoeudEtudiantService.GetProgression(student, idGraphe, noeud.NoeudId);
+                }
+            }
+            loadingEtudiant = false;
+            await OnEtudiantChanged.InvokeAsync();
+            Rerender.TriggerEtudiantChanged();
+        }
+        StateHasChanged();
+    }
+
     private async Task GetDataGroupe()
     {
         var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
@@ -181,9 +229,13 @@
     {
         // Mettre à jour la valeur de l'étudiant dans le stockage de session
         await sessionStorage.SetItemAsync<string>("daEtudiant", etudiant);
-
         await OnEtudiantChanged.InvokeAsync();
         Rerender.TriggerEtudiantChanged();
+    }
+    private async void OnStatusChanged()
+    {
+        await UpdateGraphe();
+        StateHasChanged();
     }
     /// <summary>
     /// Permet de set le mode de vu. 1 => Page, 2 => Edit, 3 => Etudiant
@@ -308,35 +360,6 @@
         Console.WriteLine($"Noeud {noeud.Nom} a besoin d'un parent");
         enfantRechercheParent = noeud;
         enRecherche = true;
-    }
-
-    /// <summary>
-    /// Recupere les noeuds du graph Numero X et permet la MAJ du graph
-    /// </summary>
-    private async Task UpdateGraphe()
-    {
-        Nodes = new();
-        if (sessionStorage != null)
-        {
-            int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
-
-            var groupeGraphe = await GrapheService.Get(idGraphe);
-            var groupe = groupeGraphe.Data;
-            await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
-
-            // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
-            while (idGraphe == 0)
-            {
-                //Plus chill qu'une boucle industrielle
-                await Task.Delay(100);
-            }
-            Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
-
-            var response = await NoeudService.GetAllFromGraph(idGraphe);
-            Nodes = response.Data.ToList();
-            Console.WriteLine("Mise a jour des noeuds du graph");
-        }
-        StateHasChanged();
     }
 
     /// <summary>

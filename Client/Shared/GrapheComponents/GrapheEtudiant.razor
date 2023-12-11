@@ -31,6 +31,12 @@
                 <RadzenText class="custom-grapheprof-selectuser-title">+</RadzenText>
                 <RadzenImage class="custom-grapheprof-selectuser-title" Style="height: 30px; width: 30px; align-content:center; margin-left: 1%;margin-right: 1%;" Path="/RessourceVisuel/scroll.png"></RadzenImage>
                 <RadzenText class="custom-grapheprof-selectuser-title">pour zoomer !</RadzenText>
+                @if (loading == true)
+                {
+                    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Size="ProgressBarCircularSize.Medium" Mode="ProgressBarMode.Indeterminate">
+                    </RadzenProgressBarCircular>
+                    <RadzenText class="custom-grapheprof-selectuser-title">Chargement de votre progression ...</RadzenText>
+                }
 
             </RadzenStack>
         </foreignObject>
@@ -99,6 +105,7 @@
     private double viewBoxWidth = 2000;
     private double viewBoxHeight = 2000;
     private double zoomIncrement = 100;
+    private bool loading;
     private string viewForm = "hidden";
     private string displayNouveauNoeud = "hidden";
     private Noeud nouveauNoeud;
@@ -125,15 +132,12 @@
             await Task.Delay(100);
         }
         Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+        loading = true;
         foreach (var noeud in Nodes)
         {
-            await CheckStatus(noeud);
+            await NoeudEtudiantService.GetProgression(await sessionStorage.GetItemAsync<string>("idConnexion"), idGraphe, noeud.NoeudId);
         }
-
-        // Consider navigating using a relative URL
-        Nodes.Clear();
-        StateHasChanged();
-        Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+        loading = false;
         StateHasChanged();
     }
     //Hardcode
@@ -141,100 +145,7 @@
 
     private void OnMouseHover() => displayHover = "show";
     private void OnMouseLeave() => displayHover = "hidden";
-
-    /// <summary>
-    /// Change le status des enfants selon le parent
-    /// </summary>
-    private async Task CheckStatus(Noeud noeud)
-    {
-        var graphe = await GrapheService.Get(await sessionStorage.GetItemAsync<int>("idGraphe"));
-
-        try
-        {
-            // Récupérer tous les nœuds enfants du nœud parent
-            var childrenNodesResponse = await NoeudService.GetAllById(noeud.NoeudId);
-
-            var childrenNodes = childrenNodesResponse.Data;
-
-            var parentNoeudEtudiant = await NoeudEtudiantService.GetByNoeudAndDa(noeud.NoeudId, await sessionStorage.GetItemAsync<string>("idConnexion"));
-
-            foreach (var childNode in childrenNodes)
-            {
-                var childNoeudEtudiant = await NoeudEtudiantService.GetByNoeudAndDa(childNode.NoeudId, await sessionStorage.GetItemAsync<string>("idConnexion"));
-
-                
-
-                if (childNoeudEtudiant.Data != null)
-                {
-                    if (parentNoeudEtudiant.Data.Status == 4 && childNode.Type == NoeudType.STRUCTURE && childNoeudEtudiant.Data.Status == 2)
-                    {
-
-                            childNoeudEtudiant.Data.Status = 4; // Bloqué par le prof
-
-                        await NoeudEtudiantService.Update(childNoeudEtudiant.Data.Noeud_EtudiantId, childNoeudEtudiant.Data);
-                    }
-
-                    else if (parentNoeudEtudiant.Data.Status == 1) // si la parent est bloqué par le prof
-                    {
-                        if (childNoeudEtudiant.Data.Status == 1) // et quer les enfants sont aussi bloqué par le prof
-                        {
-                            childNoeudEtudiant.Data.Status = 1; // Bloqué par le prof
-                        }
-                        else // sinon
-                            childNoeudEtudiant.Data.Status = 5; // bloqué par la progression
-                    }
-
-                    else if (parentNoeudEtudiant.Data.Status == 5) // si le parent est bloqué par la progression
-                    {
-                        if (childNoeudEtudiant.Data.Status != 1) // Et que le prof n'a pas bloqué le noeud
-                        {
-                            childNoeudEtudiant.Data.Status = 5; // les enfants sont bloqué par la progression
-                        }
-                    }
-                    else if (parentNoeudEtudiant.Data.Status == 2) // Si le parent est non  complété
-                    {
-                        if (childNoeudEtudiant.Data.Status == 1) // Si l'enfant est bloqué par le prof
-                        {
-                            childNoeudEtudiant.Data.Status = 1; // Bloqué par le prof
-                        }
-                        else
-                        {
-                            childNoeudEtudiant.Data.Status = 5; // Bloqué par la progression
-                        }
-                    }
-                    //OUVERTURE DE NOEUD ENFANT
-
-                    else if (parentNoeudEtudiant.Data.Status == 4 && childNoeudEtudiant.Data.Status == 4) // si le parent et l'enfant son complétés
-                    {
-                        childNoeudEtudiant.Data.Status = 4; // l'enfant est complété
-                    }
-
-                    else if (parentNoeudEtudiant.Data.Status == 4) // Si le parent est Complété
-                    {
-                        if (childNoeudEtudiant.Data.Status == 1) // Si l'enfant est bloqué par le prof
-                        {
-                            childNoeudEtudiant.Data.Status = 1; // reste bloqué
-                        }
-                        else
-                        {
-                            childNoeudEtudiant.Data.Status = 2; // si non il est non complété
-                        }
-                    }
-
-                        await NoeudEtudiantService.Update(childNoeudEtudiant.Data.Noeud_EtudiantId, childNoeudEtudiant.Data); // Update chaque enfants du noeud parents
-                    }
-                    
-                }        
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erreur : {ex}");
-            }
-    }
-            
-             
-
-
+                   
     /// <summary>
     /// Appeler un changement de status
     /// </summary>

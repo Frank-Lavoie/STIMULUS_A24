@@ -9,6 +9,8 @@
 @inject NavigationManager NavigationManager
 @inject IGrapheService GrapheService
 @inject INoeudService NoeudService
+@inject IPageService PageService
+@inject IComposantService ComposantService
 @inject INoeudEtudiantService NoeudEtudiantService
 @inject RerenderService Rerender
 @inject IGroupeEtudiantService GroupeEtudiantService
@@ -20,6 +22,10 @@
 <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
     <RadzenButton Click=SupprimerGroupe Text="Supprimer le groupe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
+        @if (loading == true)
+        {
+            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+        }
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
         <RadzenImage Path="@imageActif" Style="width: 50px; height: 50px; border-radius: 50%;" />
@@ -33,7 +39,18 @@
                 <RadzenText TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
             }
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Cours associé</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
+            @if (groupeCours != null)
+            {
+                <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
+            }
+            else
+            {
+                <RadzenText TextStyle="TextStyle.Body1"><b>Aucun</b></RadzenText>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" class="rz-p-4">
+                <RadzenDropDown @bind-Value=@idCours Data=@listCours TextProperty="Code" ValueProperty="CoursId" AllowClear=true Placeholder="Associé un cours" Style="width: 100%; max-width: 400px;" Name="DropDownClear" />
+                    <RadzenButton Click=@(args => AssocierCours(idCours)) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
+                </RadzenStack>
+            }
         </RadzenStack>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
@@ -84,13 +101,16 @@
     public STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant noeud_etudiant { get; set; }
     public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGrapheGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
     public STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant groupe_etudiant = new();
+    public List<Cours> listCours{ get; set; } = new List<Cours>();
     public List<Etudiant> listEtudiant { get; set; } = new List<Etudiant>();
     public List<Etudiant> listEtudiantAjoute { get; set; } = new List<Etudiant>();
     private List<string> selectedEtudiants = new List<string>();
     public DateTime dateDuJour = DateTime.Now.Date;
+    public int idCours;
     public string imageActif;
     public string siActif;
     public string dateAffichee;
+    public bool loading;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,80 +124,102 @@
             var etudiant = await EtudiantService.GetAll();
             var student = etudiant.Data;
             listEtudiant.AddRange(student);
-        }
-        catch { }
 
-        var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
-        groupeProf = groupe.Data;
+            var newcours = await CoursService.GetAll();
+            listCours.AddRange(newcours.Data);
 
-        if (groupeProf.DateCloture >= dateDuJour)
-        {
-            imageActif = "/RessourceVisuel/groupeactif.jpg";
-            siActif = "Actif";
-        }
-        else
-        {
-            imageActif = "/RessourceVisuel/groupeinactif.jpg";
-            siActif = "Inactif";
-        }
+            var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
+            groupeProf = groupe.Data;
 
-        var dateCloture = (groupeProf != null) ? groupeProf.DateCloture : DateTime.MinValue;
-        dateAffichee = dateCloture.ToString("yyyy-MM-dd");
-
-        var cours = await CoursService.Get((int)groupeProf.CoursId);
-        groupeCours = cours.Data;
-
-        var graphe = await GrapheService.GetAllFromGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
-        var graphes = graphe.Data;
-        foreach (var grapheGroupe in graphes)//Va chercher tous les graphes, de tous les groupes
-        {
-            if (grapheGroupe != null)
+            if (groupeProf.DateCloture >= dateDuJour)
             {
-                listGrapheGroupe.Add(grapheGroupe);
+                imageActif = "/RessourceVisuel/groupeactif.jpg";
+                siActif = "Actif";
             }
-        }
-
-        var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
-        var etudiants = eleve.Data;
-
-        foreach (var etudiant in etudiants)
-        {
-            var responseEtudiant = await EtudiantService.Get(etudiant.CodeDA);
-            var etudiantGroupe = responseEtudiant.Data;
-
-            // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
-            if (etudiantGroupe != null)
+            else
             {
-                listEtudiantAjoute.Add(etudiantGroupe);
-                selectedEtudiants.Add(etudiantGroupe.Identifiant);
+                imageActif = "/RessourceVisuel/groupeinactif.jpg";
+                siActif = "Inactif";
             }
-        }
-        StateHasChanged();
+
+            var dateCloture = (groupeProf != null) ? groupeProf.DateCloture : DateTime.MinValue;
+            dateAffichee = dateCloture.ToString("yyyy-MM-dd");
+
+            var graphe = await GrapheService.GetAllFromGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+            var graphes = graphe.Data;
+            foreach (var grapheGroupe in graphes)//Va chercher tous les graphes, de tous les groupes
+            {
+                if (grapheGroupe != null)
+                {
+                    listGrapheGroupe.Add(grapheGroupe);
+                }
+            }
+
+            var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+            var etudiants = eleve.Data;
+
+            foreach (var studentGroupe in etudiants)
+            {
+                var responseEtudiant = await EtudiantService.Get(studentGroupe.CodeDA);
+                var etudiantGroupe = responseEtudiant.Data;
+
+                // Vérifiez si l'étudiantGroupe est non null avant de l'ajouter à la liste
+                if (etudiantGroupe != null)
+                {
+                    listEtudiantAjoute.Add(etudiantGroupe);
+                    selectedEtudiants.Add(etudiantGroupe.Identifiant);
+                }
+            }
+
+            if (await CoursService.Get((int)groupeProf.CoursId) != null)
+            {
+                var cours = await CoursService.Get((int)groupeProf.CoursId);
+                groupeCours = cours.Data;
+            }        
+            StateHasChanged();
+        }    
+        catch{ }
     }
     private async void SupprimerGroupe()
     {
         var responseGroupeEtudiant = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
         var responseGraphe = await GrapheService.GetAllFromGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
 
-        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer ce groupe ? Il contient : "+ responseGroupeEtudiant.Data.Count() +" étudiant(s) et " +responseGraphe.Data.Count()+ " graphe(s)", "Supprimer");
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer ce groupe ? Il contient : "+ responseGroupeEtudiant.Data.Count() +" étudiant(s) et " +responseGraphe.Data.Count()+ " graphe(s). Par la suite de cette action ces données seront supprimés.", "Supprimer");
 
         if (result.HasValue && result.Value)
         {
+            loading = true;
+            StateHasChanged();
+
             foreach (var etudiantGroupeDelete in responseGroupeEtudiant.Data)
             {
                 await GroupeEtudiantService.Delete(etudiantGroupeDelete.Groupe_EtudiantId);
-
-                foreach(var grapheGroupe in responseGraphe.Data)
-                {
-                    await GrapheService.Delete(grapheGroupe.GrapheId);
-                }
+            }
+            foreach (var grapheGroupe in responseGraphe.Data)
+            {
+                await SupprimerGraphe(grapheGroupe.GrapheId);
             }
 
             await GroupeService.Delete(await sessionStorage.GetItemAsync<int>("idGroupe"));
+            loading = false;
             await OnGroupeDelete.InvokeAsync();
             Rerender.TriggerGroupeDelete();
             NavigationManager.NavigateTo("/");
         }
+    }
+    private async Task AssocierCours(int coursId)
+    {
+        var groupe = await GroupeService.Get(await sessionStorage.GetItemAsync<int>("idGroupe"));
+        groupeProf = groupe.Data;
+        groupeProf.CoursId = coursId;
+        await GroupeService.Update(groupeProf.GroupeId, groupeProf);
+        var Newcours = await CoursService.Get(coursId);
+        StateHasChanged();
+        groupeCours = Newcours.Data;
+        await OnGroupeDelete.InvokeAsync();
+        Rerender.TriggerGroupeDelete();
+        StateHasChanged();
     }
 
     private async Task UpdateEtudiant()
@@ -270,6 +312,69 @@
         }
     }
 
+    //ACTION POUR SUPPRESSION DES GRAPHES LORS DE LA SUPPRESION DE GROUPE
+
+    private async Task SupprimerGraphe(int grapheId)
+    {
+            // Récupérer tous les nœuds du graphe
+            var allNoeuds = await NoeudService.GetAllFromGraph(grapheId);
+            var noeuds = allNoeuds.Data;
+
+            // Supprimer les nœuds et leurs enfants récursivement
+            foreach (var noeudDelete in noeuds)
+            {
+                await SupprimerNoeudEtSesEnfants(noeudDelete.NoeudId);
+            }
+
+            // Supprimer le graphe
+            await GrapheService.Delete(grapheId);
+    }
+
+    private async Task SupprimerNoeudEtSesEnfants(int noeudId)
+    {
+        // Supprimer les pages associées au nœud
+        var allPage = await PageService.GetAllFromNoeud(noeudId);
+        var pages = allPage.Data;
+
+        if (pages != null)
+        {
+            foreach (var pageDelete in pages)
+            {
+                var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
+                var composant = allComposant.Data;
+
+                if (composant != null)
+                {
+                    foreach (var composantDelete in composant)
+                    {
+                        await ComposantService.Delete(composantDelete.ComposantId);
+                    }
+                }
+                await PageService.Delete(pageDelete.PageId);
+            }
+        }
+
+        // Supprimer les enfants récursivement
+        var children = await NoeudService.GetAllById(noeudId);
+        foreach (var child in children.Data)
+        {
+            await SupprimerNoeudEtSesEnfants(child.NoeudId);
+        }
+
+        // Supprimer les associations d'étudiants pour le nœud
+        var noeudEtudiants = await NoeudEtudiantService.GetAllById(noeudId);
+        var etudiantNoeudDelete = noeudEtudiants.Data;
+        if (etudiantNoeudDelete != null)
+        {
+            foreach (var etudiantNoeud in etudiantNoeudDelete)
+            {
+                await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
+            }
+        }
+
+        // Supprimer le nœud lui-même
+        await NoeudService.Delete(noeudId);
+    }
 
     private async void RedirectionGraphe(int id)
     {
