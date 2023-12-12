@@ -12,8 +12,8 @@ using STIMULUS_V2.Server.Data;
 namespace STIMULUS_V2.Server.Migrations
 {
     [DbContext(typeof(STIMULUSContext))]
-    [Migration("20231204023040_test2")]
-    partial class test2
+    [Migration("20231206211532_ContenueMax")]
+    partial class ContenueMax
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -170,7 +170,10 @@ namespace STIMULUS_V2.Server.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Contenue")
-                        .HasColumnType("varchar(8000)");
+                        .HasColumnType("varchar(max)");
+
+                    b.Property<int?>("ExerciceId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Nom")
                         .IsRequired()
@@ -182,6 +185,8 @@ namespace STIMULUS_V2.Server.Migrations
                     b.HasKey("FichierSauvegardeId");
 
                     b.HasIndex("CodeDA");
+
+                    b.HasIndex("ExerciceId");
 
                     b.ToTable("FichierSauvegarde");
                 });
@@ -395,32 +400,6 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Noeud");
                 });
 
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant", b =>
-                {
-                    b.Property<int>("Noeud_EtudiantId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Noeud_EtudiantId"), 1L, 1);
-
-                    b.Property<string>("CodeDA")
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("NoeudId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Noeud_EtudiantId");
-
-                    b.HasIndex("CodeDA");
-
-                    b.HasIndex("NoeudId");
-
-                    b.ToTable("Noeud_Etudiant");
-                });
-
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page", b =>
                 {
                     b.Property<int>("PageId")
@@ -574,7 +553,13 @@ namespace STIMULUS_V2.Server.Migrations
                         .WithMany()
                         .HasForeignKey("CodeDA");
 
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Exercice", "Exercice")
+                        .WithMany()
+                        .HasForeignKey("ExerciceId");
+
                     b.Navigation("Etudiant");
+
+                    b.Navigation("Exercice");
                 });
 
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.FichierSource", b =>
@@ -638,21 +623,6 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Graphe");
 
                     b.Navigation("NoeudParent");
-                });
-
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant", b =>
-                {
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Etudiant", "Etudiant")
-                        .WithMany()
-                        .HasForeignKey("CodeDA");
-
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Noeud", "Noeud")
-                        .WithMany()
-                        .HasForeignKey("NoeudId");
-
-                    b.Navigation("Etudiant");
-
-                    b.Navigation("Noeud");
                 });
 
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Page", b =>

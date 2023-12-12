@@ -45,18 +45,20 @@ else
                 <RadzenRow RowGap="2" Class="justify-content-center">
                     @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
                     {
+                        <div style="justify-content-center">
+                            <!-- Conteneur du composant spécifique -->
+                            @if (composant.Type == "Code")
+                            {
+                                <CodeComponent Reference="composant.Reference" />
+                            }
+                            @if (composant.Type == "Exercice")
+                            {
+                                <ExerciceComponent Reference="composant.Reference" />
+                            }
+                        </div>
                         <div style="margin: 0 auto; width: 100%;max-width: 1200px; padding: 10px; text-align: center; box-sizing: content-box;">
-
                             <!-- Conteneur du composant spécifique -->
                             <div style="text-align: center;">
-                                @if (composant.Type == "Code")
-                                {
-                                    <CodeComponent Reference="composant.Reference" />
-                                }
-                                @if (composant.Type == "Exercice")
-                                {
-                                    <ExerciceComponent Reference="composant.Reference" />
-                                }
                                 @if (composant.Type == "Image")
                                 {
                                     <ImageComponent Reference="composant.Reference" />
@@ -81,7 +83,6 @@ else
         </RadzenBody>
     </RadzenLayout>
 }
-
 @code {
     [Parameter]
     public EventCallback OnStatusUpdated { get; set; }

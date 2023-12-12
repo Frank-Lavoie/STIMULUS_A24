@@ -1,4 +1,4 @@
-@* @using Newtonsoft.Json;
+@using Newtonsoft.Json;
 @using STIMULUS_V2.Shared.Interface.ChildInterface;
 @using STIMULUS_V2.Shared.Models.Entities;
 @using BlazorMonaco
@@ -18,7 +18,7 @@
 
     <AuthorizeView Roles="ETUDIANT">
         <GrapheEtudiant />
-    </AuthorizeView>
+    </AuthorizeView>*@
     <div>
         <div class="fileSelector">
             @if (FichierCode != null)
@@ -83,7 +83,6 @@
             <button @onclick=@Save class="boutonExerciceDroite">Sauvegarder</button>
         </div>
     </div>
-
     <style>
         .focused {
             display: block;
@@ -98,7 +97,6 @@
             width: 800px;
         }
     </style>
-
     @code {
     [Parameter]
     public int Reference { get; set; }
@@ -361,6 +359,7 @@
             await ChangeTab(fichier.Id);
             fichiersSauvegardes.Add(new FichierSauvegarde()
             {
+                FichierSauvegardeId = fichier.Id,
                 Nom = fichier.Nom,
                 Contenue = fichier.Contenu,
                 Version = DateTime.Now,
@@ -372,28 +371,39 @@
         {
             foreach (var PostFichier in fichiersSauvegardes)
             {
-                if(await FichierSauvegardeService.Get(PostFichier.FichierSauvegardeId) != null)
+                var tempoFi = new FichierSauvegarde()
                 {
+                    Nom = PostFichier.Nom,
+                    Contenue = PostFichier.Contenue,
+                    Version = DateTime.Now,
+                    CodeDA = IdEtudiant,
+                    ExerciceId = exercice.ExerciceId
+                };
+                try
+                {
+                    var fichierTest = await FichierSauvegardeService.Get(PostFichier.FichierSauvegardeId);
+                    var dataFichierTest = fichierTest.Data;
                     await FichierSauvegardeService.Update(PostFichier.FichierSauvegardeId, PostFichier);
                 }
-                else
+                catch (Exception e)
                 {
-                    await FichierSauvegardeService.Create(PostFichier);
-                }               
+                    Console.WriteLine(e.Message);
+                    await FichierSauvegardeService.Create(tempoFi);
+                }
             }
-
             var fichiersSauvegardesCall = await FichierSauvegardeService.GetAllExercice(exercice.ExerciceId, IdEtudiant);
             var fichier = fichiersSauvegardesCall.Data;
 
+            FichierCode.Clear();
             foreach (var fichierListSauvegarde in fichier)
             {
                 FichierCode.Add(new Fichier()
-                    {
-                        Contenu = fichierListSauvegarde.Contenue,
-                        Nom = fichierListSauvegarde.Nom,
-                        Id = fichierListSauvegarde.FichierSauvegardeId,
-                        Css = HiddenTab
-                    });
+                {
+                    Contenu = fichierListSauvegarde.Contenue,
+                    Nom = fichierListSauvegarde.Nom,
+                    Id = fichierListSauvegarde.FichierSauvegardeId,
+                    Css = HiddenTab
+                });
             }
             //FichierCode[0].Css = FocusedTab;
         }
@@ -406,19 +416,15 @@
         Console.WriteLine("File saved");
 
         //var log = Log.ForContext<StimulusFrontEnd.Models.Exercice>();
-
         //log.Information($"Save(): File saved");
-
         if (FichierCode.Count() > 0)
         {
             if (id < 0)
                 id = FichierCode.Last().Id;
             await ChangeTab(id);
         }
-
         StateHasChanged();
     }
-
     /// <summary>
     /// Change le focus du fichier à éditer
     /// </summary>
@@ -437,7 +443,6 @@
         await SetCode(FichierCode.Find(f => f.Id == id).Contenu);
         StateHasChanged();
     }
-
     /// <summary>
     /// Ajoute un fichier
     /// </summary>
@@ -479,12 +484,10 @@
             {
 
             }
-
         }
-
         StateHasChanged();
     }
-
     public EventCallback<List<FichierSource>> FichierSourceChanged { get; set; }
     }
-} *@
+}
+

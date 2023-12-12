@@ -71,14 +71,15 @@ using (var scope = app.Services.CreateScope())
     context.EnsureEtuUserCreated();
     context.EnsureProfUserCreated();
 
-    ////Création du trigger pour changer le status de bloqué/débloqué
+
+    ////CrÃ©ation du trigger pour changer le status de bloquÃ©/dÃ©bloquÃ©
     //context.Database.ExecuteSqlRaw(@"
     //    CREATE TRIGGER TRG_UpdateStatus
     //    ON Noeud
     //    AFTER UPDATE
     //    AS
     //    BEGIN
-    //        -- Mettre à jour le statut dans la table Noeud_Etudiant
+    //        -- Mettre Ã  jour le statut dans la table Noeud_Etudiant
     //        UPDATE ne
     //        SET ne.Status = n.Status
     //        FROM Noeud_Etudiant ne
@@ -88,14 +89,14 @@ using (var scope = app.Services.CreateScope())
     //        WHERE i.Status <> d.Status OR (i.Status IS NULL AND d.Status IS NOT NULL) OR (i.Status IS NOT NULL AND d.Status IS NULL);
     //    END;
     //");
-    ////Création du trigger pour inséré des données dans Noeud_Etudiant
+    ////CrÃ©ation du trigger pour insÃ©rÃ© des donnÃ©es dans Noeud_Etudiant
     //context.Database.ExecuteSqlRaw(@"
     //    CREATE TRIGGER TRG_AfterInsertNoeud
     //    ON Noeud
     //    AFTER INSERT
     //    AS
     //    BEGIN
-    //        -- Insertion des étudiants dans Noeud_Etudiant
+    //        -- Insertion des Ã©tudiants dans Noeud_Etudiant
     //        INSERT INTO Noeud_Etudiant (NoeudId, CodeDA, Status)
     //        SELECT i.NoeudId, ge.CodeDA, i.Status
     //        FROM inserted i

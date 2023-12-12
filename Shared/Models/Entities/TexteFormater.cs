@@ -12,6 +12,6 @@ namespace STIMULUS_V2.Shared.Models.Entities
         public int TexteFormaterId { get; set; }
 
         [Column(TypeName = "nvarchar(max)")]
-        public string? Contenu { get; set; }
+        public string? Contenue { get; set; }
     }
 }

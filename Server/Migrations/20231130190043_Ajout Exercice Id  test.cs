@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace STIMULUS_V2.Server.Migrations
 {
-    public partial class pagenom : Migration
+    public partial class AjoutExerciceIdtest : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -231,7 +231,8 @@ namespace STIMULUS_V2.Server.Migrations
                     Nom = table.Column<string>(type: "nvarchar(10)", nullable: false),
                     Contenue = table.Column<string>(type: "varchar(8000)", nullable: true),
                     Version = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CodeDA = table.Column<string>(type: "nvarchar(255)", nullable: true)
+                    CodeDA = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    ExerciceId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -241,6 +242,11 @@ namespace STIMULUS_V2.Server.Migrations
                         column: x => x.CodeDA,
                         principalTable: "Etudiant",
                         principalColumn: "Identifiant");
+                    table.ForeignKey(
+                        name: "FK_FichierSauvegarde_Exercice_ExerciceId",
+                        column: x => x.ExerciceId,
+                        principalTable: "Exercice",
+                        principalColumn: "ExerciceId");
                 });
 
             migrationBuilder.CreateTable(
@@ -354,7 +360,6 @@ namespace STIMULUS_V2.Server.Migrations
                     PageId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Ordre = table.Column<int>(type: "int", nullable: false),
-                    Nom = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NoeudId = table.Column<int>(type: "int", nullable: true),
                     ImportanceId = table.Column<string>(type: "char(3)", nullable: true)
                 },
@@ -380,6 +385,7 @@ namespace STIMULUS_V2.Server.Migrations
                     ComposantId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Ordre = table.Column<int>(type: "int", nullable: false),
+                    Reference = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(20)", nullable: true),
                     PageId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -428,6 +434,11 @@ namespace STIMULUS_V2.Server.Migrations
                 name: "IX_FichierSauvegarde_CodeDA",
                 table: "FichierSauvegarde",
                 column: "CodeDA");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FichierSauvegarde_ExerciceId",
+                table: "FichierSauvegarde",
+                column: "ExerciceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FichierSource_ExerciceId",
