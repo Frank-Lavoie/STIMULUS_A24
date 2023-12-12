@@ -9,44 +9,39 @@
 @inject IExerciceService ExerciceService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 @inject IJSRuntime JsRunTime
+@inject DialogService DialogService
 
 @if (InitDone)
 {
     @*<AuthorizeView Roles="PROFESSEUR">
-        <GrapheProf />
+        VOTRE CODE POUR LA VUE PROFESSEUR
     </AuthorizeView>
 
     <AuthorizeView Roles="ETUDIANT">
-        <GrapheEtudiant />
+        VOTRE CODE POUR LA VUE ÉTUDIANT
     </AuthorizeView>*@
     <div>
-        <div class="fileSelector">
+        <div class="fileSelector d-flex align-items-center">
             @if (FichierCode != null)
             {
                 @foreach (Fichier fichier in FichierCode)
                 {
+                    <div class="file-tab">
+                        <button @onclick="() => ChangeTab(fichier.Id)" class="custom-gestion-subtitle" style="color: @(fichier.Css == "focused" ? "white" : "grey")">@((fichier.Nom != null) ? fichier.Nom : "")</button>
 
-                    @if (fichier.Nom == "Main.py" || fichier.Nom == "main.py")
-                    {
-                        <div class="file-tab">
-                            <button @onclick="() => ChangeTab(fichier.Id)" style="color: @(fichier.Css == "focused" ? "white" : "grey")">@((fichier.Nom != null) ? fichier.Nom : "")</button>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="file-tab">
-                            <button @onclick="() => ChangeTab(fichier.Id)" style="color: @(fichier.Css == "focused" ? "white" : "grey")">@((fichier.Nom != null) ? fichier.Nom : "")</button>
+                        @if (fichier.Nom != "Main.py" && fichier.Nom != "main.py")
+                        {
                             <button class="close-button" @onclick="() => Delete(fichier.Id)">X</button>
-                        </div>
-                    }
-
+                        }
+                    </div>
                 }
             }
             else
             {
                 <p>Chargement...</p>
             }
-            <button @onclick="AddPage">+</button>
+
+            <RadzenButton Click=AlertAddPage Icon="add" class="custom-gestion-subtitle" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
         </div>
 
         <div class="d-flex justify-content-around">
@@ -72,16 +67,22 @@
                 }
             </div>
             <div id="background-result">
-                <p style="white-space:pre-wrap; color: white;">@Result</p>
+                <div class="d-flex align-items-center">
+                    <p class="custom-gestion-subtitle" style="white-space:pre-wrap; color: white;">@Result</p>
+
+                    @if (pythonLoading == true)
+                    {
+                        <RadzenProgressBarCircular Style="margin-left:10px;" ProgressBarStyle="ProgressBarStyle.Light" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Small" />
+                    }
+                </div>
+
             </div>
         </div>
     </div>
     <!-- Section bouton -->
-    <div class="row">
-        <div class="d-flex flex-row-reverse" style="width: 800px">
-            <button @onclick=@Post class="boutonExerciceGauche">Éxecuter</button>
-            <button @onclick=@Save class="boutonExerciceDroite">Sauvegarder</button>
-        </div>
+    <div class="form-group mt-2 d-flex justify-content-center">
+        <RadzenButton Click="Save" Style="background-color: #14274E;" class="custom-creategroup-title" Text="Sauvegarder" Icon="save" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Click="Post" Style="background-color: #14274E; margin-left:5px;" class="custom-creategroup-title" Text="Exécuter" Icon="arrow_forward_ios" ButtonStyle="ButtonStyle.Primary" />
     </div>
     <style>
         .focused {
@@ -100,6 +101,8 @@
     @code {
     [Parameter]
     public int Reference { get; set; }
+    public string NomFichier { get; set; }
+    public bool pythonLoading { get; set; }
 
     public Exercice exercice { get; set; }
 
@@ -279,7 +282,7 @@
 
             Result = "Échec de la supression des fichiers";
         }
-        Result = "Fichier supprimé";
+        Result = "Fichier supprimé ✔️";
         //}
         await SetCode();
         StateHasChanged();
@@ -310,6 +313,7 @@
         int id = FichierCode.FirstOrDefault().Id;
 
         Result = "Interprétation du code...";
+        pythonLoading = true;
         Console.WriteLine("Running python code...");
         StateHasChanged();
 
@@ -340,6 +344,7 @@
         //Voir pour le mettre en post
         var sortieApi = await ExerciceService.ExecuteCode(IdEtudiant, jsonString);
         Result = sortieApi.Data;
+        pythonLoading = false;
         StateHasChanged();
     }
 
@@ -411,7 +416,7 @@
         {
             Result = "Échec de l'enregistrement des fichiers";
         }
-        Result = "Fichiers enregistrés";
+        Result = "Fichiers enregistrés ✔️";
 
         Console.WriteLine("File saved");
 
@@ -446,25 +451,34 @@
     /// <summary>
     /// Ajoute un fichier
     /// </summary>
-    private async void AddPage()
+    private async void AddPage(string nomFichier, DialogService dialogService)
     {
-        string nomFichier = await JS.InvokeAsync<string>("PromptFunction.promptFunc", null);
         nomFichier = String.Concat(nomFichier.Where(c => !Char.IsWhiteSpace(c))).ToLower();
+        nomFichier = NomFichier;
 
         if (String.IsNullOrWhiteSpace(nomFichier))
         {
             Result = "Nom de fichier invalide";
+            dialogService.Close(true);
         }
         else if (nomFichier.Length < 4)
         {
             Result = "Nom de fichier trop court";
+            dialogService.Close(true);
         }
         else if (FichierCode.Any(f => f.Nom == nomFichier))
         {
             Result = "Nom de fichier déjà utilisé";
+            dialogService.Close(true);
         }
         else
         {
+            if (!nomFichier.EndsWith(".py"))
+            {
+                // Ajouter ".py" à la fin du nom du fichier
+                nomFichier += ".py";
+            }
+
             try
             {
                 foreach (Fichier f in FichierCode)
@@ -479,6 +493,7 @@
                         Id = -(FichierCode.Count + 1),
                         Css = FocusedTab
                     });
+                dialogService.Close(true);
             }
             catch (Exception e)
             {
@@ -487,6 +502,23 @@
         }
         StateHasChanged();
     }
+
+
+    async Task AlertAddPage()
+    {
+        var result = await DialogService.OpenAsync("Ajouter une page", ds =>
+        @<RadzenStack Gap="1.5rem">
+        <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="NomFichier" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Ajouter" Click="(() => AddPage(NomFichier, ds))" ButtonStyle="ButtonStyle.Primary" />
+                <RadzenButton Text="Annuler" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    );
+    }
+
     public EventCallback<List<FichierSource>> FichierSourceChanged { get; set; }
     }
 }
