@@ -31,6 +31,9 @@
                 <RadzenText class="custom-grapheprof-selectuser-title">+</RadzenText>
                 <RadzenImage class="custom-grapheprof-selectuser-title" Style="height: 30px; width: 30px; align-content:center; margin-left: 1%;margin-right: 1%;" Path="/RessourceVisuel/scroll.png"></RadzenImage>
                 <RadzenText class="custom-grapheprof-selectuser-title">pour zoomer !</RadzenText>
+                <div class="rz-m-12">
+                    <RadzenProgressBar @bind-Value="@pourcentageProgression" Unit="% complété"  Style="width:300px;" />
+                </div>
                 @if (loading == true)
                 {
                     <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Size="ProgressBarCircularSize.Medium" Mode="ProgressBarMode.Indeterminate">
@@ -110,10 +113,12 @@
     private string displayNouveauNoeud = "hidden";
     private Noeud nouveauNoeud;
     private Noeud_Etudiant noeudEtudiant;
+    public double pourcentageProgression;
 
     protected async override void OnInitialized()
     {
         await UpdateGraphe();
+        await CalculProgressionEtudiant();
         Rerender.OnNoeudStatus += HandleChangeNoeud;
     }
 
@@ -145,7 +150,7 @@
 
     private void OnMouseHover() => displayHover = "show";
     private void OnMouseLeave() => displayHover = "hidden";
-                   
+
     /// <summary>
     /// Appeler un changement de status
     /// </summary>
@@ -153,6 +158,35 @@
     {
         await UpdateGraphe(); 
         StateHasChanged();
+    }
+
+    private async Task CalculProgressionEtudiant()
+    {
+        int totalNodes = Nodes.Count();
+        int progressionEtudiant = 0;
+
+        foreach (var progression in Nodes)
+        {
+            var etudiantData = await NoeudEtudiantService.GetByNoeudAndDa(progression.NoeudId, await sessionStorage.GetItemAsync<string>("idConnexion"));
+
+            if (etudiantData != null)
+            {
+                var noeudEtudiant = etudiantData.Data;
+
+                if (noeudEtudiant.Status == 4)
+                {
+                    progressionEtudiant += 1;
+                }
+            }
+        }
+
+        bool tousLesNoeudsSontDeStatus4 = progressionEtudiant == totalNodes;
+
+        // Calculer la progression en pourcentage
+        double pourcentageProgressionVirule = tousLesNoeudsSontDeStatus4 ? 100.0 : (double)progressionEtudiant / totalNodes * 100;
+
+        // Convertir le pourcentage en entier
+        pourcentageProgression = (int)pourcentageProgressionVirule;
     }
 
     private void ResetViewbox()

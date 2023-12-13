@@ -178,35 +178,39 @@
     /// </summary>
     private async Task UpdateGraphe()
     {
-        Nodes = new();
-        if (sessionStorage != null)
+        try
         {
-            int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
-
-            var groupeGraphe = await GrapheService.Get(idGraphe);
-            var groupe = groupeGraphe.Data;
-            await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
-
-            // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
-            while (idGraphe == 0)
+            Nodes = new();
+            if (sessionStorage != null)
             {
-                //Plus chill qu'une boucle industrielle
-                await Task.Delay(100);
-            }
-            Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
-            loadingEtudiant = true;
-            foreach (var noeud in Nodes)
-            {
-                foreach(var student in listEtudiant)
+                int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
+
+                var groupeGraphe = await GrapheService.Get(idGraphe);
+                var groupe = groupeGraphe.Data;
+                await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
+
+                // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
+                while (idGraphe == 0)
                 {
-                    await NoeudEtudiantService.GetProgression(student, idGraphe, noeud.NoeudId);
+                    //Plus chill qu'une boucle industrielle
+                    await Task.Delay(100);
                 }
+                Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+                loadingEtudiant = true;
+                foreach (var noeud in Nodes)
+                {
+                    foreach (var student in listEtudiant)
+                    {
+                        await NoeudEtudiantService.GetProgression(student, idGraphe, noeud.NoeudId);
+                    }
+                }
+                loadingEtudiant = false;
+                await OnEtudiantChanged.InvokeAsync();
+                Rerender.TriggerEtudiantChanged();
             }
-            loadingEtudiant = false;
-            await OnEtudiantChanged.InvokeAsync();
-            Rerender.TriggerEtudiantChanged();
+            StateHasChanged();
         }
-        StateHasChanged();
+        catch { }
     }
 
     private async Task GetDataGroupe()
