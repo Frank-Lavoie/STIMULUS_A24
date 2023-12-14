@@ -9,6 +9,7 @@ using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Web;
 
 namespace STIMULUS_V2.Server.Services
 {
@@ -51,6 +52,7 @@ namespace STIMULUS_V2.Server.Services
                 string path = "Python/" + da;
                 bool status = false;
                 List<string> filenames = new List<string>();
+                json = Uri.UnescapeDataString(json);
 
                 if (!Directory.Exists(path))
                     dossier = Directory.CreateDirectory(path);
