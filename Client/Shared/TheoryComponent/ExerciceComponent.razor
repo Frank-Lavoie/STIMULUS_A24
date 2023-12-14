@@ -4,6 +4,7 @@
 @using BlazorMonaco
 @using BlazorMonaco.Editor
 @using BlazorMonaco.Languages
+@using System.Web
 
 @inject IFichierSauvegardeService FichierSauvegardeService
 @inject IExerciceService ExerciceService
@@ -340,9 +341,10 @@
         await ChangeTab(id);
 
         jsonString = JsonConvert.SerializeObject(fichiers);
+        string urlString = Uri.EscapeDataString(jsonString);
 
         //Voir pour le mettre en post
-        var sortieApi = await ExerciceService.ExecuteCode(IdEtudiant, jsonString);
+        var sortieApi = await ExerciceService.ExecuteCode(IdEtudiant, urlString);
         Result = sortieApi.Data;
         pythonLoading = false;
         StateHasChanged();
