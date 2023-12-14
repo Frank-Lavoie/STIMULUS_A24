@@ -153,6 +153,38 @@ namespace STIMULUS_V2.Server.Services
                 return new APIResponse<IEnumerable<Noeud>>(null, 500, $"Erreur lors de la récupération du model par son graph {typeof(Noeud).Name}. Message : {ex.Message}.");
             }
         }
+        public async Task<APIResponse<bool>> ReOrderNoeuds(int noeud)
+        {
+            try
+            {
+                var ParentNode = await Get(noeud);
+                var ChildNode = await GetAllById(noeud);
+
+                // Ajustez la position en X et Y pour chaque enfant
+                for (int i = 0; i < ChildNode.Data.Count(); i++)
+                {
+                    var ChildrenNode = ChildNode.Data.ElementAt(i);
+
+                    // Ajustez la position en Y pour que les enfants soient sous le parent
+                    ChildrenNode.PosY = ParentNode.Data.PosY + 200;
+
+                    // Ajustez la position en X pour aligner les enfants horizontalement avec le parent
+                    // et les espacer en fonction de l'index
+                    ChildrenNode.PosX = ParentNode.Data.PosX + (i - (ChildNode.Data.Count() - 1) / 2.0) * 200;
+
+                    await Update(ChildrenNode.NoeudId, ChildrenNode);
+                }
+
+                return new APIResponse<bool>(true, 200, "Ré-arrangement terminé");
+            }
+            catch
+            {
+                return new APIResponse<bool>(false, 500, "Erreur lors du ré-arrangement des noeuds");
+            }
+
+        }
+
+
 
         public async Task<APIResponse<Noeud>> Update(int id, Noeud item)
         {

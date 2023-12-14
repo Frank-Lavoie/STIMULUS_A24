@@ -48,7 +48,11 @@
                     }
                 }
             }
-            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto; background-color: #14274E;" />
+            @if (modeDeVue == 2)
+            {
+                <RadzenButton class="custom-graphe-viewmodebutton-title" Click=ReOrderNodes Text="Réordonner" Style="margin-left: auto; background-color: #14274E;" ButtonStyle="ButtonStyle.Warning" />
+            }
+            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="margin-left: auto; background-color: #14274E;" />
             @if (loading == true)
             {
                 <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
@@ -174,35 +178,39 @@
     /// </summary>
     private async Task UpdateGraphe()
     {
-        Nodes = new();
-        if (sessionStorage != null)
+        try
         {
-            int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
-
-            var groupeGraphe = await GrapheService.Get(idGraphe);
-            var groupe = groupeGraphe.Data;
-            await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
-
-            // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
-            while (idGraphe == 0)
+            Nodes = new();
+            if (sessionStorage != null)
             {
-                //Plus chill qu'une boucle industrielle
-                await Task.Delay(100);
-            }
-            Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
-            loadingEtudiant = true;
-            foreach (var noeud in Nodes)
-            {
-                foreach(var student in listEtudiant)
+                int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
+
+                var groupeGraphe = await GrapheService.Get(idGraphe);
+                var groupe = groupeGraphe.Data;
+                await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
+
+                // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
+                while (idGraphe == 0)
                 {
-                    await NoeudEtudiantService.GetProgression(student, idGraphe, noeud.NoeudId);
+                    //Plus chill qu'une boucle industrielle
+                    await Task.Delay(100);
                 }
+                Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+                loadingEtudiant = true;
+                foreach (var noeud in Nodes)
+                {
+                    foreach (var student in listEtudiant)
+                    {
+                        await NoeudEtudiantService.GetProgression(student, idGraphe, noeud.NoeudId);
+                    }
+                }
+                loadingEtudiant = false;
+                await OnEtudiantChanged.InvokeAsync();
+                Rerender.TriggerEtudiantChanged();
             }
-            loadingEtudiant = false;
-            await OnEtudiantChanged.InvokeAsync();
-            Rerender.TriggerEtudiantChanged();
+            StateHasChanged();
         }
-        StateHasChanged();
+        catch { }
     }
 
     private async Task GetDataGroupe()
@@ -526,6 +534,20 @@
 
         // Supprimer le nœud lui-même
         await NoeudService.Delete(noeudId);
+    }
+
+    public async Task ReOrderNodes()
+    {
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir réordonner les nœuds de ce graph ? Cette option réinitialisera la position de vos nœuds pour leur donner une nouvelle position.", "Réordonner");
+        if (result.HasValue && result.Value)
+        {
+            foreach (var noeud in Nodes)
+            {
+                await NoeudService.ReOrderNoeuds(noeud.NoeudId);
+            }
+        }
+        await UpdateGraphe();
+        StateHasChanged();
     }
 
     /// <summary>

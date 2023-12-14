@@ -6,12 +6,11 @@
 @if (reference != null)
 {
     <div>
-        <h1 style="font-size: 1.5em;">@((reference.Description != null) ? reference.Description : "")</h1>
-        <p>
+        <h2>
             <a href="@((reference.Url != null) ? reference.Url : "")" target="_blank">
-                @((reference.Url != null) ? "Voir la référence" : "")
+                @((reference.Url != null) ? (reference.Description) : "")
             </a>
-        </p>
+        </h2>
     </div>
 }
 else
