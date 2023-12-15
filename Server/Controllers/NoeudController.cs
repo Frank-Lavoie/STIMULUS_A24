@@ -76,6 +76,16 @@ namespace STIMULUS_V2.Server.Controllers
             return apiResponse;
         }
 
+        [HttpGet("Fetch/ReOrder/{id}")]
+        public async Task<IActionResult> ReOrderNoeuds(int id)
+        {
+            var response = await noeudService.ReOrderNoeuds(id);
+            var log = Log.ForContext<NoeudController>();
+            var apiResponse = StatusCode(response.StatusCode, response);
+            log.Information($"GetAllFromGraph(int id = {id}) \n  Response: {apiResponse}");
+            return apiResponse;
+        }
+
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Noeud noeud)
         {

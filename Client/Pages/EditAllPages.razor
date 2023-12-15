@@ -96,7 +96,7 @@
                                                         <RadzenLabel Text="Contenu" />
                                                     </RadzenColumn>
                                                     <RadzenColumn Size="12" SizeMD="8">
-                                                        <RadzenTextBox @bind-Value="contenuTexte" Style="width: 200px; height : 160px" />
+                                                        <RadzenTextArea @bind-Value="contenuTexte" Style="width: 200px; height : 200px" />
                                                     </RadzenColumn>
                                                 </RadzenRow>
                                             }
@@ -140,7 +140,7 @@
                                             }
                                             @if (typeComposant == "Exercice")
                                             {
-                                                <RadzenRow AlignItems="AlignItems.Center">
+                                                <RadzenRow AlignItems="AlignItems.Start">
                                                     <RadzenColumn Size="12" SizeMD="4">
                                                         <RadzenLabel Text="Solution" />
                                                     </RadzenColumn>
@@ -164,7 +164,7 @@
                                                         <RadzenLabel Text="Contenu" />
                                                     </RadzenColumn>
                                                     <RadzenColumn Size="12" SizeMD="8">
-                                                        <RadzenTextBox @bind-Value="contenuCode" Style="width: 200px;" />@* TEMPORAIRE *@
+                                                        <RadzenTextArea @bind-Value="contenuCode" Style="width: 200px;height : 200px;" />@* TEMPORAIRE *@
                                                     </RadzenColumn>
                                                 </RadzenRow>
                                             }
@@ -179,10 +179,10 @@
                     </EditForm>
                 </Popup>
             </RadzenStack>
-            <RadzenRow RowGap="2" Class="justify-content-center">
+            <RadzenRow RowGap="2" Class="justify-content-start">
                 @foreach (var composant in listComposant.OrderBy(c => c.Ordre))
                 {
-                    <div style="margin: 0 auto; width: 100%;max-width: 1200px; padding: 10px; text-align: center; box-sizing: content-box;">
+                    <div style="margin: 0 auto; width: 100%;max-width: 1200px; padding: 10px;">
                         <!-- Conteneur du bouton -->
                         <div style="text-align: right; margin-bottom: 10px;">
                             <div style="text-align: center;">
@@ -194,8 +194,8 @@
                             </div>
                         </div>
 
-                        <!-- Conteneur du composant spécifique -->
-                        <div style="text-align: center;">
+                        <div style="justify-content-center">
+                            <!-- Conteneur du composant spécifique -->
                             @if (composant.Type == "Code")
                             {
                                 <CodeComponent Reference="composant.Reference" />
@@ -204,6 +204,10 @@
                             {
                                 <ExerciceComponent Reference="composant.Reference" />
                             }
+                        </div>
+
+                        <div style="text-align: center;">
+
                             @if (composant.Type == "Image")
                             {
                                 <ImageComponent Reference="composant.Reference" />
@@ -226,7 +230,8 @@
             </RadzenRow>
         </RadzenCard>
     </RadzenBody>
-</RadzenLayout>
+
+    </RadzenLayout>
 
 @code {
     [Parameter]
@@ -390,7 +395,7 @@
         }
         if (typeComposant == "Texte")
         {
-            texte.Contenu = contenuTexte;
+            texte.Contenue = contenuTexte;
 
             var texteNew = await TexteService.Create(texte);
             var newTexte = texteNew.Data;
@@ -414,7 +419,8 @@
         {
             composant.Ordre = 1;
         }
-        else{
+        else
+        {
             composant.Ordre = composants.Count() + 1;
         }
 

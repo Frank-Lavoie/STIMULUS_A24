@@ -50,6 +50,11 @@ namespace STIMULUS_V2.Client.Services
             var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Noeud>>>($"api/Noeud/Fetch/FromGraph/{id}");
             return result; ;
         }
+        public async Task<APIResponse<bool>> ReOrderNoeuds(int id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<APIResponse<bool>>($"api/Noeud/Fetch/ReOrder/{id}");
+            return result;
+        }
 
         public async Task<APIResponse<Noeud>> Update(int id, Noeud item)
         {

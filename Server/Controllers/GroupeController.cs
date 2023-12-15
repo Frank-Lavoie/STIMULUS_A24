@@ -76,6 +76,7 @@ namespace STIMULUS_V2.Server.Controllers
             return apiResponse;
         }
 
+
         [HttpGet("Fetch/All/GroupActif/{id}")]
         public async Task<IActionResult> GetAllActif(string id)
         {
