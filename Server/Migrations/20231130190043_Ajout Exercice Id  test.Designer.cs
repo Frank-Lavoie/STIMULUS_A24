@@ -12,8 +12,8 @@ using STIMULUS_V2.Server.Data;
 namespace STIMULUS_V2.Server.Migrations
 {
     [DbContext(typeof(STIMULUSContext))]
-    [Migration("20231116194015_testcomposant")]
-    partial class testcomposant
+    [Migration("20231130190043_Ajout Exercice Id  test")]
+    partial class AjoutExerciceIdtest
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -83,9 +83,6 @@ namespace STIMULUS_V2.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CodeId"), 1L, 1);
 
-                    b.Property<string>("ComposantId")
-                        .HasColumnType("char(3)");
-
                     b.Property<string>("Contenue")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -94,8 +91,6 @@ namespace STIMULUS_V2.Server.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("CodeId");
-
-                    b.HasIndex("ComposantId");
 
                     b.ToTable("Code");
                 });
@@ -112,6 +107,9 @@ namespace STIMULUS_V2.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("PageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reference")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
@@ -152,15 +150,10 @@ namespace STIMULUS_V2.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ExerciceId"), 1L, 1);
 
-                    b.Property<string>("ComposantId")
-                        .HasColumnType("char(3)");
-
                     b.Property<string>("Solution")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ExerciceId");
-
-                    b.HasIndex("ComposantId");
 
                     b.ToTable("Exercice");
                 });
@@ -179,6 +172,9 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Property<string>("Contenue")
                         .HasColumnType("varchar(8000)");
 
+                    b.Property<int?>("ExerciceId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nom")
                         .IsRequired()
                         .HasColumnType("nvarchar(10)");
@@ -189,6 +185,8 @@ namespace STIMULUS_V2.Server.Migrations
                     b.HasKey("FichierSauvegardeId");
 
                     b.HasIndex("CodeDA");
+
+                    b.HasIndex("ExerciceId");
 
                     b.ToTable("FichierSauvegarde");
                 });
@@ -313,9 +311,6 @@ namespace STIMULUS_V2.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"), 1L, 1);
 
-                    b.Property<string>("ComposantId")
-                        .HasColumnType("char(3)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -330,8 +325,6 @@ namespace STIMULUS_V2.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ImageId");
-
-                    b.HasIndex("ComposantId");
 
                     b.ToTable("Image");
                 });
@@ -470,9 +463,6 @@ namespace STIMULUS_V2.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReferenceId"), 1L, 1);
 
-                    b.Property<string>("ComposantId")
-                        .HasColumnType("char(3)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -481,8 +471,6 @@ namespace STIMULUS_V2.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ReferenceId");
-
-                    b.HasIndex("ComposantId");
 
                     b.ToTable("Reference");
                 });
@@ -495,15 +483,10 @@ namespace STIMULUS_V2.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TexteFormaterId"), 1L, 1);
 
-                    b.Property<string>("ComposantId")
-                        .HasColumnType("char(3)");
-
                     b.Property<string>("Contenue")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TexteFormaterId");
-
-                    b.HasIndex("ComposantId");
 
                     b.ToTable("TexteFormater");
                 });
@@ -515,9 +498,6 @@ namespace STIMULUS_V2.Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VideoId"), 1L, 1);
-
-                    b.Property<string>("ComposantId")
-                        .HasColumnType("char(3)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -533,8 +513,6 @@ namespace STIMULUS_V2.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VideoId");
-
-                    b.HasIndex("ComposantId");
 
                     b.ToTable("Video");
                 });
@@ -560,15 +538,6 @@ namespace STIMULUS_V2.Server.Migrations
                     b.ToTable("Professeur", (string)null);
                 });
 
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Code", b =>
-                {
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Importance", "Composant")
-                        .WithMany()
-                        .HasForeignKey("ComposantId");
-
-                    b.Navigation("Composant");
-                });
-
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Composant", b =>
                 {
                     b.HasOne("STIMULUS_V2.Shared.Models.Entities.Page", "Page")
@@ -578,22 +547,19 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Page");
                 });
 
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Exercice", b =>
-                {
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Importance", "Composant")
-                        .WithMany()
-                        .HasForeignKey("ComposantId");
-
-                    b.Navigation("Composant");
-                });
-
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.FichierSauvegarde", b =>
                 {
                     b.HasOne("STIMULUS_V2.Shared.Models.Entities.Etudiant", "Etudiant")
                         .WithMany()
                         .HasForeignKey("CodeDA");
 
+                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Exercice", "Exercice")
+                        .WithMany()
+                        .HasForeignKey("ExerciceId");
+
                     b.Navigation("Etudiant");
+
+                    b.Navigation("Exercice");
                 });
 
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.FichierSource", b =>
@@ -644,15 +610,6 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Groupe");
                 });
 
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Image", b =>
-                {
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Importance", "Composant")
-                        .WithMany()
-                        .HasForeignKey("ComposantId");
-
-                    b.Navigation("Composant");
-                });
-
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Noeud", b =>
                 {
                     b.HasOne("STIMULUS_V2.Shared.Models.Entities.Graphe", "Graphe")
@@ -696,33 +653,6 @@ namespace STIMULUS_V2.Server.Migrations
                     b.Navigation("Etudiant");
 
                     b.Navigation("Page");
-                });
-
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Reference", b =>
-                {
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Importance", "Composant")
-                        .WithMany()
-                        .HasForeignKey("ComposantId");
-
-                    b.Navigation("Composant");
-                });
-
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.TexteFormater", b =>
-                {
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Importance", "Composant")
-                        .WithMany()
-                        .HasForeignKey("ComposantId");
-
-                    b.Navigation("Composant");
-                });
-
-            modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Video", b =>
-                {
-                    b.HasOne("STIMULUS_V2.Shared.Models.Entities.Importance", "Composant")
-                        .WithMany()
-                        .HasForeignKey("ComposantId");
-
-                    b.Navigation("Composant");
                 });
 
             modelBuilder.Entity("STIMULUS_V2.Shared.Models.Entities.Admin", b =>

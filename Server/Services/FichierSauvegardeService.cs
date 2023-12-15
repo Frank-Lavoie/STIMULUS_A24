@@ -4,6 +4,7 @@ using STIMULUS_V2.Shared.Interface.ChildInterface;
 using STIMULUS_V2.Shared.Models.DTOs;
 using STIMULUS_V2.Shared.Models.Entities;
 using System.Linq;
+using System.Net.Http;
 
 namespace STIMULUS_V2.Server.Services
 {
@@ -116,6 +117,27 @@ namespace STIMULUS_V2.Server.Services
         public Task<APIResponse<IEnumerable<FichierSauvegarde>>> GetAllById(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<APIResponse<IEnumerable<FichierSauvegarde>>> GetAllExercice(int exerciceId, string da)
+        {
+            try
+            {
+                var itemList = await sTIMULUSContext.FichierSauvegarde.Where(item => item.CodeDA == da && item.ExerciceId == exerciceId ).ToListAsync();
+
+                if (itemList != null && itemList.Any())
+                {
+                    return new APIResponse<IEnumerable<FichierSauvegarde>>(itemList, 200, "Succès");
+                }
+                else
+                {
+                    return new APIResponse<IEnumerable<FichierSauvegarde>>(null, 404, $"{typeof(FichierSauvegarde).Name} non trouvé");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse<IEnumerable<FichierSauvegarde>>(null, 500, $"Erreur lors de la récupération de la liste du model {typeof(FichierSauvegarde).Name}. Message : {ex.Message}.");
+            }
         }
 
         public async Task<APIResponse<FichierSauvegarde>> Update(int id, FichierSauvegarde item)

@@ -1,4 +1,4 @@
-﻿.custom-creategroup-titletop {
+﻿.custom-gestion-titletop {
     display: flex;
     justify-content: center;
     padding: 2%;
@@ -7,16 +7,16 @@
     color: #14274E;
 }
 
-.custom-creategroup-title {
+.custom-gestion-title {
     font-family: Oswald;
     color: #14274E;
 }
 
-.custom-creategroup-subtitle {
+.custom-gestion-subtitle {
     font-family: Comfortaa;
     color: #14274E;
 }
 
-.custom-creategroup-savebutton {
+.custom-gestion-savebutton {
     background-color: #14274E;
 }

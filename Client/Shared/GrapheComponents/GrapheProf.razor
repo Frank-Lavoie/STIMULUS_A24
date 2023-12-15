@@ -31,18 +31,32 @@
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
             <RadzenButton Style="background-color: #14274E;" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
-            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="@modeDeVuButtonEdition" />
-            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="@modeDeVuButtonPage" />
-            <RadzenButton Style="background-color: #14274E;" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="@modeDeVuButtonEtudiant" />
-            @if(modeDeVue == 3)
+            <RadzenButton Style="@modeDeVuButtonEdition" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(2)) Text="Édition" ButtonStyle="ButtonStyle.Warning" />
+            <RadzenButton Style="@modeDeVuButtonPage" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(1)) Text="Gestion de pages" ButtonStyle="ButtonStyle.Warning" />
+            @if(listEtudiant.Any() || listEtudiant != null)
             {
-                @if (listEtudiant.Any())
+                <RadzenButton Style="@modeDeVuButtonEtudiant" class="custom-graphe-viewmodebutton-title" Click=@(args => ModeDeVue(3)) Text="Vue étudiante" ButtonStyle="ButtonStyle.Warning" />
+                @if (modeDeVue == 3)
                 {
                     <RadzenText class="custom-grapheprof-selectuser-title">Sélectionner un étudiant :</RadzenText>
                         <RadzenDropDown @bind-Value="@etudiant" AllowFiltering="true" Data="@listEtudiant" Style="width: 100%; max-width: 170px;" Name="DropDownBindValue" Change="OnValueChanged" />
+                    @if (loadingEtudiant == true)
+                    {
+                        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Size="ProgressBarCircularSize.Medium" Mode="ProgressBarMode.Indeterminate">
+                        </RadzenProgressBarCircular>
+                        <RadzenText class="custom-grapheprof-selectuser-title">Chargement de la progression des étudiants ...</RadzenText>
+                    }
                 }
             }
-            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; margin-left: auto; background-color: #14274E;" />
+            @if (modeDeVue == 2)
+            {
+                <RadzenButton class="custom-graphe-viewmodebutton-title" Click=ReOrderNodes Text="Réordonner" Style="margin-left: auto; background-color: #14274E;" ButtonStyle="ButtonStyle.Warning" />
+            }
+            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="margin-left: auto; background-color: #14274E;" />
+            @if (loading == true)
+            {
+                <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            }
         </RadzenStack>
     </foreignObject>
     <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
@@ -109,7 +123,8 @@
                         AjoutNouveauNoeud="AjoutNouveauNoeud" 
                         SupprNoeud="SupprimerNoeud"
                         ReLinkBindPage="ReLinkBindPage"
-                        ReLinkPage="ReLinkPage" />
+                        ReLinkPage="ReLinkPage" 
+                        Etudiant ="@listEtudiant"/>
                 }
             </Draggable>
         </svg>
@@ -118,10 +133,15 @@
 
 @code {
     [Parameter]
+    public EventCallback OnStatusUpdated { get; set; }
+    [Parameter]
     public EventCallback OnGrapheDelete { get; set; }
     [Parameter]
     public EventCallback OnEtudiantChanged { get; set; }
+    private bool loading;
+    private bool loadingEtudiant;
     private string displayHover = "hidden";
+    private string etudiantLoading;
     private double viewBoxX = 0;
     private double viewBoxY = 0;
     private double viewBoxWidth = 2000;
@@ -134,9 +154,9 @@
     private bool enRecherchePage = new();
     private bool upt = false;
     private int modeDeVue = 2;
-    private ButtonStyle modeDeVuButtonEdition = ButtonStyle.Warning;
-    private ButtonStyle modeDeVuButtonPage = ButtonStyle.Primary;
-    private ButtonStyle modeDeVuButtonEtudiant = ButtonStyle.Primary;
+    private string modeDeVuButtonEdition = "background-color: #24A7FF;";
+    private string modeDeVuButtonPage = "background-color: #14274E;";
+    private string modeDeVuButtonEtudiant = "background-color: #14274E;";
 
     private List<string> listEtudiant { get; set; } = new();
     private Noeud nouveauNoeud = new();
@@ -145,11 +165,54 @@
     public List<Noeud> Nodes { get; set; } = new();
 
     protected async override void OnInitialized()
-    {
-        StateHasChanged();   
-        await UpdateGraphe();
+    {  
+        Rerender.OnGroupeDelete += SupprimerGraphe;
+        Rerender.OnNoeudProf += OnStatusChanged;
         await GetDataGroupe();
+        await UpdateGraphe();
+        StateHasChanged();
     }
+
+    /// <summary>
+    /// Recupere les noeuds du graph Numero X et permet la MAJ du graph
+    /// </summary>
+    private async Task UpdateGraphe()
+    {
+        try
+        {
+            Nodes = new();
+            if (sessionStorage != null)
+            {
+                int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
+
+                var groupeGraphe = await GrapheService.Get(idGraphe);
+                var groupe = groupeGraphe.Data;
+                await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
+
+                // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
+                while (idGraphe == 0)
+                {
+                    //Plus chill qu'une boucle industrielle
+                    await Task.Delay(100);
+                }
+                Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+                loadingEtudiant = true;
+                foreach (var noeud in Nodes)
+                {
+                    foreach (var student in listEtudiant)
+                    {
+                        await NoeudEtudiantService.GetProgression(student, idGraphe, noeud.NoeudId);
+                    }
+                }
+                loadingEtudiant = false;
+                await OnEtudiantChanged.InvokeAsync();
+                Rerender.TriggerEtudiantChanged();
+            }
+            StateHasChanged();
+        }
+        catch { }
+    }
+
     private async Task GetDataGroupe()
     {
         var eleve = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
@@ -168,17 +231,19 @@
         }
         etudiant = listEtudiant.FirstOrDefault();
         await sessionStorage.SetItemAsync<string>("daEtudiant", etudiant);
-        await OnEtudiantChanged.InvokeAsync();
-        Rerender.TriggerEtudiantChanged();
     }
 
     private async Task OnValueChanged(object value)
     {
         // Mettre à jour la valeur de l'étudiant dans le stockage de session
         await sessionStorage.SetItemAsync<string>("daEtudiant", etudiant);
-
         await OnEtudiantChanged.InvokeAsync();
         Rerender.TriggerEtudiantChanged();
+    }
+    private async void OnStatusChanged()
+    {
+        await UpdateGraphe();
+        StateHasChanged();
     }
     /// <summary>
     /// Permet de set le mode de vu. 1 => Page, 2 => Edit, 3 => Etudiant
@@ -188,22 +253,21 @@
     {
         if (v == 1)
         {
-            modeDeVuButtonPage = ButtonStyle.Warning;
-            modeDeVuButtonEdition = ButtonStyle.Primary;
-            modeDeVuButtonEtudiant = ButtonStyle.Primary;
+            modeDeVuButtonPage = "background-color: #24A7FF;";
+            modeDeVuButtonEdition = "background-color: #14274E;"; 
+            modeDeVuButtonEtudiant = "background-color: #14274E;";
         }
         else if (v == 2)
         {
-            modeDeVuButtonPage = ButtonStyle.Primary;
-            modeDeVuButtonEdition = ButtonStyle.Warning;
-            modeDeVuButtonEtudiant = ButtonStyle.Primary;
+            modeDeVuButtonPage = "background-color: #14274E;";
+            modeDeVuButtonEdition = "background-color: #24A7FF;";
+            modeDeVuButtonEtudiant = "background-color: #14274E;";
         }
         else
         {
-            modeDeVuButtonPage = ButtonStyle.Primary;
-            modeDeVuButtonEdition = ButtonStyle.Primary;
-            modeDeVuButtonEtudiant = ButtonStyle.Warning;
-
+            modeDeVuButtonPage = "background-color: #14274E;";
+            modeDeVuButtonEdition = "background-color: #14274E;";
+            modeDeVuButtonEtudiant = "background-color: #24A7FF;"; 
         }
         modeDeVue = v;
         Console.WriteLine($"Mode de vu : {v}");
@@ -307,35 +371,6 @@
     }
 
     /// <summary>
-    /// Recupere les noeuds du graph Numero X et permet la MAJ du graph
-    /// </summary>
-    private async Task UpdateGraphe()
-    {
-        Nodes = new();
-        if (sessionStorage != null)
-        {
-            int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
-
-            var groupeGraphe = await GrapheService.Get(idGraphe);
-            var groupe = groupeGraphe.Data;
-            await sessionStorage.SetItemAsync<int>("idGroupe", (int)groupe.GroupeId);
-
-            // Attendre 'idGraphe' pour ne pas etre 0 (utilise un timeout ou cancellation token = plus safe).
-            while (idGraphe == 0)
-            {
-                //Plus chill qu'une boucle industrielle
-                await Task.Delay(100);
-            }
-            Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
-
-            var response = await NoeudService.GetAllFromGraph(idGraphe);
-            Nodes = response.Data.ToList();
-            Console.WriteLine("Mise a jour des noeuds du graph");
-        }
-        StateHasChanged();
-    }
-
-    /// <summary>
     /// Permet l'ajout de noveau noeud
     /// </summary>
     private async void AjoutNouveauNoeud(Noeud nouveauNoeud)
@@ -428,52 +463,23 @@
 
         if (result.HasValue && result.Value)
         {
-            var allNoeud = await NoeudService.GetAllFromGraph(await sessionStorage.GetItemAsync<int>("idGraphe"));
-            var noeuds = allNoeud.Data;
+            loading = true;
 
+            var grapheId = await sessionStorage.GetItemAsync<int>("idGraphe");
+
+            // Récupérer tous les nœuds du graphe
+            var allNoeuds = await NoeudService.GetAllFromGraph(grapheId);
+            var noeuds = allNoeuds.Data;
+
+            // Supprimer les nœuds et leurs enfants récursivement
             foreach (var noeudDelete in noeuds)
             {
-                // Supprimer les pages associées au nœud
-                var allPage = await PageService.GetAllFromNoeud(noeudDelete.NoeudId);
-                var pages = allPage.Data;
-
-                if (pages != null)
-                {
-                    foreach (var pageDelete in pages)
-                    {
-                        var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
-                        var composant = allComposant.Data;
-
-                        if (composant != null)
-                        {
-                            foreach (var composantDelete in composant)
-                            {
-                                await ComposantService.Delete(composantDelete.ComposantId);
-                            }
-                        }
-                        await PageService.Delete(pageDelete.PageId);
-                    }
-                }
-                foreach (var noeudDeleteParent in noeuds)
-                {
-                    var noeud = await NoeudEtudiantService.GetAllById(noeudDeleteParent.NoeudId);
-                    var etudiantNoeudDelete = noeud.Data;
-
-                    foreach (var etudiantNoeud in etudiantNoeudDelete)
-                    {
-                        await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
-                    }
-
-                }
-
-                foreach (var nodeDelete in noeuds)
-                {
-                    await NoeudService.Delete(nodeDelete.NoeudId);
-
-                }
+                await SupprimerNoeudEtSesEnfants(noeudDelete.NoeudId);
             }
+
             // Supprimer le graphe
-            await GrapheService.Delete(await sessionStorage.GetItemAsync<int>("idGraphe"));
+            await GrapheService.Delete(grapheId);
+            loading = false;
             await OnGrapheDelete.InvokeAsync();
             Rerender.TriggerGrapheDelete();
             NavigationManager.NavigateTo("/");
@@ -482,6 +488,66 @@
         {
             NavigationManager.NavigateTo("/Graphe");
         }
+    }
+
+    private async Task SupprimerNoeudEtSesEnfants(int noeudId)
+    {
+        // Supprimer les pages associées au nœud
+        var allPage = await PageService.GetAllFromNoeud(noeudId);
+        var pages = allPage.Data;
+
+        if (pages != null)
+        {
+            foreach (var pageDelete in pages)
+            {
+                var allComposant = await ComposantService.GetAllById(pageDelete.PageId);
+                var composant = allComposant.Data;
+
+                if (composant != null)
+                {
+                    foreach (var composantDelete in composant)
+                    {
+                        await ComposantService.Delete(composantDelete.ComposantId);
+                    }
+                }
+                await PageService.Delete(pageDelete.PageId);
+            }
+        }
+
+        // Supprimer les enfants récursivement
+        var children = await NoeudService.GetAllById(noeudId);
+        foreach (var child in children.Data)
+        {
+            await SupprimerNoeudEtSesEnfants(child.NoeudId);
+        }
+
+        // Supprimer les associations d'étudiants pour le nœud
+        var noeudEtudiants = await NoeudEtudiantService.GetAllById(noeudId);
+        var etudiantNoeudDelete = noeudEtudiants.Data;
+        if (etudiantNoeudDelete != null)
+        {
+            foreach (var etudiantNoeud in etudiantNoeudDelete)
+            {
+                await NoeudEtudiantService.Delete(etudiantNoeud.Noeud_EtudiantId);
+            }
+        }
+
+        // Supprimer le nœud lui-même
+        await NoeudService.Delete(noeudId);
+    }
+
+    public async Task ReOrderNodes()
+    {
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir réordonner les nœuds de ce graph ? Cette option réinitialisera la position de vos nœuds pour leur donner une nouvelle position.", "Réordonner");
+        if (result.HasValue && result.Value)
+        {
+            foreach (var noeud in Nodes)
+            {
+                await NoeudService.ReOrderNoeuds(noeud.NoeudId);
+            }
+        }
+        await UpdateGraphe();
+        StateHasChanged();
     }
 
     /// <summary>

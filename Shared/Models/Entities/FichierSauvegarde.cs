@@ -14,14 +14,18 @@ namespace STIMULUS_V2.Shared.Models.Entities
         [Column(TypeName = "nvarchar(10)")]
         public string Nom { get; set; }
 
-        [Column(TypeName = "varchar(8000)")]
+        [Column(TypeName = "varchar(max)")]
         public string? Contenue { get; set; }
 
         public DateTime Version { get; set; } = DateTime.Now;
 
         [ForeignKey("Etudiant")]
         public string? CodeDA { get; set; }
+        public Etudiant? Etudiant { get; set; }
 
-        public Etudiant? Etudiant { get; set; }        
+        [ForeignKey("Exercicre")]
+        public int? ExerciceId { get; set; }
+        public Exercice? Exercice { get; set; }
+   
     }
 }

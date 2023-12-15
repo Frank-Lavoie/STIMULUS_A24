@@ -1,4 +1,4 @@
-//Lien pour le mapping Js/C# : https://sciencevikinglabs.com/blog/development/2021-01-02-blazor-code-snippet-highlightjs/
+﻿//Lien pour le mapping Js/C# : https://sciencevikinglabs.com/blog/development/2021-01-02-blazor-code-snippet-highlightjs/
 
 window.HighlightFunctions = {
     highlightSnippets: function () {
@@ -9,7 +9,7 @@ window.HighlightFunctions = {
 }
 
 //Ajoute un event listner qui fait que quandf on appui sur TAb dans l'interpreteur python, on ajoute une tabulation dans le code a la palce de changer le focus
-//Code trouv� sur StackOverflow
+//Code trouvé sur StackOverflow
 window.TabulationFunction = {
     tab: function (id) {
         const element = document.getElementById(id);

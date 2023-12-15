@@ -6,18 +6,14 @@
 
     @if (code != null)
     {
-        <div class="codeSample component">
-            <div class="headCode">
-                <p class="titleCode">
-                    @((code.Titre != null) ? code.Titre : "")
-                </p>
-            </div>
-            <pre class="code">
-                <code class="python">
-                    @((code.Contenu != null) ? code.Contenu : "")
-                </code>
-            </pre>
+    <div class="codeSample component">
+        <div class="headCode left-align">
+            @((code.Titre != null) ? code.Titre : "")
         </div>
+        <pre class="code left-align">
+            @((code.Contenu != null) ? code.Contenu : "")
+        </pre>
+    </div>
     }
     else
     {

@@ -12,5 +12,7 @@ namespace STIMULUS_V2.Shared.Interface.ChildInterface
     public interface INoeudService : IModelService<Noeud, int>
     {
         Task<APIResponse<IEnumerable<Noeud>>> GetAllFromGraph(int id);
+
+        Task<APIResponse<bool>> ReOrderNoeuds(int noeud);
     }
 }

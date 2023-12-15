@@ -12,6 +12,7 @@
 @inject ILocalStorageService localStorageService
 @inject IGroupeService GroupeService
 @inject ICoursService CoursService
+@inject IEtudiantService EtudiantService
 @inject IGroupeEtudiantService GroupeEtudiantService
 @inject AppState State;
 @inject Radzen.DialogService DialogService
@@ -48,7 +49,7 @@
             <RadzenPanelMenuItem class="custom-menusidebar-title" Text="Gestion de cours" Icon="school">
                 @foreach (var cours in ListeCoursProf)
                 {
-                    <RadzenPanelMenuItem Icon="event" class="custom-menusidebar-subtilte" Text="@cours.Code" Click=@(args => DialogService.Alert("Description du cours : "+ cours.Description, @cours.Code, new AlertOptions() { OkButtonText = "Ok" }))></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="@cours.Code" Icon="event" Click="(() => ShowCoursInfo(cours))"></RadzenPanelMenuItem>
                 }
                 <RadzenPanelMenuItem class="custom-menusidebar-subtilte" Text="Créer un nouveau cours" Icon="add" Path="/CreerCours" />
             </RadzenPanelMenuItem>
@@ -75,6 +76,7 @@
         Rerender.OnGroupeCreated += HandleUpdateSideBar;
         Rerender.OnGrapheCreated += HandleUpdateSideBar;
         Rerender.OnGrapheDelete += HandleUpdateSideBar;
+        Rerender.OnGroupeDelete += HandleUpdateSideBar;
     }
 
     public async Task SideBarData()
@@ -107,6 +109,8 @@
                 HashSet<int> uniqueCoursIds = new HashSet<int>(); //Permet d'afficher un cours une seul fois même si il est lié à plusieurs groupes
                 foreach (var cours in groupes)
                 {
+                    if (!cours.CoursId.HasValue)
+                        continue;
                     var responseCours = await CoursService.Get((int)cours.CoursId);
 
                     // Check if the course ID is not already in the HashSet
@@ -135,13 +139,11 @@
 
                     ListeGraphesEtudiant.AddRange(graphesDuGroupe);
                 }
-
                 foreach (var cours in groupes)
                 {
-                    var responseCours = await CoursService.GetAllById((int)cours.GroupeId);
-                    var nomDesCours = responseCours.Data;
-
-                    ListeCoursEtudiant.AddRange(nomDesCours);
+                    var groupeCours = await GroupeService.Get((int)cours.GroupeId);
+                    var responseCours = await CoursService.Get((int)groupeCours.Data.CoursId);
+                    ListeCoursEtudiant.Add(responseCours.Data);
                 }
                 StateHasChanged();
             }
@@ -149,12 +151,62 @@
                 await SideBarData();
         }
     }
+    public async Task ShowCoursInfo(Cours cours)
+    {
+        await SideBarData();
+        HashSet<STIMULUS_V2.Shared.Models.Entities.Etudiant> ListeCoursEtudiant = new HashSet<Etudiant>();
+
+        var allGroupeForCours = await GroupeService.GetAllById(cours.CoursId);
+
+        foreach(var etudiantGroupe in allGroupeForCours.Data)
+        {
+            var etudiants = await GroupeEtudiantService.GetAllStudentForGroup(etudiantGroupe.GroupeId);
+
+            foreach(var etudiant in etudiants.Data)
+            {
+                var etudiantCours = await EtudiantService.Get(etudiant.CodeDA);
+                ListeCoursEtudiant.Add(etudiantCours.Data);
+            }
+        }
+
+        var result = await DialogService.OpenAsync(cours.Code, ds =>
+    @<RadzenStack Gap="1.5rem">
+        <p>Description du cours : <b>@cours.Description</b></p>
+        <p>Nombre total de groupes pour ce cours : <b>@allGroupeForCours.Data.Count()</b></p>
+        <p>Nombre d'élèves pour ce cours : <b>@ListeCoursEtudiant.Count()</b></p>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="width: 80px;" />
+                <RadzenButton Text="Supprimer" Click="(() => SupprimerCours(cours.CoursId))" Icon="delete" ButtonStyle="ButtonStyle.Warning" />
+            </RadzenStack>
+        </RadzenStack>
+        </RadzenStack>
+    );
+    }
+
+    private async Task SupprimerCours(int coursId)
+    {
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir supprimer ce cours ?", "Supprimer");
+        if (result.HasValue && result.Value)
+        {
+            var allGroupeForCours = await GroupeService.GetAllById(coursId);
+            foreach (var groupeUpdate in allGroupeForCours.Data)
+            {
+                groupeUpdate.CoursId = null;
+                await GroupeService.Update(groupeUpdate.GroupeId, groupeUpdate);
+            }
+            await CoursService.Delete(coursId);
+            NavigationManager.NavigateTo("/");
+            HandleUpdateSideBar();
+        }
+
+    }
+
     private async void HandleUpdateSideBar()
     {
         await SideBarData();
         StateHasChanged();
     }
-
     public async Task ChargerGraphe(int idGraphe)
     {
         await sessionStorage.SetItemAsync<int>("idGraphe", idGraphe);
