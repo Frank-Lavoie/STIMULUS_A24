@@ -171,13 +171,13 @@
 
         var result = await DialogService.OpenAsync(cours.Code, ds =>
     @<RadzenStack Gap="1.5rem">
-        <p>Description du cours : <b>@cours.Description</b></p>
-        <p>Nombre total de groupes pour ce cours : <b>@allGroupeForCours.Data.Count()</b></p>
-        <p>Nombre d'élèves pour ce cours : <b>@ListeCoursEtudiant.Count()</b></p>
+        <p class="custom-menusidebar-subtilte">Description du cours : <b class="custom-menusidebar-subtilte">@cours.Description</b></p>
+        <p class="custom-menusidebar-subtilte">Nombre total de groupes pour ce cours : <b class="custom-menusidebar-subtilte">@allGroupeForCours.Data.Count()</b></p>
+        <p class="custom-menusidebar-subtilte">Nombre d'élèves pour ce cours : <b class="custom-menusidebar-subtilte">@ListeCoursEtudiant.Count()</b></p>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
             <RadzenStack Orientation="Orientation.Horizontal">
-                <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="width: 80px;" />
-                <RadzenButton Text="Supprimer" Click="(() => SupprimerCours(cours.CoursId))" Icon="delete" ButtonStyle="ButtonStyle.Warning" />
+                <RadzenButton class="custom-menusidebar-tilte" Text="Ok" Click="() => ds.Close(true)" Style="width: 80px;" />
+                <RadzenButton class="custom-menusidebar-tilte" Text="Supprimer" Click="(() => SupprimerCours(cours.CoursId))" Icon="delete" ButtonStyle="ButtonStyle.Warning" />
             </RadzenStack>
         </RadzenStack>
         </RadzenStack>
