@@ -52,7 +52,7 @@
             {
                 <RadzenButton class="custom-graphe-viewmodebutton-title" Click=ReOrderNodes Text="Réordonner" Style="margin-left: auto; background-color: #14274E;" ButtonStyle="ButtonStyle.Warning" />
             }
-            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="margin-left: auto; background-color: #14274E;" />
+            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="background-color: #14274E;" />
             @if (loading == true)
             {
                 <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
@@ -538,7 +538,7 @@
 
     public async Task ReOrderNodes()
     {
-        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir réordonner les nœuds de ce graph ? Cette option réinitialisera la position de vos nœuds pour leur donner une nouvelle position.", "Réordonner");
+        var result = await DialogService.Confirm("Êtes-vous sûr de vouloir réordonner les nœuds de ce graphe ? Cette option réinitialisera la position de vos nœuds pour leur donner une nouvelle position.", "Remettre le graphe en ordre");
         if (result.HasValue && result.Value)
         {
             foreach (var noeud in Nodes)

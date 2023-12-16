@@ -64,6 +64,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<STIMULUSContext>();
 
+    //METTRE SES LIGNES EN COMMENTAIRE SINON LA BD SE SUPPRIMERA
     //context.Database.EnsureDeleted();
     //context.Database.EnsureCreated();
 

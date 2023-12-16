@@ -160,17 +160,23 @@ namespace STIMULUS_V2.Server.Services
                 var ParentNode = await Get(noeud);
                 var ChildNode = await GetAllById(noeud);
 
+                if(ParentNode.Data.Status == 0)
+                {
+                    ParentNode.Data.PosX = 805;
+                    ParentNode.Data.PosY = -175;
+                }
+
                 // Ajustez la position en X et Y pour chaque enfant
                 for (int i = 0; i < ChildNode.Data.Count(); i++)
                 {
                     var ChildrenNode = ChildNode.Data.ElementAt(i);
 
                     // Ajustez la position en Y pour que les enfants soient sous le parent
-                    ChildrenNode.PosY = ParentNode.Data.PosY + 200;
+                    ChildrenNode.PosY = ParentNode.Data.PosY + 400;
 
                     // Ajustez la position en X pour aligner les enfants horizontalement avec le parent
                     // et les espacer en fonction de l'index
-                    ChildrenNode.PosX = ParentNode.Data.PosX + (i - (ChildNode.Data.Count() - 1) / 2.0) * 200;
+                    ChildrenNode.PosX = ParentNode.Data.PosX + (i - (ChildNode.Data.Count() - 1) / 2.0) * 400;
 
                     await Update(ChildrenNode.NoeudId, ChildrenNode);
                 }
