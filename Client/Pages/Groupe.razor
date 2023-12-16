@@ -19,7 +19,89 @@
 
 @page "/Groupe"
 
-<RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
+<div class="custom-groupe-titletop">
+    <RadzenLabel>Gestion de groupe</RadzenLabel>
+</div>
+<RadzenCard Class="rz-my-6 mx-auto" Style="max-width: 1200px">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        @if (siActif == "Actif")
+        {
+            <RadzenText class="custom-groupe-title" TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
+        }
+        <RadzenButton Click=SupprimerGroupe Text="Supprimer le groupe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="margin-left:65%; background-color: darkblue; background-color: #14274E;" />
+        @if (loading == true)
+        {
+            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+        }
+     
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
+        <RadzenStack Style="margin-left: 10%;" Orientation="Orientation.Vertical" class="rz-my-0">
+            <RadzenStack Style="margin-top: 15%;" Orientation="Orientation.Horizontal" class="rz-display-flex align-items-center">
+                <RadzenText class="custom-groupe-title" TextStyle="TextStyle.Overline">Nom:</RadzenText>
+                <RadzenText class="custom-groupe-subtitle" TextStyle="TextStyle.Body1"><b>@((groupeProf != null) ? groupeProf.Nom : "")</b></RadzenText>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" class="rz-display-flex">
+                <RadzenImage Path="@imageActif" Style="width: 10px; height: 10px; border-radius: 50%; margin-top: 5%" />
+                <RadzenText TextStyle="TextStyle.Overline" class="custom-groupe-title rz-display-flex rz-my-0">Status:</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@siActif</b></RadzenText>
+            </RadzenStack>
+           
+            <RadzenStack Orientation="Orientation.Horizontal" class="rz-display-flex">
+                <RadzenText TextStyle="TextStyle.Overline" class="custom-groupe-title rz-display-flex rz-mt-2 rz-mb-0">Cours associé: </RadzenText>
+                @if (groupeCours != null)
+                {
+                    <RadzenText Style="margin-top: 5%;" class="custom-groupe-subtitle" TextStyle="TextStyle.Body1"><b>@((groupeCours != null) ? groupeCours.Code : "")</b></RadzenText>
+                }
+                else
+                {
+                    <RadzenText TextStyle="TextStyle.Body1"><b>Aucun</b></RadzenText>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" class="rz-p-4">
+                        <RadzenDropDown class="custom-groupe-title" @bind-Value=@idCours Data=@listCours TextProperty="Code" ValueProperty="CoursId" AllowClear=true Placeholder="Associé un cours" Style="width: 100%; max-width: 400px;" Name="DropDownClear" />
+                        <RadzenButton class="custom-groupe-title" Click=@(args => AssocierCours(idCours)) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
+                    </RadzenStack>
+                }
+            </RadzenStack>
+           
+        </RadzenStack>
+        <RadzenStack Style="margin-left: 10%; margin-" Orientation="Orientation.Vertical">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenText TextStyle="TextStyle.Overline" class="custom-groupe-title rz-display-flex rz-my-0">@((listGrapheGroupe.Any() ? "Graphe(s) associé(s): " : "Aucun graphe pour ce groupe"))</RadzenText>
+                    @foreach (var graphe in listGrapheGroupe)
+                {
+                    <RadzenButton class="custom-groupe-title" Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; background-color: #14274E;" />
+                }
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenText TextStyle="TextStyle.Overline" class="custom-groupe-title rz-display-flex rz-mt-2 rz-my-0">Mettre à jour la liste d'étudiant</RadzenText>
+                <RadzenDropDown class="custom-gestion-subtitle" @bind-Value=@selectedEtudiants Data=@listEtudiant TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Ajouter des étudiants" Chips="true" Style="height: 25%; width: 80%; max-width: 400px;"></RadzenDropDown>
+                <RadzenButton Click=@(() => UpdateEtudiant()) Icon="refresh" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.H6" Class="text-center" Style="margin-top:20px;margin-bottom:10px; text-decoration: underline"><strong>Liste des élèves</strong></RadzenText>
+    <RadzenRow RowGap="2" Class="justify-content-center">
+        @if (listEtudiantAjoute.Any())
+        {
+            <RadzenDataGrid TItem="Etudiant" Data="@listEtudiantAjoute" EmptyText="Aucun élève dans ce groupe." Sortable="true" SortOrder="SortOrder.Ascending" Style="height: 50%; text-align: center; margin-top:20px; margin-bottom:10px;">
+                <Columns>
+                    <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Identifiant" Title="Code DA" />
+                    <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Prenom" Title="Prénom" />
+                    <RadzenDataGridColumn TextAlign="TextAlign.Center" TItem="Etudiant" Property="Nom" Title="Nom" />
+                </Columns>
+            </RadzenDataGrid>
+        }
+    </RadzenRow>
+    @if (listEtudiantAjoute.Count() == 0)
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Ce groupe ne contient aucun étudiant.</RadzenText>
+        </RadzenStack>
+    }
+</RadzenCard>
+
+
+@* <RadzenCard Class="rz-my-12 mx-auto" Style="max-width: 1200px">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
     <RadzenButton Click=SupprimerGroupe Text="Supprimer le groupe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" style="background-color: darkblue; background-color: #14274E;" />
         @if (loading == true)
@@ -28,13 +110,13 @@
         }
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" Class="rz-p-4">
-        <RadzenImage Path="@imageActif" Style="width: 50px; height: 50px; border-radius: 50%;" />
-        <RadzenStack Gap="2">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            <RadzenImage Path="@imageActif" Style="width: 50px; height: 50px; border-radius: 50%;" />
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Nom</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@((groupeProf != null) ? groupeProf.Nom : "")</b></RadzenText>
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Status</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@siActif</b></RadzenText>
-            @if(siActif == "Actif" )
+            @if (siActif == "Actif")
             {
                 <RadzenText TextStyle="TextStyle.Caption">Sera inactif le @((groupeProf != null) ? dateAffichee : "")</RadzenText>
             }
@@ -47,20 +129,23 @@
             {
                 <RadzenText TextStyle="TextStyle.Body1"><b>Aucun</b></RadzenText>
                 <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" class="rz-p-4">
-                <RadzenDropDown @bind-Value=@idCours Data=@listCours TextProperty="Code" ValueProperty="CoursId" AllowClear=true Placeholder="Associé un cours" Style="width: 100%; max-width: 400px;" Name="DropDownClear" />
+                    <RadzenDropDown @bind-Value=@idCours Data=@listCours TextProperty="Code" ValueProperty="CoursId" AllowClear=true Placeholder="Associé un cours" Style="width: 100%; max-width: 400px;" Name="DropDownClear" />
                     <RadzenButton Click=@(args => AssocierCours(idCours)) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
                 </RadzenStack>
             }
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@((listGrapheGroupe.Any() ? "Graphe(s) associé(s): " : "Aucun graphe pour ce groupe"))</RadzenText>
+            @foreach (var graphe in listGrapheGroupe)
+            {
+                <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;background-color: #14274E;" />
+            }
+        </RadzenStack>
+        <RadzenStack Gap="2">   
         </RadzenStack>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0">
-        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@((listGrapheGroupe.Any() ? "Graphe(s) associé(s): " : "Aucun graphe pour ce groupe"))</RadzenText>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="3">
-        @foreach (var graphe in listGrapheGroupe)
-        {
-            <RadzenButton Click="@(() => RedirectionGraphe(graphe.GrapheId))" Text="@graphe.Nom" Style="margin-left:20px; margin-right: 20px; margin-top :20px;background-color: #14274E;" />
-        }
+       
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Style="margin-top:10px;" Gap="2">
         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Mettre à jour la liste d'étudiant</RadzenText>
@@ -89,7 +174,7 @@
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Ce groupe ne contient aucun étudiant.</RadzenText>
           </RadzenStack>
         }
-</RadzenCard>
+</RadzenCard> *@
 
 @code {
     [Parameter]
