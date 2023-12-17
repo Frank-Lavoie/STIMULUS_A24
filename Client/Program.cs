@@ -9,7 +9,9 @@ using STIMULUS_V2.Client.CustomAuthentication;
 using STIMULUS_V2.Client.Services;
 using STIMULUS_V2.Client.Services.AuthenticationService;
 using STIMULUS_V2.Shared.Interface.ChildInterface;
-
+using Serilog;
+using Serilog.Core;
+using Serilog.Extensions.Logging;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.RootComponents.Add<App>("#app");

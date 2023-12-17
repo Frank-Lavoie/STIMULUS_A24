@@ -20,7 +20,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Create([FromBody] Exercice exercice)
         {
             var response = await exerciceService.Create(exercice);
-            var log = Log.ForContext<EtudiantController>();
+            var log = Log.ForContext<ExerciceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Create([FromBody] Exercice exercice = {exercice}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -37,7 +37,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var response = await exerciceService.Delete(id);
-            var log = Log.ForContext<EtudiantController>();
+            var log = Log.ForContext<ExerciceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Delete(int id = {id}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -47,7 +47,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Get(int id)
         {
             var response = await exerciceService.Get(id);
-            var log = Log.ForContext<EtudiantController>();
+            var log = Log.ForContext<ExerciceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Get(int id = {id}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -57,7 +57,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> GetAll()
         {
             var response = await exerciceService.GetAll();
-            var log = Log.ForContext<EtudiantController>();
+            var log = Log.ForContext<ExerciceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"GetAll() \n  Response: {apiResponse}");
             return apiResponse;
@@ -67,7 +67,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> GetAllById(int id)
         {
             var response = await exerciceService.GetAllById(id);
-            var log = Log.ForContext<EtudiantController>();
+            var log = Log.ForContext<ExerciceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"GetAllById(int id = {id}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -77,7 +77,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] Exercice exercice)
         {
             var response = await exerciceService.Update(id, exercice);
-            var log = Log.ForContext<EtudiantController>();
+            var log = Log.ForContext<ExerciceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Update(int id = {id}, [FromBody] Exercice exercice = {exercice}) \n  Response: {apiResponse}");
             return apiResponse;
