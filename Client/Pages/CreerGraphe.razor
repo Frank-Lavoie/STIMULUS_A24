@@ -114,8 +114,6 @@
             graphe.Status = GrapheStatus.DESACTIVER;
         }
 
-        var nouveauGraphe = await GrapheService.Create(graphe);
-        var newgraphe = nouveauGraphe.Data;
 
         if(SiCopierGraphe == false)
         {
@@ -128,6 +126,9 @@
             }
             else
             {
+                var nouveauGraphe = await GrapheService.Create(graphe);
+                var newgraphe = nouveauGraphe.Data;
+
                 nouveauNoeud.GrapheId = newgraphe.GrapheId;
                 nouveauNoeud.Nom = nomSansEspaces;
                 nouveauNoeud.Description = "Structure";
@@ -162,6 +163,8 @@
             }
             else
             {
+                var nouveauGraphe = await GrapheService.Create(graphe);
+                var newgraphe = nouveauGraphe.Data;
                 var graphecopier = await NoeudService.GetAllFromGraph(grapheCopie.GrapheId);
                 var correspondanceNoeudParent = new Dictionary<int, int>();
 
