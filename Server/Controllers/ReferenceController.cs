@@ -20,7 +20,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Create([FromBody] Reference reference)
         {
             var response = await referenceService.Create(reference);
-            var log = Log.ForContext<ProfesseurController>();
+            var log = Log.ForContext<ReferenceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Create([FromBody] Reference reference = {reference}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -30,7 +30,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var response = await referenceService.Delete(id);
-            var log = Log.ForContext<ProfesseurController>();
+            var log = Log.ForContext<ReferenceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Delete(int id = {id}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -40,7 +40,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Get(int id)
         {
             var response = await referenceService.Get(id);
-            var log = Log.ForContext<ProfesseurController>();
+            var log = Log.ForContext<ReferenceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Get(int id = {id}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -50,7 +50,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> GetAll()
         {
             var response = await referenceService.GetAll();
-            var log = Log.ForContext<ProfesseurController>();
+            var log = Log.ForContext<ReferenceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"GetAll() \n  Response: {apiResponse}");
             return apiResponse;
@@ -60,7 +60,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> GetAllById(int id)
         {
             var response = await referenceService.GetAllById(id);
-            var log = Log.ForContext<ProfesseurController>();
+            var log = Log.ForContext<ReferenceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"GetAllById(int id = {id}) \n  Response: {apiResponse}");
             return apiResponse;
@@ -70,7 +70,7 @@ namespace STIMULUS_V2.Server.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] Reference reference)
         {
             var response = await referenceService.Update(id, reference);
-            var log = Log.ForContext<ProfesseurController>();
+            var log = Log.ForContext<ReferenceController>();
             var apiResponse = StatusCode(response.StatusCode, response);
             log.Information($"Update(int id = {id}, [FromBody] Reference reference = {reference}) \n  Response: {apiResponse}");
             return apiResponse;

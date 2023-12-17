@@ -1,18 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Win32;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System;
 using STIMULUS_V2.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using STIMULUS_V2.Shared.Models.Authentication;
 using Serilog;
 using STIMULUS_V2.Shared.Models.DTOs;
-using STIMULUS_V2.Shared.Models.Entities;
 
 namespace STIMULUS_V2.Server.Controllers
 {
