@@ -27,9 +27,9 @@ namespace STIMULUS_V2.Server.Services
                 {
                     double pourcentage = sommePts.Data / sommeImportance.Data * 100;
 
-                    //int pourcentageArrondi = (int)Math.Round(pourcentage);/*Arrondi ou non ?*/
+                    int pourcentageArrondi = (int)Math.Round(pourcentage);/*Arrondi ou non ?*/
 
-                    return new APIResponse<double>(pourcentage, 200, "Succès");
+                    return new APIResponse<double>(pourcentageArrondi, 200, "Succès");
                 }
                 else
                 {

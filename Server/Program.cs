@@ -90,7 +90,7 @@ using (var scope = app.Services.CreateScope())
     //        WHERE i.Status <> d.Status OR (i.Status IS NULL AND d.Status IS NOT NULL) OR (i.Status IS NOT NULL AND d.Status IS NULL);
     //    END;
     //");
-    ////Création du trigger pour inséré des données dans Noeud_Etudiant
+    //////Création du trigger pour inséré des données dans Noeud_Etudiant
     //context.Database.ExecuteSqlRaw(@"
     //    CREATE TRIGGER TRG_AfterInsertNoeud
     //    ON Noeud

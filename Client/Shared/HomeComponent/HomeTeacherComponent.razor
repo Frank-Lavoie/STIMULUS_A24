@@ -1,10 +1,16 @@
-﻿@using Radzen.Blazor.Rendering;
+@using Radzen.Blazor.Rendering
 @using STIMULUS_V2.Client.Shared.TheoryComponent
-@using STIMULUS_V2.Shared.Interface.ChildInterface;
-@using STIMULUS_V2.Shared.Models.Entities;
+@using STIMULUS_V2.Shared.Interface.ChildInterface
+@using STIMULUS_V2.Shared.Models.Entities
 @using System.Globalization
-@inject  IPageEtudiantService PageEtudiantService
+@inject IGroupeService GroupeService
+@inject IEtudiantService EtudiantService
+@inject ICoursService CoursService
+@inject IGroupeEtudiantService GroupeEtudiantService
+@inject IPageEtudiantService DashBoardService
 
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+    <!-- Section de l'interface utilisateur -->
 <div class="container text-center">
     <h1 class="custom-home-title">Bienvenue sur Stimulus!</h1>
     <div class="teacher-info-container">
@@ -14,198 +20,158 @@
     </div>
 </div>
 
-<div class="box-display">
-    <RadzenText TextStyle="TextStyle.DisplayH3" class="custom-home-title">Tableau de bord</RadzenText>
-    <div class="row">
-        <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
-            <RadzenCard class="w-100 mb-4">
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                <RadzenLabel Text="Smooth" For="smooth" Class="rz-mr-6" />
-            </RadzenCard>
-        </div>
+    <!-- Section principale du tableau de bord -->
+    <div class="box-display" style="background-color: transparent;">
+    <RadzenText TextStyle="TextStyle.DisplayH3" class="custom-home-title" Style="text-decoration:underline">Tableau de bord</RadzenText>
+        <!-- Deux graphiques représentant les données -->
+        @if (progression != null && progression.Length > 0)
+        {
+            <!-- Carte de configuration avec des options -->
+            <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+                <RadzenCard class="w-100 mb-4">
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel class="lead custom-home-subtitle" Text="Afficher les étiquettes de données" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenCheckBox @bind-Value="@smooth" Name="smooth" Style="margin-left: 8px;"></RadzenCheckBox>
+                <RadzenLabel class="lead custom-home-subtitle, rz-mr-6" Text="Lisser les graphiques" For="smooth"/>
+                </RadzenCard>
+            </div>
+            <!-- Dropdown pour sélectionner le groupe -->
+            <div class="mb-3 custom-dropdown">
+            <label for="ddlGroupes" class="form-label, lead custom-home-subtitle">Sélectionnez un groupe :</label>
+                <select class="form-select" id="ddlGroupes" @onchange="OnGroupeSelectionChange">
+                    @foreach (var groupe in groupeProf)
+                    {
+                        <option value="@groupe.GroupeId">@groupe.Nom</option>
+                    }
+                </select>
+            </div>
+            <div class="row">
+                <div class="col-sm-11 col-lg-5 my-5">
+                    <RadzenChart>
+                        <RadzenPieSeries Data="@progression" Title="Student" CategoryProperty="Student" ValueProperty="Progression">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                        </RadzenPieSeries>
+                    </RadzenChart>
+                </div>
 
-        <div class="col-sm-11 col-lg-5 my-5">
-            <RadzenChart>
-                <RadzenPieSeries Data="@progression" Title="Student" CategoryProperty="Progression" ValueProperty="Progression">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                </RadzenPieSeries>
-            </RadzenChart>
-        </div>
-
-        <div class="col-sm-11 col-lg-5 my-5">
-            <RadzenChart>
-                <RadzenAreaSeries Smooth="@smooth" Data="@progression" CategoryProperty="Progression" Title="2019" ValueProperty="Progression" RenderingOrder="1">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                </RadzenAreaSeries>
-                <RadzenAreaSeries Smooth="@smooth" Data="@progression" CategoryProperty="Progression" Title="2020" LineType="LineType.Dashed" ValueProperty="Progression">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                </RadzenAreaSeries>
-               
-            </RadzenChart>
-        </div>
+                <div class="col-sm-11 col-lg-5 my-5">
+                    <RadzenChart>
+                        <RadzenAreaSeries Smooth="@smooth" Data="@progression" CategoryProperty="Student" Title="Progression" ValueProperty="Progression" RenderingOrder="1">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                        </RadzenAreaSeries>
+                    </RadzenChart>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p class="lead">Veuillez créer un groupe et des pages pour utiliser le tableau de bord</p>
+        }
     </div>
-</div>
+
+
+<!-- Style pour le tableau de bord -->
+<style>
+    .box-display {
+        text-align: center;
+        align-items: center;
+        background-color: lightgrey;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .custom-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .custom-dropdown select {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+</style>
 
 @code {
     bool showDataLabels = false;
     bool smooth = true;
+    int selectedGroupeId = 1;
+    public List<Etudiant> listEtudiant { get; set; } = new List<Etudiant>();
+    public List<Groupe> groupeProf { get; set; } = new List<Groupe>();
 
     class DataItem
     {
         public string Student { get; set; }
         public double Progression { get; set; }
-        public string Date { get; set; }
-        public double Revenue { get; set; }
     }
 
-    DataItem[] progression = new DataItem[] {
-        new DataItem
-        {
-            Student = "Q1",
-            Progression = 30000
-        },
-        new DataItem
-        {
-            Student = "Q2",
-            Progression = 40000
-        },
-        new DataItem
-        {
-            Student = "Q3",
-            Progression = 50000
-        },
-        new DataItem
-        {
-            Student = "Q4",
-            Progression = 80000
-        },
-    };
+    DataItem[] progression;
 
-    DataItem[] revenue2019 = new DataItem[] {
-        new DataItem
-        {
-            Date = ("2019-01-01"),
-            Revenue = 234000
-        },
-        new DataItem
-        {
-            Date = ("2019-02-01"),
-            Revenue = 269000
-        },
-        new DataItem
-        {
-            Date = ("2019-03-01"),
-            Revenue = 233000
-        },
-        new DataItem
-        {
-            Date = ("2019-04-01"),
-            Revenue = 244000
-        },
-        new DataItem
-        {
-            Date = ("2019-05-01"),
-            Revenue = 214000
-        },
-        new DataItem
-        {
-            Date = ("2019-06-01"),
-            Revenue = 253000
-        },
-        new DataItem
-        {
-            Date = ("2019-07-01"),
-            Revenue = 274000
-        },
-        new DataItem
-        {
-            Date = ("2019-08-01"),
-            Revenue = 284000
-        },
-        new DataItem
-        {
-            Date = ("2019-09-01"),
-            Revenue = 273000
-        },
-        new DataItem
-        {
-            Date = ("2019-10-01"),
-            Revenue = 282000
-        },
-        new DataItem
-        {
-            Date = ("2019-11-01"),
-            Revenue = 289000
-        },
-        new DataItem
-        {
-            Date = ("2019-12-01"),
-            Revenue = 294000
-        }
-    };
+    string errorMessage = string.Empty;
 
-    DataItem[] revenue2020 = new DataItem[] {
-        new DataItem
+    async Task UpdateProgression()
+    {
+        try
         {
-            Date = ("2019-01-01"),
-            Revenue = 334000
-        },
-        new DataItem
-        {
-            Date = ("2019-02-01"),
-            Revenue = 369000
-        },
-        new DataItem
-        {
-            Date = ("2019-03-01"),
-            Revenue = 333000
-        },
-        new DataItem
-        {
-            Date = ("2019-04-01"),
-            Revenue = 344000
-        },
-        new DataItem
-        {
-            Date = ("2019-05-01"),
-            Revenue = 314000
-        },
-        new DataItem
-        {
-            Date = ("2019-06-01"),
-            Revenue = 353000
-        },
-        new DataItem
-        {
-            Date = ("2019-07-01"),
-            Revenue = 374000
-        },
-        new DataItem
-        {
-            Date = ("2019-08-01"),
-            Revenue = 384000
-        },
-        new DataItem
-        {
-            Date = ("2019-09-01"),
-            Revenue = 373000
-        },
-        new DataItem
-        {
-            Date = ("2019-10-01"),
-            Revenue = 382000
-        },
-        new DataItem
-        {
-            Date = ("2019-11-01"),
-            Revenue = 389000
-        },
-        new DataItem
-        {
-            Date = ("2019-12-01"),
-            Revenue = 394000
+            // Récupérer l'identifiant du professeur depuis le stockage de session
+            string professeurIdentifiant = await sessionStorage.GetItemAsync<string>("idConnexion");
+
+            // Récupérer la liste des groupes pour le professeur
+            var groupe = await GroupeService.GetAllForTeacher(professeurIdentifiant);
+            groupeProf = groupe.Data.ToList();
+
+            // Récupérer la liste des étudiants pour le groupe sélectionné
+            var eleveResponse = await GroupeEtudiantService.GetAllStudentForGroup(selectedGroupeId);
+            var etudiants = eleveResponse.Data;
+
+            // Initialiser la liste des données
+            List<DataItem> dataItems = new List<DataItem>();
+
+            // Parcourir chaque étudiant et récupérer la progression
+            foreach (var etudiant in etudiants)
+            {
+                try
+                {
+                    // Appeler le service pour calculer la progression
+                    var response = await DashBoardService.CalculerPourcentage(selectedGroupeId, etudiant.CodeDA, professeurIdentifiant);
+                    dataItems.Add(new DataItem { Student = etudiant.CodeDA, Progression = response.Data });
+                }
+                catch (Exception ex)
+                {
+                    // Gérer l'exception, par exemple, imprimer le message d'erreur
+                    Console.WriteLine($"Erreur lors du calcul pour {etudiant.CodeDA}: {ex.Message}");
+                }
+            }
+
+            // Affecter les données à la variable de progression
+            progression = dataItems.ToArray();
+
+            // Forcer la mise à jour du composant
+            StateHasChanged();
         }
-    };
+        catch (Exception ex)
+        {
+            // Gérer l'exception, par exemple, imprimer le message d'erreur
+            Console.WriteLine($"Erreur lors de la mise à jour de la progression : {ex.Message}");
+        }
+    }
+
+    async Task OnGroupeSelectionChange(ChangeEventArgs e)
+    {
+        // Mettre à jour le groupe sélectionné
+        selectedGroupeId = Convert.ToInt32(e.Value.ToString());
+        await UpdateProgression();
+    }
+
+    // Méthode d'initialisation du composant
+    protected override async Task OnInitializedAsync()
+    {
+        // Appeler la méthode de mise à jour au chargement du composant
+        await UpdateProgression();
+    }
 }
