@@ -235,7 +235,7 @@ namespace STIMULUS_V2.Server.Services
                     {
                         if (ChildNode.Data != null)
                         {
-                            if (ParentNode.Data.Status == 4 && childNode.Type == NoeudType.STRUCTURE && ChildNode.Data.Status == 2)
+                            if (ParentNode.Data.Status == 4 && childNode.Type == NoeudType.STRUCTURE && ChildNode.Data.Status == 2 || ParentNode.Data.Status == 0 && childNode.Type == NoeudType.STRUCTURE && ChildNode.Data.Status == 2)
                             {
 
                                 ChildNode.Data.Status = 4; // Bloqué par le prof

@@ -186,10 +186,16 @@
                         <!-- Conteneur du bouton -->
                         <div style="text-align: right; margin-bottom: 10px;">
                             <div style="text-align: center;">
-                                <!-- Bouton pour la flèche vers le haut -->
-                                <RadzenButton Style="position: relative; margin-bottom: -20px;" Icon="arrow_upward" Click="@(args => ChangeComposantOrdreUp(composant.ComposantId))" />
-                                <!-- Bouton pour la flèche vers le bas -->
-                                <RadzenButton Icon="arrow_downward" Click="@(args => ChangeComposantOrdreDown(composant.ComposantId))" />
+                                @if(composant.Ordre != 1)
+                                {
+                                    <!-- Bouton pour la flèche vers le haut -->
+                                    <RadzenButton Style="position: relative; margin-bottom: -20px;" Icon="arrow_upward" Click="@(args => ChangeComposantOrdreUp(composant.ComposantId))" />
+                                }
+                                @if(listComposant.Count() != composant.Ordre)
+                                {
+                                    <!-- Bouton pour la flèche vers le bas -->
+                                    <RadzenButton Icon="arrow_downward" Click="@(args => ChangeComposantOrdreDown(composant.ComposantId))" />
+                                }
                                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Style="height:35px;" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteComposant(composant.ComposantId))" />
                             </div>
                         </div>
@@ -612,24 +618,6 @@
             await ComposantService.Update(id, composantChange);
             await ComposantService.Update(composantAChangerPlaceAvec.ComposantId, composantAChangerPlaceAvec);
         }
-        else
-        {
-            // Si aucun composant n'est actuellement à l'ordre désiré,
-            // vous pouvez ajuster la logique pour permettre l'échange
-            composantAChangerPlaceAvec = composants.FirstOrDefault(c => c.Ordre == composantChange.Ordre + 1);
-
-            if (composantAChangerPlaceAvec != null)
-            {
-                // 6. Échanger les ordres des deux composants
-                int tempOrdre = composantChange.Ordre;
-                composantChange.Ordre = composantAChangerPlaceAvec.Ordre;
-                composantAChangerPlaceAvec.Ordre = tempOrdre;
-
-                // 7. Mettre à jour les composants modifiés dans la base de données
-                await ComposantService.Update(id, composantChange);
-                await ComposantService.Update(composantAChangerPlaceAvec.ComposantId, composantAChangerPlaceAvec);
-            }
-        }
 
         // 8. Rafraîchir la page
         listComposant = new();
@@ -660,24 +648,6 @@
             // 5. Mettre à jour les composants modifiés dans la base de données
             await ComposantService.Update(id, composantChange);
             await ComposantService.Update(composantAChangerPlaceAvec.ComposantId, composantAChangerPlaceAvec);
-        }
-        else
-        {
-            // Si aucun composant n'est actuellement à l'ordre désiré,
-            // vous pouvez ajuster la logique pour permettre l'échange
-            composantAChangerPlaceAvec = composants.FirstOrDefault(c => c.Ordre == composantChange.Ordre - 1);
-
-            if (composantAChangerPlaceAvec != null)
-            {
-                // 6. Échanger les ordres des deux composants
-                int tempOrdre = composantChange.Ordre;
-                composantChange.Ordre = composantAChangerPlaceAvec.Ordre;
-                composantAChangerPlaceAvec.Ordre = tempOrdre;
-
-                // 7. Mettre à jour les composants modifiés dans la base de données
-                await ComposantService.Update(id, composantChange);
-                await ComposantService.Update(composantAChangerPlaceAvec.ComposantId, composantAChangerPlaceAvec);
-            }
         }
 
         // 8. Rafraîchir la page

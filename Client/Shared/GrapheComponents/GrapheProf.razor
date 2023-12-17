@@ -52,7 +52,14 @@
             {
                 <RadzenButton class="custom-graphe-viewmodebutton-title" Click=ReOrderNodes Text="Réordonner" Style="margin-left: auto; background-color: #14274E;" ButtonStyle="ButtonStyle.Warning" />
             }
-            <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="background-color: #14274E;" />
+            @if(modeDeVue == 2)
+            {
+                <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="background-color: #14274E;" />
+            }
+            else
+            {
+                <RadzenButton Click=SupprimerGraphe Text="Supprimer le graphe" class="custom-graphe-viewmodebutton-title" ButtonStyle="ButtonStyle.Danger" Style="margin-left: auto;background-color: #14274E;" />
+            }
             @if (loading == true)
             {
                 <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />

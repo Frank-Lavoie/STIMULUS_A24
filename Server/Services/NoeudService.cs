@@ -172,11 +172,11 @@ namespace STIMULUS_V2.Server.Services
                     var ChildrenNode = ChildNode.Data.ElementAt(i);
 
                     // Ajustez la position en Y pour que les enfants soient sous le parent
-                    ChildrenNode.PosY = ParentNode.Data.PosY + 400;
+                    ChildrenNode.PosY = ParentNode.Data.PosY + 300;
 
                     // Ajustez la position en X pour aligner les enfants horizontalement avec le parent
                     // et les espacer en fonction de l'index
-                    ChildrenNode.PosX = ParentNode.Data.PosX + (i - (ChildNode.Data.Count() - 1) / 2.0) * 400;
+                    ChildrenNode.PosX = ParentNode.Data.PosX + (i - (ChildNode.Data.Count() - 1) / 2.0) * 300;
 
                     await Update(ChildrenNode.NoeudId, ChildrenNode);
                 }
