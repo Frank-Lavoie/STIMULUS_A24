@@ -10,18 +10,19 @@
 @inject IPageEtudiantService DashBoardService
 
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-<div class="custom-container custom-homestudent-background">
     <!-- Section de l'interface utilisateur -->
+<div class="container text-center">
+    <h1 class="custom-home-title">Bienvenue sur Stimulus!</h1>
     <div class="teacher-info-container">
         <div class="container text-center">
-            <p class="lead">Bienvenue sur STIMULUS V2</p>
-            <p class="lead">Vous êtes un Professeur</p>
+            <p class="lead custom-home-subtitle">Vous êtes un Professeur</p>
         </div>
     </div>
+</div>
 
     <!-- Section principale du tableau de bord -->
-    <div class="box-display">
-        <RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
+    <div class="box-display" style="background-color: transparent;">
+    <RadzenText TextStyle="TextStyle.DisplayH3" class="custom-home-title" Style="text-decoration:underline">Tableau de bord</RadzenText>
         <!-- Deux graphiques représentant les données -->
         @if (progression != null && progression.Length > 0)
         {
@@ -29,14 +30,14 @@
             <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
                 <RadzenCard class="w-100 mb-4">
                     <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                    <RadzenLabel Text="Afficher les étiquettes de données" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-                    <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                    <RadzenLabel Text="lisser les graphiques" For="smooth" Class="rz-mr-6" />
+                    <RadzenLabel class="lead custom-home-subtitle" Text="Afficher les étiquettes de données" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenCheckBox @bind-Value="@smooth" Name="smooth" Style="margin-left: 8px;"></RadzenCheckBox>
+                <RadzenLabel class="lead custom-home-subtitle, rz-mr-6" Text="Lisser les graphiques" For="smooth"/>
                 </RadzenCard>
             </div>
             <!-- Dropdown pour sélectionner le groupe -->
             <div class="mb-3 custom-dropdown">
-                <label for="ddlGroupes" class="form-label">Sélectionnez un groupe :</label>
+            <label for="ddlGroupes" class="form-label, lead custom-home-subtitle">Sélectionnez un groupe :</label>
                 <select class="form-select" id="ddlGroupes" @onchange="OnGroupeSelectionChange">
                     @foreach (var groupe in groupeProf)
                     {
@@ -67,7 +68,6 @@
             <p class="lead">Veuillez créer un groupe et des pages pour utiliser le tableau de bord</p>
         }
     </div>
-</div>
 
 
 <!-- Style pour le tableau de bord -->

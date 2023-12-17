@@ -87,7 +87,7 @@
 .box-display {
     text-align: center;
     align-items: center;
-    background-color: lightgrey;
+    background-color: transparent;
     border-radius: 10px;
     margin-bottom: 20px;
     margin-left: 10px;
