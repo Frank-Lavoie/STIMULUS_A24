@@ -14,8 +14,26 @@
     <!-- Section de l'interface utilisateur -->
     <div class="teacher-info-container">
         <div class="container text-center">
+            <p class="lead">Bienvenue sur STIMULUS V2</p>
             <p class="lead">Vous êtes un Professeur</p>
+        </div>
+    </div>
 
+    <!-- Section principale du tableau de bord -->
+    <div class="box-display">
+        <RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
+        <!-- Deux graphiques représentant les données -->
+        @if (progression != null && progression.Length > 0)
+        {
+            <!-- Carte de configuration avec des options -->
+            <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+                <RadzenCard class="w-100 mb-4">
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Afficher les étiquettes de données" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                    <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+                    <RadzenLabel Text="lisser les graphiques" For="smooth" Class="rz-mr-6" />
+                </RadzenCard>
+            </div>
             <!-- Dropdown pour sélectionner le groupe -->
             <div class="mb-3 custom-dropdown">
                 <label for="ddlGroupes" class="form-label">Sélectionnez un groupe :</label>
@@ -26,26 +44,6 @@
                     }
                 </select>
             </div>
-        </div>
-    </div>
-
-    <!-- Section principale du tableau de bord -->
-    <div class="box-display">
-        <RadzenText TextStyle="TextStyle.DisplayH3">Tableau de bord</RadzenText>
-
-        <!-- Carte de configuration avec des options -->
-        <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
-            <RadzenCard class="w-100 mb-4">
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Afficher les étiquettes de données" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                <RadzenLabel Text="lisser les graphiques" For="smooth" Class="rz-mr-6" />
-            </RadzenCard>
-        </div>
-
-        <!-- Deux graphiques représentant les données -->
-        @if (progression != null && progression.Length > 0)
-        {
             <div class="row">
                 <div class="col-sm-11 col-lg-5 my-5">
                     <RadzenChart>
@@ -89,14 +87,14 @@
         display: inline-block;
     }
 
-        .custom-dropdown select {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            width: 100%;
-        }
+    .custom-dropdown select {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        width: 100%;
+    }
 </style>
 
 @code {
