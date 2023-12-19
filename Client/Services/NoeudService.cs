@@ -52,7 +52,7 @@ namespace STIMULUS_V2.Client.Services
 
         public async Task<APIResponse<IEnumerable<Noeud>>> GetAllById(int id)
         {
-            var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Noeud>>>($"api/Noeud/Fetch/AllBy/{id}");
+            var result = await _httpClient.GetFromJsonAsync<APIResponse<IEnumerable<Noeud>>>($"api/Noeud/Fetch/All/{id}");
             var log = Log.ForContext<NoeudService>();
             log.Information($"GetAllById(int id = {id}) ApiResponse: {result}");
             return result;
