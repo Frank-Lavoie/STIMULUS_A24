@@ -123,7 +123,7 @@ namespace STIMULUS_V2.Server.Services
         {
             try
             {
-                var itemList = await sTIMULUSContext.FichierSauvegarde.Where(item => item.CodeDA == da && item.ExerciceId == exerciceId ).ToListAsync();
+                var itemList = await sTIMULUSContext.FichierSauvegarde.Where(item => item.CodeDA == da && item.ExerciceId == exerciceId).ToListAsync();
 
                 if (itemList != null && itemList.Any())
                 {
