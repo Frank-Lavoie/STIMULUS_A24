@@ -1,1 +1,0 @@
-# STIMULUS_V2
