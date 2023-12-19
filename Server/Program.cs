@@ -12,7 +12,17 @@ using STIMULUS_V2.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configuration des fichiers de configuration
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
+    var env = hostingContext.HostingEnvironment;
+
+    config
+        .SetBasePath(env.ContentRootPath)
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .AddJsonFile($"appsettings.Development.json", optional: true)
+        .AddEnvironmentVariables();
+});
 
 builder.Host.UseSerilog((ctx, lc) =>
     lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
