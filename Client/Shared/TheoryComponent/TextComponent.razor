@@ -1,0 +1,33 @@
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Models.Authentication;
+@using STIMULUS_V2.Shared.Models.Entities;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject AuthenticationStateProvider authStateProvider;
+@inject ITexteFormaterService TextFormaterService; 
+
+@if (texte != null)
+{
+    <p class="custom-theory-texte-paragraph">@((texte.Contenue != null) ? texte.Contenue : "")</p>
+}
+else
+{
+    <p>Chargement...</p>
+}
+
+@code {
+    [Parameter] 
+    public int Reference { get; set; }
+
+    public TexteFormater texte { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var Texte = await TextFormaterService.Get(Reference);
+        texte = Texte.Data;
+
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
+} 

@@ -1,0 +1,104 @@
+﻿@using STIMULUS_V2.Client.Services.AuthenticationService;
+@using STIMULUS_V2.Shared.Models.Authentication;﻿
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IAuthenticationService AuthenticationService
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager NavMgr
+@inject IJSRuntime js
+
+<div>
+    @if (isLoading)
+    {
+        <div class="loading-overlay">
+          @*  <RadzenStack AlignItems="Radzen.AlignItems.Center" Class="rz-m-12" Gap="2rem">
+                <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Danger" ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+            </RadzenStack>*@
+            <div id="logo-container-loadinginloading">
+                <svg xmlns="http://www.w3.org/2000/svg" width="150" height="50">
+                    <text x="50%" y="50%" font-size="50" stroke-width="2" stroke="#365FA0" fill="lightyellow" id="animated-text" text-anchor="middle" dy="0.3em">
+                        C E P I
+                    </text>
+                </svg>
+            </div>
+        </div>
+    }
+
+    <RadzenRow Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 800px; overflow: hidden;">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-text-align-center rz-p-12" Style="height: 100%; background: linear-gradient(225deg, hsla(215, 33%, 23%, 1) 37%, hsla(206, 31%, 90%, 1) 100%);">
+                <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H2" Class="rz-color-white rz-mb-6 custom-connexion-title">STIMULUS</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" Class="rz-color-white custom-connexion-subtitle">Votre plateforme d'apprentissage en ligne.</RadzenText>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-p-12">
+                <RadzenText  TextStyle="TextStyle.H5" TagName="TagName.H2" Class="rz-mb-6 custom-connexion-title">
+                    Connexion
+                </RadzenText>
+                <RadzenLabel Style="color: red" Text="@errorMessage" />
+                <RadzenTemplateForm  Data=@("SimpleLogin")>
+                    <RadzenLogin Style="--rz-primary: #14274E;" class="custom-connexion-subtitle" AllowRegister="false" AllowResetPassword="false"
+                                 LoginText="Se connecter" UserText="Identifiant" PasswordText="Mot de passe"                               
+                                 UserRequired="Identifiant requis"
+                                 PasswordRequired="Mot de passe requis"
+                                 Login="@(args => OnLogin(args, "Login with default values"))"/>
+                </RadzenTemplateForm>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</div>
+
+@code {
+    private ConnexionVerification LoginModel = new();
+    private InscriptionVerification RegisterModel = new();
+    private bool isLoading;
+    private bool showErrorMessage;
+    private string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    async void OnLogin(LoginArgs args, string name)
+    {
+        isLoading = true;
+
+        LoginModel.Identifiant = args.Username;
+        LoginModel.Password = args.Password;
+        await sessionStorage.SetItemAsync<string>("idConnexion", args.Username);
+        await HandleLogin();
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var result = await AuthenticationService.LoginAsync(LoginModel);
+            if (result.Data is not null)
+            {
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(result.Data);
+                NavMgr.NavigateTo("/", replace: true);
+            }
+            else 
+            {
+                errorMessage = result.Message.ToString();
+            }           
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+        }       
+    }
+
+    private async Task HandleRegister()
+    {
+        var result = await AuthenticationService.RegisterAccountAsync(RegisterModel);
+        await js.InvokeVoidAsync("alert", result);
+    }
+}

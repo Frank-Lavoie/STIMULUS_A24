@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject AppState State;
+@inject AuthenticationStateProvider authStateProvider
+
+<div class="container text-center">
+    <AuthorizeView Roles="PROFESSEUR">
+        <p class="lead">Vous êtes un Professeur</p>
+        @{       
+        }
+    </AuthorizeView>
+
+    <AuthorizeView Roles="ETUDIANT">
+        <p class="lead">Vous êtes un Étudiant</p>
+        @{
+        }
+    </AuthorizeView>
+
+    <AuthorizeView Roles="ADMIN">
+        <p class="lead">Vous êtes un Administrateur</p>
+        @{
+        }
+    </AuthorizeView>
+</div>
+
+@code {
+
+}

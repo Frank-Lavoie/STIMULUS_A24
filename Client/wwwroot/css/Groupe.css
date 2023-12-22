@@ -1,0 +1,20 @@
+﻿.custom-groupe-titletop {
+    display: flex;
+    justify-content: center;
+    font-family: Oswald;
+    color: #14274E;
+    font-size: xx-large
+}
+
+.custom-groupe-title {
+    font-family: Oswald;
+    color: #14274E;
+    font-size: medium;
+}
+
+
+
+.custom-group-subtitle {
+    font-family: Comfortaa;
+    color: #14274E;
+}

@@ -1,0 +1,91 @@
+﻿@using STIMULUS_V2.Client.Services;
+@using Radzen.Blazor.Rendering;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+@using STIMULUS_V2.Shared.Models.Authentication;
+
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IEtudiantService EtudiantService
+@inject IProfesseurService ProfesseurService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject RerenderService Rerender
+
+@page "/Profile"
+
+
+<RadzenText Style="margin-top:10px;" class="custom-profile-title custom-profile-titleposition">Profile</RadzenText>
+    <RadzenCard class="rz-mx-auto" Style="max-width: 50%;">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenText class="custom-profile-subtitle">Prénom: </RadzenText>
+                    <RadzenText>@prenom</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenText class="custom-profile-subtitle">Nom: </RadzenText>
+                <RadzenText>@((nom != null) ? nom : "")</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenText class="custom-profile-subtitle">Adresse courriel: </RadzenText>
+                <RadzenText>@((email != null) ? email : "")</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenText class="custom-profile-subtitle">Rôle: </RadzenText>
+                    <RadzenText>@((role != null) ? role : "")</RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+
+    @code {
+
+    public Etudiant etudiant { get; set; }
+    public Professeur professeur { get; set; }
+    public string prenom { get; set; }
+    public string nom { get; set; }
+    public string email { get; set; }
+    public string role { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ProfileData();
+    }
+
+    public async Task ProfileData()
+    {
+        try
+        {
+            var idConnexion = await sessionStorage.GetItemAsync<string>("idConnexion");
+
+            if (idConnexion != null)
+            {
+                var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authenticationState.User;
+                var isProfesseur = user.IsInRole("PROFESSEUR");
+                var isEtudiant = user.IsInRole("ETUDIANT");
+
+                if (isProfesseur)
+                {
+                    var prof = await ProfesseurService.Get(idConnexion);
+                    professeur = prof.Data;
+
+                    prenom = professeur.Prenom;
+                    nom = professeur.Nom;
+                    email = professeur.Email;
+                    role = "PROFESSEUR";
+                }
+                if (isEtudiant)
+                {
+                    var etu = await EtudiantService.Get(idConnexion);
+                    etudiant = etu.Data;
+
+                    prenom = etudiant.Prenom;
+                    nom = etudiant.Nom;
+                    email = etudiant.Email;
+                    role = "ÉTUDIANT";
+                }
+            }
+        }
+        catch { }
+
+    }
+}

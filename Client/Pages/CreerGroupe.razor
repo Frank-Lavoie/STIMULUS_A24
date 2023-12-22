@@ -1,0 +1,111 @@
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
+@inject AuthenticationStateProvider authStateProvider
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject AppState State;
+@inject NavigationManager NavigationManager
+@inject IEtudiantService EtudiantService
+@inject ICoursService CoursService
+@inject IGroupeService GroupeService
+@inject IGroupeEtudiantService GroupeEtudiantService
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+@inject AppState State;
+@inject RerenderService Rerender
+
+@page "/CreerGroupe"
+
+
+
+<div >
+    <RadzenLabel class="custom-gestion-titletop"> Création de groupe</RadzenLabel>
+</div>
+
+<EditForm Model="groupe" OnSubmit="AjoutGroupe">
+    <RadzenCard class="rz-mx-auto" style="max-width: 50%;">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            <RadzenStack Gap="o">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Nom</RadzenLabel>
+                        <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="groupe.Nom" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Date de clôture</RadzenLabel>
+                        <RadzenDatePicker class="custom-gestion-subtitle" Style="width: 100%;" Name="DateCloture" @bind-Value="groupe.DateCloture" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Cours associé</RadzenLabel>
+                        <RadzenDropDown class="custom-gestion-subtitle" @bind-Value="groupe.CoursId" AllowClear="true" Placeholder="Sélectionnez un cours" Data="@listCours" Style="width: 100%;" TextProperty="Code" ValueProperty="CoursId" Name="Code"></RadzenDropDown>
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Étudiant à ajouter</RadzenLabel>
+                        <RadzenDropDown class="custom-gestion-subtitle" @bind-Value="selectedStudents" Data="@listEtudiant" TextProperty="Identifiant" ValueProperty="Identifiant" Name="DropDownMultipleChips" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple=true AllowClear=true Placeholder="Sélectionner les étudiants" Chips="true" Style="width: 100%; max-width: 400px;"></RadzenDropDown>
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenButton class="custom-gestion-subtitle" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+                        <RadzenButton class="custom-gestion-subtitle" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
+                    </div>                    
+                </div>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventCallback OnGroupeCreated { get; set; }
+    public STIMULUS_V2.Shared.Models.Entities.Groupe groupe = new();
+    public STIMULUS_V2.Shared.Models.Entities.Groupe_Etudiant groupe_etudiant = new();
+    public STIMULUS_V2.Shared.Models.Entities.Etudiant etudiant = new();
+    public List<STIMULUS_V2.Shared.Models.Entities.Etudiant> listEtudiant { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Etudiant>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Cours> listCours{ get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Cours>();
+    IEnumerable<string> selectedStudents = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var cours = await CoursService.GetAll();
+        var allCours = cours.Data;
+        listCours.AddRange(allCours);
+
+        var etudiant = await EtudiantService.GetAll();
+        var etudiants = etudiant.Data;
+        listEtudiant.AddRange(etudiants);
+    }
+
+    private async void AjoutGroupe()
+    {
+        try
+        {
+            groupe.DateCreation = DateTime.Now;
+            groupe.ProfesseurId = await sessionStorage.GetItemAsync<string>("idConnexion");
+
+            var Groupe = await GroupeService.Create(groupe);
+            var nouveauGroupe = Groupe.Data;
+
+            foreach (var etudiantId in selectedStudents)
+            {
+                groupe_etudiant.GroupeId = nouveauGroupe.GroupeId;
+                groupe_etudiant.CodeDA = etudiantId; // Utilisez l'identifiant de l'étudiant
+
+                await GroupeEtudiantService.Create(groupe_etudiant);
+                await sessionStorage.SetItemAsync<int>("idGroupe", nouveauGroupe.GroupeId);          
+            }
+            await OnGroupeCreated.InvokeAsync();
+            Rerender.TriggerGroupeCreated();
+            NavigationManager.NavigateTo("/Groupe");
+        }
+        catch
+        {
+            await js.InvokeVoidAsync("alert", "Erreur lors de la création du groupe");
+        }
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

@@ -1,0 +1,312 @@
+﻿@using Microsoft.CodeAnalysis;
+@using System.Text;
+@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Client.Shared.NoeudComponents
+@using STIMULUS_V2.Shared.Models.DTOs;
+@using STIMULUS_V2.Shared.Models.Entities;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using static STIMULUS_V2.Client.Shared.NoeudComponents.Connector;
+@using static STIMULUS_V2.Client.Shared.NoeudComponents.NoeudsEtudiant;
+
+@inject MouseService mouseSrv;
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntim
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IUpdateService updateService
+@inject INoeudService NoeudService;
+@inject IGrapheService GrapheService;
+@inject INoeudEtudiantService NoeudEtudiantService;
+@inject AppState State;
+@inject RerenderService Rerender
+
+
+<div class="row mt-2">
+    <div class="col">
+        <foreignObject class="custom-graphe-foreignobject-bg" x="5" y="5" width="150" height="50">
+            <RadzenStack class="divGrapheEntete" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoom-button" Text="+" ButtonStyle="ButtonStyle.Primary" Click=AugmenterZoom />
+                <RadzenButton Style="background-color: #14274E;" class="custom-graphe-zoomout-button" Text="-" ButtonStyle="ButtonStyle.Primary" Click=ReduireZoom />
+                <RadzenButton Style="background-color: #14274E;" class="custom-graphe-reset-button" Icon="refresh" ButtonStyle="ButtonStyle.Primary" Click=ResetViewbox />
+                <RadzenImage class="custom-grapheprof-selectuser-title" Style="height: 50px; width: 35px;align-content:center; margin-left: 1%; margin-right: 1%" Path="/RessourceVisuel/shift.png"></RadzenImage>
+                <RadzenText class="custom-grapheprof-selectuser-title">+</RadzenText>
+                <RadzenImage class="custom-grapheprof-selectuser-title" Style="height: 30px; width: 30px; align-content:center; margin-left: 1%;margin-right: 1%;" Path="/RessourceVisuel/scroll.png"></RadzenImage>
+                <RadzenText class="custom-grapheprof-selectuser-title">pour zoomer !</RadzenText>
+                <div class="rz-m-12">
+                    <RadzenProgressBar @bind-Value="@pourcentageProgression" Unit="% complété" Style="width:300px;" class="custom-grapheprof-selectuser-title" />
+                </div>
+                @if (loading == true)
+                {
+                    <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" Value="100" ShowValue="false" Size="ProgressBarCircularSize.Medium" Mode="ProgressBarMode.Indeterminate">
+                    </RadzenProgressBarCircular>
+                    <RadzenText class="custom-grapheprof-selectuser-title">Chargement de votre progression ...</RadzenText>
+                }
+
+            </RadzenStack>
+        </foreignObject>
+        <svg class="bg-transparent" width="100%" height="2000" xmlns="http://www.w3.org/2000/svg">
+            <foreignObject class="bg-transparent" x="0" y="5" width="180" height="350">
+                <RadzenPanel class="custom-graphe-legend-panel">
+                    <RadzenStack class="custom-graphe-legend-stack" Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                        <RadzenLabel class="custom-graphe-legend-title" style="color:black;text-decoration: underline;">Légende</RadzenLabel>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Bloqué</RadzenLabel>
+                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/140-140-140.png"></RadzenImage>
+                            </div>
+                        </div>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Non consulté</RadzenLabel>
+                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/non_compléter.png"></RadzenImage>
+                            </div>
+                        </div>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Consulté</RadzenLabel>
+                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/199-160-53.png"></RadzenImage>
+                            </div>
+                        </div>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Complété</RadzenLabel>
+                                <RadzenImage class="custom-graphe-legend-color-size" Path="/RessourceVisuel/Legende/complété.png"></RadzenImage>
+                            </div>
+                        </div>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Catégorie de noeuds</RadzenLabel>
+                                <RadzenImage class="custom-graphe-legend-color-size" Style="margin-right: 7%;" Path="/RessourceVisuel/Legende/structure.png"></RadzenImage>
+                            </div>
+                        </div>
+                        <div class="custom-graphe-legend-color-position">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <RadzenLabel class="custom-graphe-legend-subtitle">Zoom: @AfficheZoom()</RadzenLabel>
+                            </div>
+                        </div>
+                    </RadzenStack>
+                </RadzenPanel>
+            </foreignObject>
+            <svg class="bg-transparent" width="100%" height="1800" xmlns="http://www.w3.org/2000/svg" viewBox="@viewBoxX @viewBoxY @viewBoxWidth @viewBoxWidth" @onmousewheel="Zoom" @onmousemove=@(e => mouseSrv.FireMove(this, e)) @onmouseup=@(e => mouseSrv.FireUp(this, e))>
+                <Draggable GetModeDeVue="GetModeFond" X="@((viewBoxWidth - 1800) / 2)" Y="@((viewBoxWidth - 1500) / 2)">
+                    <rect x="-1000" y="-1000" width="4000" height="4000" style="fill:rgb(0,0,0,0);stroke-width:1;stroke:rgb(0,0,0,0)" />
+                    @foreach (var noeud in Nodes)
+                    {
+                        <NoeudsEtudiant Node="@noeud" Nodes="@Nodes"></NoeudsEtudiant>
+                    }
+                </Draggable>
+            </svg>
+        </svg>
+    </div>
+</div>
+
+@code {
+    private string displayHover;
+    public List<Noeud> Nodes { get; set; } = new();
+    private List<Noeud> NodesTemp { get; set; } = new();
+    private double viewBoxX = 0;
+    private double viewBoxY = 0;
+    private double viewBoxWidth = 2000;
+    private double viewBoxHeight = 2000;
+    private double zoomIncrement = 100;
+    private bool loading;
+    private string viewForm = "hidden";
+    private string displayNouveauNoeud = "hidden";
+    private Noeud nouveauNoeud;
+    private Noeud_Etudiant noeudEtudiant;
+    public double pourcentageProgression;
+
+    protected async override void OnInitialized()
+    {
+        await UpdateGraphe();
+        await CalculProgressionEtudiant();
+        Rerender.OnNoeudStatus += HandleChangeNoeud;
+    }
+
+    /// <summary>
+    /// Recupere les noeuds du graph Numero X
+    /// </summary>
+    private async Task UpdateGraphe()
+    {
+        Nodes = new();
+        int idGraphe = await sessionStorage.GetItemAsync<int>("idGraphe");
+
+        // Wait until 'idGraphe' is not zero (use a timeout or cancellation token for safety).
+        while (idGraphe == 0)
+        {
+            // Add a delay to avoid continuous polling (e.g., 100ms).
+            await Task.Delay(100);
+        }
+        Nodes = ((APIResponse<IEnumerable<Noeud>>)await NoeudService.GetAllFromGraph(idGraphe)).Data.ToList();
+        loading = true;
+        foreach (var noeud in Nodes)
+        {
+            await NoeudEtudiantService.GetProgression(await sessionStorage.GetItemAsync<string>("idConnexion"), idGraphe, noeud.NoeudId);
+        }
+        loading = false;
+        StateHasChanged();
+    }
+    //Hardcode
+    private int GetModeFond() => 2; 
+
+    private void OnMouseHover() => displayHover = "show";
+    private void OnMouseLeave() => displayHover = "hidden";
+
+    /// <summary>
+    /// Appeler un changement de status
+    /// </summary>
+    private async void HandleChangeNoeud()
+    {
+        await UpdateGraphe(); 
+        StateHasChanged();
+    }
+
+    private async Task CalculProgressionEtudiant()
+    {
+        int totalNodes = Nodes.Count();
+        int progressionEtudiant = 0;
+
+        foreach (var progression in Nodes)
+        {
+            var etudiantData = await NoeudEtudiantService.GetByNoeudAndDa(progression.NoeudId, await sessionStorage.GetItemAsync<string>("idConnexion"));
+
+            if (etudiantData != null)
+            {
+                var noeudEtudiant = etudiantData.Data;
+
+                if (noeudEtudiant.Status == 4)
+                {
+                    progressionEtudiant += 1;
+                }
+            }
+        }
+
+        bool tousLesNoeudsSontDeStatus4 = progressionEtudiant == totalNodes;
+
+        // Calculer la progression en pourcentage
+        double pourcentageProgressionVirule = tousLesNoeudsSontDeStatus4 ? 100.0 : (double)progressionEtudiant / totalNodes * 100;
+
+        // Convertir le pourcentage en entier
+        pourcentageProgression = (int)pourcentageProgressionVirule;
+    }
+
+    private void ResetViewbox()
+    {
+        viewBoxX = 0;
+        viewBoxY = 0;
+        viewBoxHeight = 2000;
+        viewBoxWidth = 2000;
+        zoomIncrement = 100;
+        AfficheZoom();
+    }
+
+    /// <summary>
+    /// Augmenter le zoom
+    /// </summary>
+    private void AugmenterZoom()
+    {
+        if (zoomIncrement != 150)
+        {
+            viewBoxX = viewBoxX + 10;
+            viewBoxY = viewBoxY + 10;
+            viewBoxWidth = viewBoxWidth - 20;
+            viewBoxHeight = viewBoxHeight - 20;
+            zoomIncrement = zoomIncrement + 1;
+            AfficheZoom();
+        }
+        else
+        {
+            viewBoxX = viewBoxY;
+            viewBoxHeight = viewBoxWidth;
+            AfficheZoom();
+        }
+    }
+
+    /// <summary>
+    /// Reduit le zoom
+    /// </summary>
+    private void ReduireZoom()
+    {
+        if (zoomIncrement != 0)
+        {
+            viewBoxX = viewBoxX - 10;
+            viewBoxY = viewBoxY - 10;
+            viewBoxWidth = viewBoxWidth + 20;
+            viewBoxHeight = viewBoxHeight + 20;
+            zoomIncrement = zoomIncrement - 1;
+            AfficheZoom();
+        }
+        else
+        {
+            viewBoxX = viewBoxY;
+            viewBoxHeight = viewBoxWidth;
+            AfficheZoom();
+        }
+    }
+
+    /// <summary>
+    /// Zoom scroll molette
+    /// </summary>
+    /// <param name="mouse"></param>
+    public void Zoom(WheelEventArgs mouse)
+    {
+        if (mouse.ShiftKey) // get le shift key
+        {
+            // Utilisation de mouse.DeltaY pour vérifier la direction du défilement
+            if (mouse.DeltaY < 0)
+            {
+                // Faire zoom vers le haut
+                if (zoomIncrement != 150)
+                {
+                    viewBoxX = viewBoxX + 10;
+                    viewBoxY = viewBoxY + 10;
+                    viewBoxWidth = viewBoxWidth - 20;
+                    viewBoxHeight = viewBoxHeight - 20;
+                    zoomIncrement = zoomIncrement + 1;
+                    AfficheZoom();
+                }
+                else
+                {
+                    viewBoxX = viewBoxY;
+                    viewBoxHeight = viewBoxWidth;
+                    AfficheZoom();
+                }
+            }
+            else if (mouse.DeltaY > 0)
+            {
+                // Faire zoom vers le bas
+                if (zoomIncrement != 0)
+                {
+                    viewBoxX = viewBoxX - 10;
+                    viewBoxY = viewBoxY - 10;
+                    viewBoxWidth = viewBoxWidth + 20;
+                    viewBoxHeight = viewBoxHeight + 20;
+                    zoomIncrement = zoomIncrement - 1;
+                    AfficheZoom();
+                }
+                else
+                {
+                    viewBoxX = viewBoxY;
+                    viewBoxHeight = viewBoxWidth;
+                    AfficheZoom();
+                }
+            }
+        }
+    }
+
+    public string AfficheZoom()
+    {
+        if (zoomIncrement <= 0)
+        {
+            // Vous pouvez ajuster la valeur selon vos besoins
+            return ("0%");
+        }
+        if (zoomIncrement >= 150)
+        {
+            return ("150%");
+        }
+        else
+        {
+            return (zoomIncrement + "%");
+        }
+    }
+}

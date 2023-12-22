@@ -1,0 +1,64 @@
+﻿@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+
+@inject AuthenticationStateProvider authStateProvider
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject AppState State;
+@inject NavigationManager NavigationManager
+@inject IEtudiantService EtudiantService
+@inject ICoursService CoursService
+@inject IGroupeService GroupeService
+@inject IGroupeEtudiantService GroupeEtudiantService
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+
+@page "/CreerCours"
+
+<div>
+    <RadzenLabel class="custom-gestion-titletop">Création de cours</RadzenLabel>
+</div>
+
+<EditForm Model="cours" OnSubmit="AjoutCours">
+    <RadzenCard class="rz-mx-auto" style="max-width: 50%;">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            <RadzenStack Gap="o">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Nom</RadzenLabel>
+                        <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="cours.Code" />
+                    </div>                   
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-gestion-subtitle">Description</RadzenLabel>
+                        <RadzenTextBox class="custom-gestion-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="cours.Description" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenButton class="custom-gestion-subtitle" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+                        <RadzenButton class="custom-gestion-subtitle" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />
+                    </div>
+                </div>
+            </RadzenStack>
+
+        </RadzenStack>
+    </RadzenCard>
+</EditForm>
+
+@code {
+    public STIMULUS_V2.Shared.Models.Entities.Cours cours = new();
+    public List<STIMULUS_V2.Shared.Models.Entities.Etudiant> listEtudiant { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Etudiant>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Cours> listCours { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Cours>();
+    IEnumerable<string> selectedStudents = new List<string>();
+
+    private async void AjoutCours()
+    {    
+        await CoursService.Create(cours);
+        NavigationManager.NavigateTo("/");
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+}

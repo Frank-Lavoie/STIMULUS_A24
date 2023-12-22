@@ -1,0 +1,22 @@
+﻿.custom-gestion-titletop {
+    display: flex;
+    justify-content: center;
+    padding: 2%;
+    font-family: Oswald;
+    font-size: xx-large;
+    color: #14274E;
+}
+
+.custom-gestion-title {
+    font-family: Oswald;
+    color: #14274E;
+}
+
+.custom-gestion-subtitle {
+    font-family: Comfortaa;
+    color: #14274E;
+}
+
+.custom-gestion-savebutton {
+    background-color: #14274E;
+}

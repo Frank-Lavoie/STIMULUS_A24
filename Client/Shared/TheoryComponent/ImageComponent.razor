@@ -1,0 +1,37 @@
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+
+@inject IImageService ImageService
+
+<div class="container text-center">
+    <RadzenStack AlignItems="AlignItems.Center">
+        @if (image != null)
+        {
+            <div>
+                <RadzenImage Path="@((image.url != null) ? image.url : "")" Style="width: 15rem" />
+                <p style="font-style: italic; margin-top: 10px;">@((image.Description != null) ? image.Description : "")</p>
+            </div>
+        }
+        else
+        {
+            <p>Chargement...</p>
+        }
+    </RadzenStack>
+</div>
+
+
+@code {
+	[Parameter]
+    public int Reference { get; set; }
+
+    public Image image { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var Image = await ImageService.Get(Reference);
+        image = Image.Data;
+
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
+}

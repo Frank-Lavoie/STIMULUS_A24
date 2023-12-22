@@ -1,0 +1,85 @@
+﻿/*Cette section prend en charge l'esemble des composants TheoryComponent*/
+.custom-theory-title-text-letter {
+    margin-left: 1%;
+}
+
+.custom-theory-texte-letter{
+    padding-left: 45%;
+}
+
+.custom-theory-button {
+    padding-top: 1%;
+    padding-left: 1%;
+    width: 15%;
+}
+
+.custom-theory-menu {
+    padding-top: 1%;
+    padding-left: 1%;
+}
+
+.custom-theory-backbutton {
+    margin-left: 2%;
+    width: 15%;
+}
+
+.custom-theory-save-button{
+    margin-left: 2%;
+    width: 15%;
+}
+
+/*Cette section prend en charge le composant TextComponent*/
+.custom-theory-textbox-border {
+    border: none;
+}
+
+/*Cette section prend en charge le composant VideoComponent*/
+.custom-theory-video {
+    padding-left: 2%;
+}
+.file-tab {
+    display: inline-block;
+    background-color: #1e1e1e; /* Couleur de fond sombre de VS Code */
+    color: white; /* Couleur du texte */
+    border-right: 1px solid #343131;
+    padding: 4px 8px;
+    align-items: center;
+}
+.file-tab button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: white; /* Couleur du texte */
+    margin-left: 5px; /* Espacement entre le nom du fichier et le bouton "X" */
+}
+
+.close-button {
+    transition: color 0.2s; /* Animation de changement de couleur du "X" au survol */
+}
+
+.modal-confirm {
+    font-size: 26px;
+    margin: 30px 0 -10px;
+    color: black;
+}
+#background-result {
+    background-color: rgb(30, 30, 30);
+    margin-left: 10px;
+    padding-left: 10px;
+    width: 500px
+}
+.boutonExerciceGauche {
+    background-color: var(--secondaire-couleur);
+    color: var(--principale-couleur);
+    font-weight: bold;
+    border-color: var(--principale-couleur);
+    border-style: solid;
+}
+
+.boutonExerciceDroite {
+    background-color: var(--secondaire-couleur);
+    color: var(--principale-couleur);
+    font-weight: bold;
+    border-color: var(--principale-couleur);
+    border-style: solid;
+}

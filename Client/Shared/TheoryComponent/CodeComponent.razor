@@ -1,0 +1,45 @@
+﻿@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+
+@inject ICodeService CodeService
+@inject NavigationManager NavigationManager
+
+    @if (code != null)
+    {
+    <div class="codeSample component">
+        <div class="headCode left-align">
+            @((code.Titre != null) ? code.Titre : "")
+        </div>
+        <pre class="code left-align">
+            @((code.Contenu != null) ? code.Contenu : "")
+        </pre>
+    </div>
+    }
+    else
+    {
+        <p>Chargement...</p>
+    }
+
+@code {
+    [Parameter]
+    public int Reference { get; set; }
+
+    [Inject] 
+    private IJSRuntime js { get; set; }
+
+    public Code code { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var Code = await CodeService.Get(Reference);
+        code = Code.Data;
+
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await js.InvokeVoidAsync("HighlightFunctions.highlightSnippets");
+    }
+}

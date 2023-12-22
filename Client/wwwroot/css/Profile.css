@@ -1,0 +1,16 @@
+﻿.custom-profile-title {
+    font-family: Oswald;
+    font-size: larger;
+    color: #14274E;
+}
+
+.custom-profile-subtitle {
+    font-family: Comfortaa;
+    font-size: large;
+    color: #14274E;
+}
+
+.custom-profile-titleposition{
+    display: flex;
+    justify-content: center; 
+}

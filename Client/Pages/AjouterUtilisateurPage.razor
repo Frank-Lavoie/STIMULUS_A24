@@ -1,0 +1,60 @@
+﻿@using STIMULUS_V2.Client.Services.AuthenticationService﻿
+@using STIMULUS_V2.Shared.Models.Authentication;
+
+@inject IAuthenticationService AuthenticationService
+@inject IJSRuntime js
+
+@page "/AjouterUtilisateur"
+
+<div class="custom-adduser-title">
+    <RadzenLabel class="custom-adduser-title">Création de compte Stimulus</RadzenLabel>
+</div>
+<EditForm Model="RegisterModel" OnValidSubmit="HandleRegister">
+    <RadzenCard class="rz-mx-auto" Style="max-width: 50%;">
+        <DataAnnotationsValidator />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+            <RadzenStack Gap="0">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Prenom</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Prenom"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Prenom)" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Nom</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Nom"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Nom)" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Adresse courriel</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Email"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Email)" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Mot de passe</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.Password"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.Password)"  />
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label custom-adduser-subtitle"> Confirmer le mot de passe</label>
+                        <InputText class="form-control custom-adduser-textbox custom-adduser-subtitle" @bind-Value="RegisterModel.ConfirmPassword"></InputText>
+                        <ValidationMessage For="@(() => RegisterModel.ConfirmPassword)" />
+                    </div>
+                    <div class="form-group mt-3">
+                        <button type="submit" class="custom-adduser-btn-save custom-adduser-subtitle">Enregistrer</button>
+                    </div>
+                </div>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+</EditForm>
+
+@code {
+    private InscriptionVerification RegisterModel { get; set; } = new();
+
+    private async Task HandleRegister()
+    {
+        var result = await AuthenticationService.RegisterAccountAsync(RegisterModel);
+        await js.InvokeVoidAsync("alert", result);
+    }
+}

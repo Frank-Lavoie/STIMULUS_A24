@@ -1,0 +1,242 @@
+﻿@using Blazored.LocalStorage;
+@using STIMULUS_V2.Client.Services;
+@using STIMULUS_V2.Shared.Interface.ChildInterface;
+@using STIMULUS_V2.Shared.Models.Entities;
+
+@inject IJSRuntime JSRuntime
+@inject IGrapheService GrapheService
+@inject INoeudEtudiantService NoeudEtudiantService
+@inject IGroupeEtudiantService GroupeEtudiantService
+@inject INoeudService NoeudService
+@inject ILocalStorageService localStorageService
+@inject IGroupeService GroupeService
+@inject IPageService PageService
+@inject IComposantService ComposantService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject AuthenticationStateProvider authStateProvider
+@inject Microsoft.Extensions.Configuration.IConfiguration config;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppState State;
+@inject NavigationManager NavigationManager
+@inject RerenderService Rerender
+
+@page "/CreerGraphe"
+
+<div>
+    <RadzenLabel class="custom-gestion-titletop"> Création de graphe</RadzenLabel>
+</div>
+
+<EditForm Model="graphe" OnSubmit="AjoutGraphe">
+    <RadzenCard class="rz-mx-auto" style="max-width: 50%;">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+            <RadzenStack Gap="o">
+                <div class="card-body">
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Nom</RadzenLabel>
+                        <RadzenTextBox class="custom-creategroup-subtitle" Style="width: 100%;" Name="Nom" @bind-Value="graphe.Nom" />
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Status</RadzenLabel>
+                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="Status" Placeholder="Choississez le status" Data="status" Style="width: 100%;" Name="Status"></RadzenDropDown>
+                    </div>
+                    <div class="form-group mt-2">
+                        <RadzenLabel class="custom-creategroup-subtitle">Groupe associé</RadzenLabel>
+                        <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="graphe.GroupeId" AllowClear="true" Placeholder="Sélectionné un groupe" Data="@listGroupe" Style="width: 100%;" TextProperty="Nom" ValueProperty="GroupeId" Name="Nom"></RadzenDropDown>
+                    </div>               
+                    <div class="form-group mt-2">
+                        <RadzenCheckBox TValue="bool" Value=@SiCopierGraphe Change=@(args => SiCopierGraphe = args) Name="CheckBox2" />
+                        <RadzenLabel Text="Copier un graphe existant ?" Component="CheckBox2" Style="margin-left: 8px; vertical-align: middle;" />
+                    </div>
+                    @if(SiCopierGraphe == true)
+                    {
+                        <div class="form-group mt-2">
+                            <RadzenDropDown class="custom-creategroup-subtitle" @bind-Value="grapheCopie.GrapheId" AllowClear="true" Placeholder="Sélectionné un graphe" Data="@listGraphe" Style="width: 100%;" TextProperty="Nom" ValueProperty="GrapheId" Name="Nom"></RadzenDropDown>
+                        </div>
+                    } 
+                    <div class="form-group mt-2">
+                        <RadzenButton class="custom-creategroup-title custom-creategroup-savebutton" ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Créer" />
+                        <RadzenButton class="custom-creategroup-title" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Annuler" Click="@Cancel" />                       
+                    </div>
+
+                </div>
+
+            </RadzenStack>
+
+        </RadzenStack>
+    </RadzenCard>
+</EditForm>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback OnGrapheCreated { get; set; }
+    bool SiCopierGraphe;
+    public string NomGraphe { get; set; }
+    public string Status = "ACTIVER";
+    public int IdGroupe { get; set; }
+    public List<STIMULUS_V2.Shared.Models.Entities.Graphe> listGraphe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Graphe>();
+    public List<STIMULUS_V2.Shared.Models.Entities.Groupe> listGroupe { get; set; } = new List<STIMULUS_V2.Shared.Models.Entities.Groupe>();
+    public STIMULUS_V2.Shared.Models.Entities.Graphe graphe = new();
+    public STIMULUS_V2.Shared.Models.Entities.Graphe grapheCopie = new();
+    public STIMULUS_V2.Shared.Models.Entities.Noeud nouveauNoeud = new();
+    public STIMULUS_V2.Shared.Models.Entities.Noeud_Etudiant noeudEtudiant = new();
+
+    List<string> status = new List<string>() //Permet un affichage correct du Status
+    {
+        "ACTIVER",
+        "DESACTIVER"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseGroupe = await GroupeService.GetAllForTeacher(await sessionStorage.GetItemAsync<string>("idConnexion"));//Va cherchert tous les groupes du prof
+        var groupes = responseGroupe.Data;
+        listGroupe.AddRange(groupes);//Ajout des groupes dans la liste
+
+        foreach(var graphe in groupes)
+        {
+            var responseGraphe = await GrapheService.GetAllFromGroup(graphe.GroupeId);
+
+            listGraphe.AddRange(responseGraphe.Data);
+        }
+
+    }
+
+    private async void AjoutGraphe()
+    {
+        if (Status == "ACTIVER")
+        {
+            graphe.Status = GrapheStatus.ACTIVER;
+        }
+        else if (Status == "DESACTIVER")
+        {
+            graphe.Status = GrapheStatus.DESACTIVER;
+        }
+
+
+        if(SiCopierGraphe == false)
+        {
+            string nomSansEspaces = graphe.Nom.Replace(" ", "");
+
+            if (nomSansEspaces.Length > 10)
+            {
+                // Le nom est trop long, afficher une alerte
+                await JSRuntime.InvokeVoidAsync("alert", "Le nom du graphe est trop long.");
+            }
+            else
+            {
+                var nouveauGraphe = await GrapheService.Create(graphe);
+                var newgraphe = nouveauGraphe.Data;
+
+                nouveauNoeud.GrapheId = newgraphe.GrapheId;
+                nouveauNoeud.Nom = nomSansEspaces;
+                nouveauNoeud.Description = "Structure";
+                nouveauNoeud.Disponibilite = DateTime.Now;
+                nouveauNoeud.Obligatoire = false;
+                nouveauNoeud.Status = 0;
+                nouveauNoeud.PosX = 805;
+                nouveauNoeud.PosY = -175;
+                nouveauNoeud.Rayon = 50;
+                nouveauNoeud.Type = NoeudType.STRUCTURE;
+
+                var newNoeud = await NoeudService.Create(nouveauNoeud);
+                var node = newNoeud.Data;
+
+                var etudiant = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+                var etudiants = etudiant.Data;
+
+                await sessionStorage.SetItemAsync<int>("idGraphe", newgraphe.GrapheId);
+                await OnGrapheCreated.InvokeAsync();
+                Rerender.TriggerGrapheCreated();
+                NavigationManager.NavigateTo("/Graphe");
+            }
+        }
+        else
+        {
+            string nomSansEspaces = graphe.Nom.Replace(" ", "");
+
+            if (nomSansEspaces.Length > 10)
+            {
+                // Le nom est trop long, afficher une alerte
+                await JSRuntime.InvokeVoidAsync("alert", "Le nom du graphe est trop long.");
+            }
+            else
+            {
+                var nouveauGraphe = await GrapheService.Create(graphe);
+                var newgraphe = nouveauGraphe.Data;
+                var graphecopier = await NoeudService.GetAllFromGraph(grapheCopie.GrapheId);
+                var correspondanceNoeudParent = new Dictionary<int, int>();
+
+
+                foreach(var noeud in graphecopier.Data)
+                {
+                    var noeudCopier = new Noeud
+                    {
+                            Nom = noeud.Nom,
+                            Description = noeud.Description,
+                            Disponibilite = noeud.Disponibilite,
+                            Obligatoire = noeud.Obligatoire,
+                            Status = noeud.Status,
+                            PosX = noeud.PosX,
+                            PosY = noeud.PosY,
+                            Rayon = noeud.Rayon,
+                            Type = noeud.Type,
+                            GrapheId = newgraphe.GrapheId,
+                            NoeudParentId = noeud.NoeudParentId.HasValue && correspondanceNoeudParent.ContainsKey(noeud.NoeudParentId.Value) ? correspondanceNoeudParent[noeud.NoeudParentId.Value] : (int?)null
+                    };
+
+                    var nouveauNoeud =  await NoeudService.Create(noeudCopier);
+
+                    correspondanceNoeudParent.Add(noeud.NoeudId, (int)nouveauNoeud.Data.NoeudId);
+
+                    var pagenoeud = await PageService.GetAllFromNoeud(noeud.NoeudId);
+
+                    foreach(var page in pagenoeud.Data)
+                    {
+                        var pageCopier = new Page
+                        {
+                                Ordre = page.Ordre,
+                                NoeudId = nouveauNoeud.Data.NoeudId,
+                                ImportanceId = 1 //TEMPORAIRE
+                        };
+                        var nouvellePage = await PageService.Create(pageCopier);
+
+
+                        var composantpage = await ComposantService.GetAllById(page.PageId);
+
+
+                        foreach(var composant in composantpage.Data)
+                        {
+                            var composantCopier = new Composant
+                            {
+                                    Ordre = composant.Ordre,
+                                    Reference = composant.Reference,
+                                    Type = composant.Type,
+                                    PageId = nouvellePage.Data.PageId
+                            };
+
+                            var nouveauComposant = await ComposantService.Create(composantCopier);
+                        }
+
+                    }
+
+                }
+
+                var etudiant = await GroupeEtudiantService.GetAllStudentForGroup(await sessionStorage.GetItemAsync<int>("idGroupe"));
+                var etudiants = etudiant.Data;
+
+                await sessionStorage.SetItemAsync<int>("idGraphe", newgraphe.GrapheId);
+                await OnGrapheCreated.InvokeAsync();
+                Rerender.TriggerGrapheCreated();
+                NavigationManager.NavigateTo("/Graphe");
+            }
+        }
+
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
