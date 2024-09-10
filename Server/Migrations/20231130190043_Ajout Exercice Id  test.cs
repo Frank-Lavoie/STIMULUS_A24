@@ -24,7 +24,8 @@ namespace STIMULUS_V2.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cours",
+                name: ""
+                ,
                 columns: table => new
                 {
                     CoursId = table.Column<int>(type: "int", nullable: false)

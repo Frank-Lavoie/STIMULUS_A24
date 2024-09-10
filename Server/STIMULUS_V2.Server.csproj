@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	<UserSecretsId>53259bf0-6930-4905-9ada-63c59391a76d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

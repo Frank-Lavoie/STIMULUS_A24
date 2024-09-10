@@ -93,3 +93,102 @@
     margin-left: 10px;
     margin-right: 10px;
 }
+
+
+
+
+ {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    font-family: Arial, sans-serif;
+}
+
+.top-section {
+    position: relative;
+    height: 400px;
+    background: url('your-background-image.jpg') no-repeat center center;
+    background-size: cover;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content {
+    text-align: center;
+    color: white;
+}
+
+    .content h1 {
+        font-size: 3em;
+        margin-bottom: 10px;
+    }
+
+    .content .highlight {
+        color: #6bc2ff;
+    }
+
+    .content p {
+        font-size: 1.2em;
+    }
+
+.bottom-section {
+    background-color: #1c3557;
+    color: white;
+    padding: 20px 40px;
+    text-align: center;
+}
+
+    .bottom-section p {
+        margin-bottom: 20px;
+        font-size: 1.2em;
+    }
+
+.recent-courses {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+}
+
+.course-card {
+    width: 150px;
+    height: 100px;
+    border-radius: 8px;
+}
+
+    .course-card.orange {
+        background-color: #f19b37;
+    }
+
+    .course-card.cyan {
+        background-color: #7be3e1;
+    }
+.more-button {
+    display: flex;
+    justify-content: flex-end;
+}
+.more-button a {
+    display: inline-block;
+    background-color: #f19b37;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+    .more-button a:hover {
+        background-color: #d3822d;
+    }
