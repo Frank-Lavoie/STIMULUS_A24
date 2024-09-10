@@ -1,69 +1,94 @@
 ﻿@using STIMULUS_V2.Shared.Models.Authentication;
-
+@using DxMenu = Radzen.Blazor.RadzenMenu;
 @inject Microsoft.Extensions.Configuration.IConfiguration config;
 @inject AuthenticationStateProvider authStateProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-
+@inject Shared.CoreLayout.MenuSidebar menuSidebar;
 <RadzenHeader class="custom-header-background">
-    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
-        <!-- SidebarToggle et Logo dans le même conteneur flex -->
-        <div style="display: flex; align-items: center;">
-            <RadzenSidebarToggle Click="@ToggleSidebar" />
-            <div id="logo-container-header" >
-                <h2 class="custom-header-cepi">CEPI</h2>
-            </div>
-        </div>
-        <div style="display: flex; align-items: center;">
-            <RadzenProfileMenu Style="background-color: #394867;">
-                <Template>
-                    <div style="display: flex; flex-direction:row; ">
-                        <RadzenIcon Icon="account_circle"></RadzenIcon>
-                        <AuthorizeView>
-                            <Authorized>
-                                @{
-                                    sessionStorage.SetItemAsync<string>("idConnexion", context.User.Identity!.Name);
-                                 }
-                                <span class="custom-header-subtitle">@context.User.Identity!.Name</span>
-                            </Authorized>
-                            <NotAuthorized>
-                                <span>Guest</span>
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    </div>
-                </Template>
-                <ChildContent>
-                    <AuthorizeView Roles="Prof">
-                        <Authorized>
-                            <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="list"></RadzenProfileMenuItem>
-                        </Authorized>
-                    </AuthorizeView>
-                    <RadzenProfileMenuItem class="custom-header-title" Text="À propos" Path="/About" Icon="help_center"></RadzenProfileMenuItem>
-                    <RadzenProfileMenuItem class="custom-header-title" Text="Profile" Path="/Profile" Icon="account_circle"></RadzenProfileMenuItem>
-                    <Button style="border:none; background-color: #FFFFFF; padding: 0;" @onclick="Logout">
-                        <RadzenProfileMenuItem class="custom-header-title" Text="Déconnexion" Icon="logout"></RadzenProfileMenuItem>
-                    </Button>
-                </ChildContent>
-            </RadzenProfileMenu>
-        </div>
-    </div>
+	<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-left: 2%;">
+		<div style="display: flex; align-items: center;">
+			<RadzenMenu onclick="OnParentClicked" Style="background-color: transparent;">
+				<RadzenMenuItem Text="Accueil" Icon="home" Path="/" />
+				
+				<RadzenMenuItem Text="À Propos" Path="/About" Icon="help_center" />
+			</RadzenMenu>
+		</div>
+		<div id="logo-container-header">
+			<img src="/RessourceVisuel/LOGO/newlogo.svg" />
+		</div>
+		<div style="display: flex; align-items: center; width: auto;">
+			<form action="/action_page.php">
+				<input type="text" placeholder="Search.." name="search">
+			</form>
+			<RadzenMenu onclick="OnParentClickedSearch" Style="background-color: transparent;">
+				<RadzenMenuItem Icon="search" class="search-bar" />
+			</RadzenMenu>
+			<RadzenProfileMenu Style="background-color: transparent;">
+				<Template>
+					<div style="display: flex; flex-direction: row;">
+						<RadzenIcon Icon="account_circle" />
+						<AuthorizeView>
+							<Authorized>
+								@{
+									sessionStorage.SetItemAsync<string>("idConnexion", context.User.Identity!.Name);
+								}
+								<span class="custom-header-subtitle">@context.User.Identity!.Name</span>
+							</Authorized>
+							<NotAuthorized>
+								<span>Guest</span>
+							</NotAuthorized>
+						</AuthorizeView>
+					</div>
+				</Template>
+				<ChildContent>
+					<AuthorizeView Roles="Prof">
+						<Authorized>
+							<RadzenProfileMenuItem Text="Menu" Path="menu" Icon="list" />
+						</Authorized>
+					</AuthorizeView>
+					<RadzenProfileMenuItem class="custom-header-title" Text="À propos" Path="/About" Icon="help_center" />
+					<RadzenProfileMenuItem class="custom-header-title" Text="Profile" Path="/Profile" Icon="account_circle" />
+					<Button style="border:none; background-color: transparent;  padding: 0;" @onclick="Logout">
+						<RadzenProfileMenuItem class="custom-header-title" Text="Déconnexion" Icon="logout" />
+					</Button>
+				</ChildContent>
+			</RadzenProfileMenu>
+		</div>
+	</div>
 </RadzenHeader>
 
 @code {
     [Parameter]
+
     public bool sidebarExpanded { get; set; } = false;
 
+
+
     [Parameter]
-    public EventCallback<bool> SidebarExpandedChanged { get; set; }
+
+    public static EventCallback<bool> SidebarExpandedChanged { get; set; }
+
+    //private async void MenuObjetClicked(int grapheId) => await menuSidebar.ChargerGraphe(grapheId); 
 
     private void ToggleSidebar()
-    {
-        sidebarExpanded = !sidebarExpanded;
-        SidebarExpandedChanged.InvokeAsync(sidebarExpanded);
-    }
 
-    public async Task Logout()
-    {
-        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
-        await customAuthStateProvider.UpdateAuthenticationState(new SessionUtilisateur());
-    }
+	{
+
+		sidebarExpanded = !sidebarExpanded;
+
+		SidebarExpandedChanged.InvokeAsync(sidebarExpanded);
+
+	}
+
+
+
+	public async Task Logout()
+
+	{
+
+		var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+
+		await customAuthStateProvider.UpdateAuthenticationState(new SessionUtilisateur());
+
+	}
 }

@@ -22,8 +22,27 @@
     border: none;
 }
 
-.custom-header-title{
-    font-family: Oswald;
+.search-bar {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.custom-header-title {
+    margin-top: 15px;
+    font-family: Oswald display: inline-block;
+    padding: 5px 10px;
+    background-color: 2E3244;
+    text-align: center;
+    box-shadow: 0px 5px 0px 0px #B56302;
+    cursor: pointer;
+}
+
+    .custom-header-title:hover {
+        background-color: white;
+    }
+
+.rz-navigation-item-wrapper:hover {
+    background-color: transparent !important;
 }
 
 .custom-header-cepi {
