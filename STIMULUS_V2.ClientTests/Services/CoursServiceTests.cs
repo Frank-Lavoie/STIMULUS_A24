@@ -14,7 +14,7 @@ namespace STIMULUS_V2.Client.Services.Tests
         [TestMethod()]
         public void CreateTest()
         {
-            Assert.AreEqual(1, 1);
+            Assert.AreEqual(1, 2);
         }
     }
 }
