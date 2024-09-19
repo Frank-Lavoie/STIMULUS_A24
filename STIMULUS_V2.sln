@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "STIMULUS_V2.Client", "Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "STIMULUS_V2.Shared", "Shared\STIMULUS_V2.Shared.csproj", "{18D58F99-5025-4A94-B6EC-7AF3D3BDE2F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "STIMULUS_V2.ClientTests", "STIMULUS_V2.ClientTests\STIMULUS_V2.ClientTests.csproj", "{6D9AE976-3000-40F4-9E14-90EA90C23BA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{18D58F99-5025-4A94-B6EC-7AF3D3BDE2F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18D58F99-5025-4A94-B6EC-7AF3D3BDE2F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18D58F99-5025-4A94-B6EC-7AF3D3BDE2F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D9AE976-3000-40F4-9E14-90EA90C23BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D9AE976-3000-40F4-9E14-90EA90C23BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D9AE976-3000-40F4-9E14-90EA90C23BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D9AE976-3000-40F4-9E14-90EA90C23BA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
